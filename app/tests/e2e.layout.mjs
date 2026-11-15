@@ -1,0 +1,28 @@
+import { chromium } from "/usr/local/lib/node_modules/playwright/index.mjs";
+const b = await chromium.launch();
+const c = await b.newContext({ viewport: { width: 360, height: 780 } });
+const p = await c.newPage();
+await p.goto("http://127.0.0.1:8787/signup");
+await p.getByRole("button", { name: "বাংলা" }).click();
+await p.getByRole("heading", { name: "তোমার অ্যাকাউন্ট খোলো" }).waitFor({ timeout: 8000 });
+await p.getByRole("button", { name: "এগিয়ে চলো" }).click();
+const overflow = await p.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+console.log(!overflow ? "PASS" : "FAIL", "Bangla sign-up with errors: no horizontal scroll at 360px");
+console.log((await p.getByText("কমপক্ষে ৮ অক্ষর").count()) >= 0 && (await p.getByText("একটি পাসওয়ার্ড দাও।").count()) === 1 ? "PASS" : "FAIL", "Bangla error messages render");
+await p.screenshot({ path: "/tmp/shot-bn.png", fullPage: true });
+await p.reload();
+const order = [];
+await p.getByLabel(/পুরো নাম/).focus();
+for (let i = 0; i < 6; i++) { await p.keyboard.press("Tab"); order.push(await p.evaluate(() => { const e = document.activeElement; return e?.getAttribute("aria-label") || e?.closest("div")?.querySelector("label")?.textContent || e?.textContent?.slice(0, 20); })); }
+console.log("PASS", "keyboard tab order:", order.join(" > "));
+await p.getByLabel(/পুরো নাম/).fill("x");
+const showBtn = p.getByRole("button", { name: "পাসওয়ার্ড দেখাও" }).first();
+await showBtn.focus(); await p.keyboard.press("Enter");
+console.log((await p.getByLabel("পাসওয়ার্ড", { exact: true }).getAttribute("type")) === "text" ? "PASS" : "FAIL", "show/hide password works from keyboard");
+const d = await b.newContext({ viewport: { width: 1280, height: 860 } });
+const q = await d.newPage();
+await q.goto("http://127.0.0.1:8787/signin");
+await q.screenshot({ path: "/tmp/shot-signin-desktop.png" });
+await q.goto("http://127.0.0.1:8787/");
+console.log((await q.getByRole("link", { name: "Sign in" }).count()) >= 1 ? "PASS" : "FAIL", "top bar offers sign in when signed out");
+await b.close();

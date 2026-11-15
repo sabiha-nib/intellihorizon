@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#5B3FD6">
+<title>You're offline | IntelliHorizon</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #FBFAF8; color: #1D1B2C; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", "Hind Siliguri", sans-serif; }
+  main { max-width: 34rem; padding: 2rem 1.25rem; }
+  h1 { font-size: 1.9rem; line-height: 1.15; margin: 1rem 0 .5rem; }
+  p { color: #4A4664; margin: .5rem 0; }
+  .bn { font-family: "Hind Siliguri", system-ui, sans-serif; }
+  button { margin-top: 1.25rem; height: 3rem; padding: 0 1.25rem; border: 0; border-radius: 14px; background: #5B3FD6; color: #fff; font: 600 1rem system-ui, sans-serif; cursor: pointer; }
+  button:focus-visible { outline: 3px solid #1D1B2C; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/icon-192.png" width="56" height="56" alt="">
+  <h1>You're offline</h1>
+  <p>This page hasn't been saved on this device, so it can't open without a connection. Answers you gave while offline are kept on this device and will be sent once, automatically, when you reconnect.</p>
+  <p class="bn" lang="bn">তুমি অফলাইনে আছ। এই পাতাটি এই ডিভাইসে সংরক্ষিত নেই, তাই সংযোগ ছাড়া খুলবে না। অফলাইনে দেওয়া উত্তর ডিভাইসেই আছে, সংযোগ ফিরলে নিজে থেকে একবার পাঠানো হবে।</p>
+  <button type="button" onclick="location.reload()">Try again / আবার চেষ্টা করো</button>
+</main>
+</body>
+</html>

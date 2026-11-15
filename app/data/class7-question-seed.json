@@ -1,0 +1,1378 @@
+{
+ "generatedFrom": "Educerro hand-checked Class 7 content (Claude, from the owner-supplied NCTB PDFs). PDF page = printed page + 5.",
+ "questions": [
+  {
+   "key": "m23-1",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "ratio-terms",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": "দ্বিভাজিত অনুপাতে রাশিগুলো বড় হয় না, ছোট হয়।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "৪ : ৯ এর দ্বিভাজিত অনুপাত কোনটি?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "২ : ৩"
+    },
+    {
+     "id": "খ",
+     "text": "৪ : ৯"
+    },
+    {
+     "id": "গ",
+     "text": "৯ : ৪"
+    },
+    {
+     "id": "ঘ",
+     "text": "১৬ : ৮১"
+    }
+   ],
+   "answer": "ক",
+   "misconceptions": {
+    "খ": "copied-ratio",
+    "গ": "reversed-order",
+    "ঘ": "squared-not-rooted"
+   },
+   "explanation": "বইয়ের উত্তরমালা: (ক)। প্রতিটি রাশির বর্গমূল নিলে √৪ : √৯ = ২ : ৩। ১৬ : ৮১ আসে বর্গ নিলে, যা উল্টো কাজ। এই অধ্যায়ের পাতায় 'দ্বিভাজিত' শব্দটির সংজ্ঞা নেই; নিশ্চিত না হলে শিক্ষককে জিজ্ঞেস করো।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 1,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "c5e7785b-04e6-59d7-94ab-9e61a39700fe"
+  },
+  {
+   "key": "m23-2",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "আগে ক : খ : গ বের করো, তারপর প্রশ্নের ক্রম দেখো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "ক : খ = ৪ : ৭ এবং খ : গ = ১০ : ৭ হলে গ : খ : ক = কত?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "৪৯ : ৭০ : ৪০"
+    },
+    {
+     "id": "খ",
+     "text": "৪৯ : ৪০ : ৭০"
+    },
+    {
+     "id": "গ",
+     "text": "৪০ : ৭০ : ৪৯"
+    },
+    {
+     "id": "ঘ",
+     "text": "৪০ : ৪৯ : ৭০"
+    }
+   ],
+   "answer": "ক",
+   "misconceptions": {
+    "গ": "order-not-reversed",
+    "খ": "terms-mismatched",
+    "ঘ": "terms-mismatched"
+   },
+   "explanation": "ক : খ = ৪ × ১০ : ৭ × ১০ = ৪০ : ৭০, খ : গ = ১০ × ৭ : ৭ × ৭ = ৭০ : ৪৯। তাই ক : খ : গ = ৪০ : ৭০ : ৪৯। প্রশ্ন চেয়েছে উল্টো ক্রমে, গ : খ : ক = ৪৯ : ৭০ : ৪০।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 2,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "4955cc05-f8de-5448-bcb3-e528430f560a"
+  },
+  {
+   "key": "m23-3",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "মাঝের রাশি দুটো (৩ আর ৫) সমান করো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "৪ : ৩ ও ৫ : ৬ এর ধারাবাহিক অনুপাতের দ্বিতীয় রাশির মান কত?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "২০"
+    },
+    {
+     "id": "খ",
+     "text": "১৮"
+    },
+    {
+     "id": "গ",
+     "text": "১৬"
+    },
+    {
+     "id": "ঘ",
+     "text": "১৫"
+    }
+   ],
+   "answer": "ঘ",
+   "misconceptions": {
+    "ক": "picked-wrong-term",
+    "খ": "picked-wrong-term"
+   },
+   "explanation": "৪ : ৩ = ৪ × ৫ : ৩ × ৫ = ২০ : ১৫ এবং ৫ : ৬ = ৫ × ৩ : ৬ × ৩ = ১৫ : ১৮। ধারাবাহিক অনুপাত ২০ : ১৫ : ১৮, তাই দ্বিতীয় রাশি ১৫।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 3,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "0d264746-e007-5c5f-bd06-23757d6a9f51"
+  },
+  {
+   "key": "m23-4",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "প্রথম অনুপাতের উত্তর রাশি ৩, দ্বিতীয়টির পূর্ব রাশি ২। দুটোকে ৬ বানাও।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "৫ : ৩ এবং ২ : ৫ এর ধারাবাহিক অনুপাত কোনটি?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "১০ : ৬ : ১৫"
+    },
+    {
+     "id": "খ",
+     "text": "৩ : ৫ : ৬"
+    },
+    {
+     "id": "গ",
+     "text": "৫ : ৬ : ৫"
+    },
+    {
+     "id": "ঘ",
+     "text": "১৫ : ৬ : ১০"
+    }
+   ],
+   "answer": "ক",
+   "misconceptions": {
+    "ঘ": "reversed-order",
+    "খ": "middle-not-equalized",
+    "গ": "middle-not-equalized"
+   },
+   "explanation": "৫ : ৩ = ৫ × ২ : ৩ × ২ = ১০ : ৬ এবং ২ : ৫ = ২ × ৩ : ৫ × ৩ = ৬ : ১৫। তাই ধারাবাহিক অনুপাত ১০ : ৬ : ১৫।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 4,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "7bd0219e-0271-54a5-8796-b71209d01fc9"
+  },
+  {
+   "key": "m23-5",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "proportion",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": "১ম : ২য় = ৩য় : ৪র্থ। আড়াআড়ি গুণ করো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "৩, ৫, ১৫ এর চতুর্থ সমানুপাতী কোনটি?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "২০"
+    },
+    {
+     "id": "খ",
+     "text": "২৫"
+    },
+    {
+     "id": "গ",
+     "text": "৩০"
+    },
+    {
+     "id": "ঘ",
+     "text": "৩৫"
+    }
+   ],
+   "answer": "খ",
+   "misconceptions": {
+    "ক": "added-not-scaled",
+    "গ": "doubled-last-term"
+   },
+   "explanation": "৩ : ৫ = ১৫ : চতুর্থ রাশি। তাই চতুর্থ রাশি = ৫ × ১৫ ÷ ৩ = ২৫।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 5,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "22da9757-77ff-5202-bf23-2156ef764139"
+  },
+  {
+   "key": "m23-6",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "profit-loss",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": "প্রথমে এক হালিতে কত লাভ তা বের করো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "একজন কলাবিক্রেতা প্রতি হালি কলা ২৫ টাকা দরে ক্রয় করে প্রতি হালি ২৭ টাকা দরে বিক্রয় করলে, তাঁর ৫০ টাকা লাভ হয়। সে কত হালি কলা ক্রয় করেছিল?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "২৫ হালি"
+    },
+    {
+     "id": "খ",
+     "text": "২০ হালি"
+    },
+    {
+     "id": "গ",
+     "text": "৫০ হালি"
+    },
+    {
+     "id": "ঘ",
+     "text": "২৭ হালি"
+    }
+   ],
+   "answer": "ক",
+   "misconceptions": {
+    "গ": "total-as-count",
+    "ঘ": "price-as-count"
+   },
+   "explanation": "প্রতি হালিতে লাভ ২৭ − ২৫ = ২ টাকা। মোট লাভ ৫০ টাকা, তাই হালি = ৫০ ÷ ২ = ২৫।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 6,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "567a714f-78ab-5d6a-9a97-332617ca1264"
+  },
+  {
+   "key": "m23-7",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "unitary-work",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "আগে ১ জন শ্রমিক ১ বিঘায় কত দিন নেয় তা ভাবো।",
+   "unit": "দিন",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "৫ জন শ্রমিক ৬ দিনে ৮ বিঘা জমির ফসল উঠাতে পারে। ২০ বিঘা জমির ফসল উঠাতে ২৫ জন শ্রমিকের কত দিন লাগবে?",
+   "options": null,
+   "answer": "3",
+   "explanation": "৫ জনের ৮ বিঘায় ৬ দিন লাগে। ১ জনের ১ বিঘায় লাগে ৬ × ৫ ÷ ৮ দিন। ২৫ জনের ২০ বিঘায় লাগে ৬ × ৫ × ২০ ÷ (৮ × ২৫) = ৩ দিন। বইয়ের উত্তর: ৩ দিনে।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 7,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "4624130d-6b16-550b-aff0-de03ea0ca283"
+  },
+  {
+   "key": "m23-8",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "time-work",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "একদিনে দুজন মিলে কাজের কত অংশ করে?",
+   "unit": "দিন",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "স্বপন একটি কাজ ২৪ দিনে করতে পারে। রতন উক্ত কাজ ১৬ দিনে করতে পারে। স্বপন ও রতন একত্রে কাজটি কত দিনে শেষ করতে পারবে?",
+   "options": null,
+   "answer": "48/5",
+   "explanation": "এক দিনে স্বপন করে কাজের ১/২৪ অংশ, রতন ১/১৬ অংশ। একত্রে ১/২৪ + ১/১৬ = ৫/৪৮ অংশ। পুরো কাজে লাগে ৪৮/৫ = ৯ ৩/৫ দিন। বইয়ের উত্তর: ৯ ৩/৫ দিনে।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 8,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "5ef8481c-f79f-5a90-b0f7-b9925404d987"
+  },
+  {
+   "key": "m23-9",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "time-work",
+   "difficulty": 3,
+   "language": "bn",
+   "hint": "৮ দিনে কাজের কত অংশ শেষ হয়েছিল?",
+   "unit": "দিন",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 35,
+   "pdfPage": 40,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "হাবিবা ও হালিমা একটি কাজ একত্রে ২০ দিনে করতে পারে। হাবিবা ও হালিমা একত্রে ৮ দিন কাজ করার পর হাবিবা চলে গেল। হালিমা বাকি কাজ ২১ দিনে শেষ করল। সম্পূর্ণ কাজটি হালিমা কত দিনে করতে পারত?",
+   "options": null,
+   "answer": "35",
+   "explanation": "৮ দিনে দুজন মিলে করে ৮/২০ = ২/৫ অংশ। বাকি ৩/৫ অংশ হালিমা করে ২১ দিনে। তাই পুরো কাজ হালিমা একা করত ২১ ÷ ৩/৫ = ৩৫ দিনে। বইয়ের উত্তর: ৩৫ দিনে।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 9,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "48e191d4-0f99-54fc-a453-1d3a8d4b754d"
+  },
+  {
+   "key": "m23-12",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "pipes",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "এক ঘণ্টায় দুটি নল মিলে কত অংশ ভরে?",
+   "unit": "ঘণ্টা",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "একটি চৌবাচ্চায় দুটি নল আছে। প্রথম ও দ্বিতীয় নল দ্বারা যথাক্রমে ১২ ঘণ্টা ও ১৮ ঘণ্টায় খালি চৌবাচ্চাটি পূর্ণ হয়। দুটি নল এক সাথে খুলে দিলে খালি চৌবাচ্চাটি কত ঘণ্টায় পূর্ণ হবে?",
+   "options": null,
+   "answer": "36/5",
+   "explanation": "এক ঘণ্টায় ১/১২ + ১/১৮ = ৫/৩৬ অংশ পূর্ণ হয়। তাই লাগে ৩৬/৫ = ৭ ১/৫ ঘণ্টা। বইয়ের উত্তর: ৭ ১/৫ ঘণ্টায়।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 12,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "52d972b2-246c-57f8-a529-f191f76013ef"
+  },
+  {
+   "key": "m23-13",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "boat-stream",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "অনুকূলে চললে স্রোতের বেগ যোগ হয়।",
+   "unit": "কি.মি./ঘণ্টা",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "স্রোতের অনুকূলে একটি নৌকা ৪ ঘণ্টায় ৩৬ কি.মি. পথ অতিক্রম করে। স্রোতের বেগ প্রতি ঘণ্টায় ৩ কি.মি. হলে, স্থির পানিতে নৌকার বেগ কত?",
+   "options": null,
+   "answer": "6",
+   "explanation": "অনুকূলে বেগ = ৩৬ ÷ ৪ = ৯ কি.মি./ঘণ্টা = নৌকার বেগ + স্রোতের বেগ। তাই নৌকার বেগ = ৯ − ৩ = ৬ কি.মি./ঘণ্টা। বইয়ের উত্তর: ৬ কি.মি./ঘণ্টা।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 13,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "11f5525b-ed76-553b-928c-faef681b5dcb"
+  },
+  {
+   "key": "m23-14",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "boat-stream",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "প্রতিকূলে চললে স্রোতের বেগ বিয়োগ হয়।",
+   "unit": "কি.মি./ঘণ্টা",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "স্রোতের প্রতিকূলে একটি জাহাজ ১১ ঘণ্টায় ৭৭ কি.মি. পথ অতিক্রম করে। স্থির পানিতে জাহাজের গতিবেগ প্রতি ঘণ্টায় ৯ কি.মি. হলে, স্রোতের গতিবেগ প্রতি ঘণ্টায় কত?",
+   "options": null,
+   "answer": "2",
+   "explanation": "প্রতিকূলে বেগ = ৭৭ ÷ ১১ = ৭ কি.মি./ঘণ্টা = জাহাজের বেগ − স্রোতের বেগ। তাই স্রোতের বেগ = ৯ − ৭ = ২ কি.মি./ঘণ্টা। বইয়ের উত্তর: ২ কি.মি./ঘণ্টা।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 14,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "2be9c195-4625-528f-8501-2505061422bf"
+  },
+  {
+   "key": "m23-16",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "time-work",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": "দুজনের এক ঘণ্টার কাজ যোগ করো।",
+   "unit": "ঘণ্টা",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "লিলি একা একটি কাজ ১০ ঘণ্টায় করতে পারেন। মিলি একা ঐ কাজটি ৮ ঘণ্টায় করতে পারেন। লিলি ও মিলি একত্রে ঐ কাজটি কত ঘণ্টায় করতে পারবেন?",
+   "options": null,
+   "answer": "40/9",
+   "explanation": "এক ঘণ্টায় ১/১০ + ১/৮ = ৯/৪০ অংশ। তাই লাগে ৪০/৯ = ৪ ৪/৯ ঘণ্টা। বইয়ের উত্তর: ৪ ৪/৯ ঘণ্টায়।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 16,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "f75699a7-7375-5ab4-8342-82ed790110b6"
+  },
+  {
+   "key": "m23-18",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "train-speed",
+   "difficulty": 3,
+   "language": "bn",
+   "hint": "সেতু পার হতে ট্রেনকে নিজের দৈর্ঘ্যও যেতে হয়।",
+   "unit": "মিটার",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "১০০ মিটার দীর্ঘ একটি ট্রেনের গতিবেগ ঘণ্টায় ৪৮ কিলোমিটার। ঐ ট্রেনটি ৩০ সেকেন্ডে একটি সেতু অতিক্রম করে। সেতুটির দৈর্ঘ্য কত?",
+   "options": null,
+   "answer": "300",
+   "explanation": "৪৮ কি.মি./ঘণ্টা = ৪৮০০০ ÷ ৩৬০০ মিটার/সেকেন্ড। ৩০ সেকেন্ডে যায় ৪৮০০০ × ৩০ ÷ ৩৬০০ = ৪০০ মিটার। এর মধ্যে ট্রেনের দৈর্ঘ্য ১০০ মিটার, তাই সেতু ৩০০ মিটার। বইয়ের উত্তর: ৩০০ মিটার।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 18,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "a3467742-ebee-560e-9bf7-28769e4d7478"
+  },
+  {
+   "key": "m23-19",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "train-speed",
+   "difficulty": 3,
+   "language": "bn",
+   "hint": "ট্রেনের দৈর্ঘ্য আর সেতুর দৈর্ঘ্য যোগ করো।",
+   "unit": "সেকেন্ড",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "১২০ মিটার দীর্ঘ একটি ট্রেন ৩৩০ মিটার দীর্ঘ একটি সেতু অতিক্রম করবে। ট্রেনটির গতিবেগ ঘণ্টায় ৩০ কি.মি. হলে, সেতুটি অতিক্রম করতে ট্রেনটির কত সময় লাগবে?",
+   "options": null,
+   "answer": "54",
+   "explanation": "মোট পথ ১২০ + ৩৩০ = ৪৫০ মিটার। ৩০ কি.মি./ঘণ্টা = ৩০০০০ ÷ ৩৬০০ = ২৫/৩ মিটার/সেকেন্ড। সময় = ৪৫০ ÷ ২৫/৩ = ৫৪ সেকেন্ড। বইয়ের উত্তর: ৫৪ সেকেন্ড।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 19,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "9d67fc4b-ce51-5b36-96cf-281da6f8d024"
+  },
+  {
+   "key": "m23-20a",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 3,
+   "language": "bn",
+   "hint": "আগে দুটি অনুপাতকে ধারাবাহিক অনুপাতে আনো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "short",
+   "answerKind": "ratio",
+   "prompt": "তামা, দস্তা ও রুপা মিশিয়ে একটি গহনা তৈরি করা হলো। ঐ গহনায় তামা ও দস্তার অনুপাত ১ : ২ এবং দস্তা : রুপার অনুপাত ৩ : ৫। গহনার ওজন ১৯০ গ্রাম।\n(ক) তামা, দস্তা ও রুপার অনুপাত নির্ণয় করো।",
+   "options": null,
+   "answer": "3:6:10",
+   "explanation": "১ : ২ = ৩ : ৬ এবং ৩ : ৫ = ৬ : ১০, তাই তামা : দস্তা : রুপা = ৩ : ৬ : ১০। মোট ১৯ ভাগে ১৯০ গ্রাম, এক ভাগ ১০ গ্রাম: তামা ৩০, দস্তা ৬০, রুপা ১০০ গ্রাম। তামা ৩০ গ্রামের জন্য ১ : ৩ হলে দস্তা লাগে ৯০ গ্রাম, তাই আরও ৩০ গ্রাম দস্তা। বইয়ের উত্তর: (ক) ৩ : ৬ : ১০ (খ) ৩০, ৬০, ১০০ গ্রাম (গ) ৩০ গ্রাম।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 20,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "10d881f3-32e3-5dcc-b227-0058bd2baa8c"
+  },
+  {
+   "key": "m23-20b",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 3,
+   "language": "bn",
+   "hint": "আগে দুটি অনুপাতকে ধারাবাহিক অনুপাতে আনো।",
+   "unit": "গ্রাম",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "short",
+   "answerKind": "list",
+   "prompt": "তামা, দস্তা ও রুপা মিশিয়ে একটি গহনা তৈরি করা হলো। ঐ গহনায় তামা ও দস্তার অনুপাত ১ : ২ এবং দস্তা : রুপার অনুপাত ৩ : ৫। গহনার ওজন ১৯০ গ্রাম।\n(খ) গহনায় তামা, দস্তা ও রুপার ওজন (গ্রাম) পৃথকভাবে লেখো, কমা দিয়ে।",
+   "options": null,
+   "answer": "30,60,100",
+   "explanation": "১ : ২ = ৩ : ৬ এবং ৩ : ৫ = ৬ : ১০, তাই তামা : দস্তা : রুপা = ৩ : ৬ : ১০। মোট ১৯ ভাগে ১৯০ গ্রাম, এক ভাগ ১০ গ্রাম: তামা ৩০, দস্তা ৬০, রুপা ১০০ গ্রাম। তামা ৩০ গ্রামের জন্য ১ : ৩ হলে দস্তা লাগে ৯০ গ্রাম, তাই আরও ৩০ গ্রাম দস্তা। বইয়ের উত্তর: (ক) ৩ : ৬ : ১০ (খ) ৩০, ৬০, ১০০ গ্রাম (গ) ৩০ গ্রাম।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 20,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "f3fb0923-8a2d-5830-8731-998fc30ee485"
+  },
+  {
+   "key": "m23-20c",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 3,
+   "language": "bn",
+   "hint": "আগে দুটি অনুপাতকে ধারাবাহিক অনুপাতে আনো।",
+   "unit": "গ্রাম",
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 36,
+   "pdfPage": 41,
+   "type": "numeric",
+   "answerKind": "number",
+   "prompt": "তামা, দস্তা ও রুপা মিশিয়ে একটি গহনা তৈরি করা হলো। ঐ গহনায় তামা ও দস্তার অনুপাত ১ : ২ এবং দস্তা : রুপার অনুপাত ৩ : ৫। গহনার ওজন ১৯০ গ্রাম।\n(গ) ঐ গহনায় কি পরিমাণ দস্তা মিশালে তামা ও দস্তার অনুপাত ১ : ৩ হবে? (গ্রাম)",
+   "options": null,
+   "answer": "30",
+   "explanation": "১ : ২ = ৩ : ৬ এবং ৩ : ৫ = ৬ : ১০, তাই তামা : দস্তা : রুপা = ৩ : ৬ : ১০। মোট ১৯ ভাগে ১৯০ গ্রাম, এক ভাগ ১০ গ্রাম: তামা ৩০, দস্তা ৬০, রুপা ১০০ গ্রাম। তামা ৩০ গ্রামের জন্য ১ : ৩ হলে দস্তা লাগে ৯০ গ্রাম, তাই আরও ৩০ গ্রাম দস্তা। বইয়ের উত্তর: (ক) ৩ : ৬ : ১০ (খ) ৩০, ৬০, ১০০ গ্রাম (গ) ৩০ গ্রাম।",
+   "provenance": {
+    "origin": "textbook-key",
+    "exercise": "অনুশীলনী ২.৩",
+    "number": 20,
+    "answerFrom": "The book's answer key, printed page 171",
+    "checkedBy": "Claude (Educerro build), against the page image and the answer key; not yet reviewed by a teacher"
+   },
+   "id": "40b89700-1b52-5f50-9f37-7cc4050c4df8"
+  },
+  {
+   "key": "m2k-1",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": "প্রথম অনুপাতের উত্তর রাশি দিয়ে দ্বিতীয়টিকে, দ্বিতীয়টির পূর্ব রাশি দিয়ে প্রথমটিকে গুণ করো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 19,
+   "pdfPage": 24,
+   "type": "short",
+   "answerKind": "ratio",
+   "prompt": "১২ : ১৭ এবং ৫ : ১২ অনুপাত দুটিকে ধারাবাহিক অনুপাতে প্রকাশ করো।",
+   "options": null,
+   "answer": "60:85:204",
+   "explanation": "প্রথম অনুপাতকে ৫ দিয়ে, দ্বিতীয়টিকে ১৭ দিয়ে গুণ করলে মাঝের রাশি সমান হয়: ৬০ : ৮৫ এবং ৮৫ : ২০৪। তাই ধারাবাহিক অনুপাত ৬০ : ৮৫ : ২০৪। (বইয়ে এই কাজের উত্তর নেই; উত্তরটি হিসাব করে বের করা।)",
+   "provenance": {
+    "origin": "textbook-computed",
+    "exercise": "কাজ (২.১)",
+    "number": 1,
+    "answerFrom": "Computed exactly by Educerro; the book prints no answer for this task",
+    "checkedBy": "Claude (Educerro build); not yet reviewed by a teacher"
+   },
+   "id": "5f6c56b4-a220-50a9-b167-9885669c1bbd"
+  },
+  {
+   "key": "m2k-2",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": "প্রথম অনুপাতের উত্তর রাশি দিয়ে দ্বিতীয়টিকে, দ্বিতীয়টির পূর্ব রাশি দিয়ে প্রথমটিকে গুণ করো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 19,
+   "pdfPage": 24,
+   "type": "short",
+   "answerKind": "ratio",
+   "prompt": "২৩ : ১১ এবং ৭ : ১৩ অনুপাত দুটিকে ধারাবাহিক অনুপাতে প্রকাশ করো।",
+   "options": null,
+   "answer": "161:77:143",
+   "explanation": "প্রথম অনুপাতকে ৭ দিয়ে, দ্বিতীয়টিকে ১১ দিয়ে গুণ করলে মাঝের রাশি সমান হয়: ১৬১ : ৭৭ এবং ৭৭ : ১৪৩। তাই ধারাবাহিক অনুপাত ১৬১ : ৭৭ : ১৪৩। (বইয়ে এই কাজের উত্তর নেই; উত্তরটি হিসাব করে বের করা।)",
+   "provenance": {
+    "origin": "textbook-computed",
+    "exercise": "কাজ (২.১)",
+    "number": 2,
+    "answerFrom": "Computed exactly by Educerro; the book prints no answer for this task",
+    "checkedBy": "Claude (Educerro build); not yet reviewed by a teacher"
+   },
+   "id": "2c903030-3fe0-5985-aa1c-7e076d5e61f2"
+  },
+  {
+   "key": "m2k-3",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": "প্রথম অনুপাতের উত্তর রাশি দিয়ে দ্বিতীয়টিকে, দ্বিতীয়টির পূর্ব রাশি দিয়ে প্রথমটিকে গুণ করো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 19,
+   "pdfPage": 24,
+   "type": "short",
+   "answerKind": "ratio",
+   "prompt": "১৯ : ২৫ এবং ৯ : ১৭ অনুপাত দুটিকে ধারাবাহিক অনুপাতে প্রকাশ করো।",
+   "options": null,
+   "answer": "171:225:425",
+   "explanation": "প্রথম অনুপাতকে ৯ দিয়ে, দ্বিতীয়টিকে ২৫ দিয়ে গুণ করলে মাঝের রাশি সমান হয়: ১৭১ : ২২৫ এবং ২২৫ : ৪২৫। তাই ধারাবাহিক অনুপাত ১৭১ : ২২৫ : ৪২৫। (বইয়ে এই কাজের উত্তর নেই; উত্তরটি হিসাব করে বের করা।)",
+   "provenance": {
+    "origin": "textbook-computed",
+    "exercise": "কাজ (২.১)",
+    "number": 3,
+    "answerFrom": "Computed exactly by Educerro; the book prints no answer for this task",
+    "checkedBy": "Claude (Educerro build); not yet reviewed by a teacher"
+   },
+   "id": "317a7670-03c2-5a7a-9d73-ac68d538bf2a"
+  },
+  {
+   "key": "m2k-4",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "skill": "continued-ratio",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": "প্রথম অনুপাতের উত্তর রাশি দিয়ে দ্বিতীয়টিকে, দ্বিতীয়টির পূর্ব রাশি দিয়ে প্রথমটিকে গুণ করো।",
+   "unit": null,
+   "source": "textbook_exercise",
+   "status": "published",
+   "printedPage": 19,
+   "pdfPage": 24,
+   "type": "short",
+   "answerKind": "ratio",
+   "prompt": "৫ : ৮ এবং ১২ : ১৭ অনুপাত দুটিকে ধারাবাহিক অনুপাতে প্রকাশ করো।",
+   "options": null,
+   "answer": "15:24:34",
+   "explanation": "প্রথম অনুপাতকে ১২ দিয়ে, দ্বিতীয়টিকে ৮ দিয়ে গুণ করলে মাঝের রাশি সমান হয়: ৬০ : ৯৬ এবং ৯৬ : ১৩৬। তাই ধারাবাহিক অনুপাত ১৫ : ২৪ : ৩৪। (বইয়ে এই কাজের উত্তর নেই; উত্তরটি হিসাব করে বের করা।)",
+   "provenance": {
+    "origin": "textbook-computed",
+    "exercise": "কাজ (২.১)",
+    "number": 4,
+    "answerFrom": "Computed exactly by Educerro; the book prints no answer for this task",
+    "checkedBy": "Claude (Educerro build); not yet reviewed by a teacher"
+   },
+   "id": "64890677-def6-5fd9-b1a2-033270cf28da"
+  },
+  {
+   "key": "d-sop-1",
+   "chapterId": "f876e1e6-bd87-5a43-9232-369fd194711c",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 1,
+   "pdfPage": 6,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "‘কাবুলিওয়ালা’ গল্পে মিনির বয়স কত বছর?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "চার"
+    },
+    {
+     "id": "খ",
+     "text": "পাঁচ"
+    },
+    {
+     "id": "গ",
+     "text": "ছয়"
+    },
+    {
+     "id": "ঘ",
+     "text": "সাত"
+    }
+   ],
+   "answer": "খ",
+   "misconceptions": null,
+   "explanation": "গল্পের প্রথম বাক্যেই আছে: “আমার পাঁচ বছর বয়সের ছোটো মেয়ে মিনি…”",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "আমার পাঁচ বছর বয়সের ছোটো মেয়ে মিনি",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "c826d883-a995-55ae-98e7-74c3592f5e44"
+  },
+  {
+   "key": "d-sop-2",
+   "chapterId": "f876e1e6-bd87-5a43-9232-369fd194711c",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 2,
+   "pdfPage": 7,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "কাবুলিওয়ালা বাড়ির দিকে আসতে থাকলে মিনি কী করল?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "তার কাছে ছুটে গেল"
+    },
+    {
+     "id": "খ",
+     "text": "অন্তঃপুরে দৌড় দিল"
+    },
+    {
+     "id": "গ",
+     "text": "কিসমিস চাইল"
+    },
+    {
+     "id": "ঘ",
+     "text": "জানালা বন্ধ করল"
+    }
+   ],
+   "answer": "খ",
+   "misconceptions": null,
+   "explanation": "পাঠে আছে: “অমনি সে ঊর্ধ্বশ্বাসে অন্তঃপুরে দৌড় দিল।”",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "অমনি সে ঊর্ধ্বশ্বাসে অন্তঃপুরে দৌড় দিল",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "89631af3-368b-5dcb-9f09-36675b887cb9"
+  },
+  {
+   "key": "d-sop-3",
+   "chapterId": "f876e1e6-bd87-5a43-9232-369fd194711c",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 2,
+   "pdfPage": 7,
+   "type": "short",
+   "answerKind": "text",
+   "prompt": "কাবুলিওয়ালার নাম কী?",
+   "options": null,
+   "answer": "[\"রহমত\"]",
+   "explanation": "পাঠে কাবুলিওয়ালাকে ‘রহমত’ নামে ডাকা হয়েছে।",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "রহমতকে দেখিবামাত্র আমার কন্যা",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "8cde10b2-3142-55e0-b833-76adc257021e"
+  },
+  {
+   "key": "d-sop-4",
+   "chapterId": "f876e1e6-bd87-5a43-9232-369fd194711c",
+   "skill": "inference",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 2,
+   "pdfPage": 7,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "প্রথম পরিচয়ের দিনই মিনি কাবুলিওয়ালার দেওয়া কিসমিস নিয়েছিল।",
+   "options": [
+    {
+     "id": "true",
+     "text": "সত্য"
+    },
+    {
+     "id": "false",
+     "text": "মিথ্যা"
+    }
+   ],
+   "answer": "false",
+   "misconceptions": null,
+   "explanation": "পাঠে আছে, কাবুলি কিসমিস ও খোবানি দিতে গেলে “সে কিছুতেই লইল না।”",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "সে কিছুতেই লইল না",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "65f2c108-efa7-542b-aded-f8c57fd3551b"
+  },
+  {
+   "key": "d-ana-1",
+   "chapterId": "380d0eef-f9d8-5f57-8a8a-6632fdb89bd1",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 6,
+   "pdfPage": 11,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "‘জিদ’ গল্পে আগেকার দিনে একখানা শাড়ি বুনতে কত সময় লাগত?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "এক দিন"
+    },
+    {
+     "id": "খ",
+     "text": "এক সপ্তাহ"
+    },
+    {
+     "id": "গ",
+     "text": "মাসের পর মাস"
+    },
+    {
+     "id": "ঘ",
+     "text": "এক ঘণ্টা"
+    }
+   ],
+   "answer": "গ",
+   "misconceptions": null,
+   "explanation": "পাঠে আছে: “তখন একখানা শাড়ি বুননে মাসের পর মাস লাগিত।”",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "তখন একখানা শাড়ি বুননে মাসের পর মাস লাগিত",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "17845048-ee18-5897-aaa5-567e38f58ef0"
+  },
+  {
+   "key": "d-ana-2",
+   "chapterId": "380d0eef-f9d8-5f57-8a8a-6632fdb89bd1",
+   "skill": "inference",
+   "difficulty": 2,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 6,
+   "pdfPage": 11,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "সূর্যের আলো চারিদিকে ছড়িয়ে পড়ার পর সুতা কাটলে সুতা বেশি মুলাম হতো।",
+   "options": [
+    {
+     "id": "true",
+     "text": "সত্য"
+    },
+    {
+     "id": "false",
+     "text": "মিথ্যা"
+    }
+   ],
+   "answer": "false",
+   "misconceptions": null,
+   "explanation": "পাঠে বলা হয়েছে, তখন সুতা কাটলে সুতা “তেমন মুলাম হইত না”, তাই ভোরে কাজ শেষ করতে হতো।",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "তখন সুতা কাটিলে সুতা তেমন মুলাম হইত না",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "2e7c6614-76e0-5c8d-b769-efbdb56f31bc"
+  },
+  {
+   "key": "d-sci-1",
+   "chapterId": "ae6eee78-b6a9-535a-ae63-4b532e918850",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 10,
+   "pdfPage": 15,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "পাঠ্যবই অনুযায়ী সকল জীবদেহের মধ্যে সাধারণ মিল কোনটি?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "জীবদেহ মাত্রই কোষ দ্বারা গঠিত"
+    },
+    {
+     "id": "খ",
+     "text": "সব জীবের কোষ এক রকম"
+    },
+    {
+     "id": "গ",
+     "text": "সব জীব সবুজ"
+    },
+    {
+     "id": "ঘ",
+     "text": "সব কোষে সব অঙ্গাণু থাকে"
+    }
+   ],
+   "answer": "ক",
+   "misconceptions": null,
+   "explanation": "পাঠে আছে: “সকল জীবদেহের মধ্যে সাধারণ মিল বা সাদৃশ্যটি হলো যে, জীবদেহ মাত্রই কোষ দ্বারা গঠিত।”",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "জীবদেহ মাত্রই কোষ দ্বারা গঠিত",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "0245370a-b529-5c5b-89b6-d866db9075ad"
+  },
+  {
+   "key": "d-sci-2",
+   "chapterId": "ae6eee78-b6a9-535a-ae63-4b532e918850",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 10,
+   "pdfPage": 15,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "একটি জীবদেহের সব কোষের গঠন প্রকৃতি এক রকম।",
+   "options": [
+    {
+     "id": "true",
+     "text": "সত্য"
+    },
+    {
+     "id": "false",
+     "text": "মিথ্যা"
+    }
+   ],
+   "answer": "false",
+   "misconceptions": null,
+   "explanation": "পাঠে আছে: “একটি জীবদেহের সব কোষের গঠন প্রকৃতি এক রকম নয় বরং ভিন্ন।”",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "এক রকম নয় বরং ভিন্ন",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "ae18fb9d-4283-56ba-b952-d00c61b236dc"
+  },
+  {
+   "key": "d-b2-1",
+   "chapterId": "85f8ff6c-618d-545b-b828-3f274aeb8cca",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 18,
+   "pdfPage": 23,
+   "type": "short",
+   "answerKind": "text",
+   "prompt": "‘সন্ধি’ শব্দের অর্থ কী?",
+   "options": null,
+   "answer": "[\"মিলন\"]",
+   "explanation": "পাঠে আছে: “বস্তুত, ‘সন্ধি’ শব্দের অর্থ মিলন।” (প্রমাণের পাতাটি এখনো পর্যালোচনা হয়নি।)",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "“সন্ধি” শব্দের অর্থ মিলন",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "88122b7c-a987-58e0-9f9a-a7c0361d77b1"
+  },
+  {
+   "key": "d-b2-2",
+   "chapterId": "85f8ff6c-618d-545b-b828-3f274aeb8cca",
+   "skill": "apply",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 18,
+   "pdfPage": 23,
+   "type": "short",
+   "answerKind": "text",
+   "prompt": "শত + অধিক = ?",
+   "options": null,
+   "answer": "[\"শতাধিক\"]",
+   "explanation": "পাঠের উদাহরণ: শত + অধিক = শতাধিক [অ + অ = আ]।",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "শত + অধিক = শতাধিক",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "1005e25b-a1f7-5e36-86d9-70ac405d6809"
+  },
+  {
+   "key": "d-e2-1",
+   "chapterId": "3e346941-fa85-5847-8fae-f2d3371905f8",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "en",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 1,
+   "pdfPage": 6,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "According to the book, a noun is a word used to refer to…",
+   "options": [
+    {
+     "id": "a",
+     "text": "people, animals, objects, substances, states, events, ideas and feelings"
+    },
+    {
+     "id": "b",
+     "text": "actions only"
+    },
+    {
+     "id": "c",
+     "text": "the qualities of a person"
+    },
+    {
+     "id": "d",
+     "text": "the time when something happens"
+    }
+   ],
+   "answer": "a",
+   "misconceptions": null,
+   "explanation": "This is the book's definition, quoted word for word.",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "A noun is a word used to refer to people, animals, objects, substances, states, events, ideas and feelings.",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "4c91165b-a9dc-526e-81ce-afe0e0e47c22"
+  },
+  {
+   "key": "d-e2-2",
+   "chapterId": "3e346941-fa85-5847-8fae-f2d3371905f8",
+   "skill": "apply",
+   "difficulty": 2,
+   "language": "en",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 1,
+   "pdfPage": 6,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "Which noun from the book's sentences is uncountable?",
+   "options": [
+    {
+     "id": "a",
+     "text": "friends"
+    },
+    {
+     "id": "b",
+     "text": "news"
+    },
+    {
+     "id": "c",
+     "text": "books"
+    },
+    {
+     "id": "d",
+     "text": "teacher"
+    }
+   ],
+   "answer": "b",
+   "misconceptions": null,
+   "explanation": "The book asks students to decide this but prints no answer. ‘News’ cannot be counted (we don't say ‘two newses’). Answer keyed by Claude; a teacher should confirm.",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "Kamal has given me some good news.",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "e1e5b700-b926-57b9-beab-eada15a15574"
+  },
+  {
+   "key": "d-bgs-1",
+   "chapterId": "2490c92b-8c42-5059-8663-8e22efbc58f3",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 1,
+   "pdfPage": 6,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "কত সালে ভারত ও পাকিস্তান নামের দুটি স্বাধীন রাষ্ট্র প্রতিষ্ঠিত হয়?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "১৯৪৭"
+    },
+    {
+     "id": "খ",
+     "text": "১৯৫২"
+    },
+    {
+     "id": "গ",
+     "text": "১৯৬৬"
+    },
+    {
+     "id": "ঘ",
+     "text": "১৯৭১"
+    }
+   ],
+   "answer": "ক",
+   "misconceptions": null,
+   "explanation": "অধ্যায়ের প্রথম বাক্য। (প্রমাণের পাতাটি এখনো পর্যালোচনা হয়নি।)",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "১৯৪৭ সালে ভারত ও পাকিস্তান নামের দুটি স্বাধীন রাষ্ট্র প্রতিষ্ঠিত হয়",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "6ed139f6-7b2f-5e28-925c-2b502b254796"
+  },
+  {
+   "key": "d-bgs-2",
+   "chapterId": "2490c92b-8c42-5059-8663-8e22efbc58f3",
+   "skill": "recall",
+   "difficulty": 1,
+   "language": "bn",
+   "hint": null,
+   "unit": null,
+   "source": "educerro_authored",
+   "status": "draft",
+   "printedPage": 1,
+   "pdfPage": 6,
+   "type": "mcq",
+   "answerKind": "choice",
+   "prompt": "পাঠ্যবই অনুযায়ী ৬ দফা আন্দোলন কোন সালের?",
+   "options": [
+    {
+     "id": "ক",
+     "text": "১৯৫২"
+    },
+    {
+     "id": "খ",
+     "text": "১৯৬৬"
+    },
+    {
+     "id": "গ",
+     "text": "১৯৬৯"
+    },
+    {
+     "id": "ঘ",
+     "text": "১৯৭০"
+    }
+   ],
+   "answer": "খ",
+   "misconceptions": null,
+   "explanation": "পাঠে আছে: “১৯৬৬ সালের ৬ দফা আন্দোলন”। (প্রমাণের পাতাটি এখনো পর্যালোচনা হয়নি।)",
+   "provenance": {
+    "origin": "ai-draft",
+    "evidenceQuote": "১৯৬৬ সালের ৬ দফা আন্দোলন",
+    "answerFrom": "Drafted by Claude from the quoted passage",
+    "checkedBy": null,
+    "note": "Draft: must be reviewed and published by an editor before students see it"
+   },
+   "id": "a740e8c3-ab3d-5793-89b3-f8e0e182e877"
+  }
+ ],
+ "objectives": [
+  {
+   "id": "83e2bef5-029d-5c31-94c8-7f1df6e234c0",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "position": 1,
+   "text": "বহুরাশিক ও ধারাবাহিক অনুপাত ব্যাখ্যা করতে পারবে",
+   "printedPage": 18,
+   "pdfPage": 23
+  },
+  {
+   "id": "f7622df2-f0a0-5d33-9a4b-0a54e16fd41c",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "position": 2,
+   "text": "সমানুপাতের ধারণা ব্যাখ্যা করতে পারবে",
+   "printedPage": 18,
+   "pdfPage": 23
+  },
+  {
+   "id": "eccf604d-0ee9-557a-bea3-aea2a7b750d2",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "position": 3,
+   "text": "সমানুপাত সংক্রান্ত সমস্যা সমাধান করতে পারবে",
+   "printedPage": 18,
+   "pdfPage": 23
+  },
+  {
+   "id": "350bd633-e06f-5749-8386-55215be21cbf",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "position": 4,
+   "text": "লাভ-ক্ষতি কী তা ব্যাখ্যা করতে পারবে",
+   "printedPage": 18,
+   "pdfPage": 23
+  },
+  {
+   "id": "6c7325ab-2e1d-55b2-9c34-000f302124df",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "position": 5,
+   "text": "লাভ-ক্ষতি সংক্রান্ত সমস্যার সমাধান করতে পারবে",
+   "printedPage": 18,
+   "pdfPage": 23
+  },
+  {
+   "id": "89ba8d36-b957-515f-bf7f-8462af53769e",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "position": 6,
+   "text": "কর, ভ্যাট, কমিশন ও মুদ্রাবিনিময় সংক্রান্ত দৈনন্দিন জীবনের সমস্যা সমাধান করতে পারবে",
+   "printedPage": 18,
+   "pdfPage": 23
+  },
+  {
+   "id": "efb0188e-92bb-58d6-9204-ea917bc16265",
+   "chapterId": "f9c3f216-a09e-5c02-979e-497b60f8333a",
+   "position": 7,
+   "text": "ঐকিক ও অনুপাত ব্যবহার করে বাস্তব জীবনে সময় ও কাজ, নল ও চৌবাচ্চা, সময় ও দূরত্ব এবং নৌকা ও স্রোত বিষয়ক সমস্যা সমাধান করতে পারবে",
+   "printedPage": 18,
+   "pdfPage": 23
+  },
+  {
+   "id": "b03e6d35-4c11-5fda-b89f-c97f9c633ca9",
+   "chapterId": "ae6eee78-b6a9-535a-ae63-4b532e918850",
+   "position": 1,
+   "text": "উদ্ভিদ এবং প্রাণিকোষের চিহ্নিত চিত্র অঙ্কন করতে পারব",
+   "printedPage": 10,
+   "pdfPage": 15
+  },
+  {
+   "id": "628d0102-2116-5127-b0a0-704ed269e8a3",
+   "chapterId": "ae6eee78-b6a9-535a-ae63-4b532e918850",
+   "position": 2,
+   "text": "প্রাণী এবং উদ্ভিদকোষের তুলনা করতে পারব",
+   "printedPage": 10,
+   "pdfPage": 15
+  },
+  {
+   "id": "228e4616-0193-521a-a499-b8c80ba21d80",
+   "chapterId": "ae6eee78-b6a9-535a-ae63-4b532e918850",
+   "position": 3,
+   "text": "কোষের বিভিন্ন অঙ্গাণুর গঠন ও কাজ ব্যাখ্যা করতে পারব",
+   "printedPage": 10,
+   "pdfPage": 15
+  },
+  {
+   "id": "027556e1-7a5d-5096-ad2f-a1850cbecb8e",
+   "chapterId": "ae6eee78-b6a9-535a-ae63-4b532e918850",
+   "position": 4,
+   "text": "বিভিন্ন প্রকার টিস্যুর কাজ ব্যাখ্যা করতে পারব",
+   "printedPage": 10,
+   "pdfPage": 15
+  },
+  {
+   "id": "df9159ea-09ac-517f-a640-af47ec927784",
+   "chapterId": "ae6eee78-b6a9-535a-ae63-4b532e918850",
+   "position": 5,
+   "text": "উদ্ভিদ ও প্রাণী টিস্যুর পার্থক্য করতে পারব",
+   "printedPage": 10,
+   "pdfPage": 15
+  }
+ ]
+}
