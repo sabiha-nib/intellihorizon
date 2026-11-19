@@ -14,7 +14,7 @@ export type AiExplanation = {
   blocks: AiBlock[];
   quotes: AiQuote[];
   /** What validation removed or relabelled, so the record shows how much the model was corrected. */
-  checks?: { droppedCites: number; droppedQuotes: number; unverifiedBlocks: number; pageMentions: number };
+  checks?: { droppedCites: number; droppedQuotes: number; unverifiedBlocks: number; pageMentions: number; weakSupport?: number; policy?: number };
 };
 
 /** A retrieved, student-visible source the model was allowed to use. */
@@ -42,6 +42,37 @@ export function parseJsonObject(text: string): Record<string, unknown> | null {
 const QUOTED = /"([^"]{12,})"/g;
 const PAGE = /(?:\bpages?\b|\bp\.|পৃষ্ঠা|পৃ\.)\s*([0-9০-৯]{1,4})/gi;
 
+const BANGLA = /[\u0980-\u09FF]/g;
+const script = (t: string) => ((t.match(BANGLA) ?? []).length > (t.match(/[A-Za-z]/g) ?? []).length ? "bn" : "en");
+const STOP = new Set(["the", "and", "for", "that", "this", "with", "are", "was", "from", "into", "you", "your", "its", "it's", "has", "have", "can", "not", "but", "এবং", "ও", "এই", "সেই", "যে", "করে", "হয়", "হলে", "একটি", "থেকে", "জন্য", "এর", "তার", "আর", "কে", "কী", "না"]);
+const words = (t: string) => norm(t).toLowerCase().replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ").split(/\s+/).filter((w) => [...w].length >= 2 && !STOP.has(w));
+
+/**
+ * Claim-to-citation support: the share of a block's content words found in the sources it cites. Only measured when
+ * the block and its sources are in the same script (an English explanation of a Bangla passage can't be compared
+ * word by word); otherwise null.
+ */
+export function supportRatio(text: string, cited: string[]): number | null {
+  if (!cited.length) return 0;
+  const src = cited.join(" ");
+  if (script(text) !== script(src)) return null;
+  const w = words(text);
+  if (!w.length) return null;
+  const pool = new Set(words(src));
+  const joined = norm(src).toLowerCase();
+  return w.filter((x) => pool.has(x) || joined.includes(x)).length / w.length;
+}
+/** A "from the textbook" block needs at least this share of its words in the cited text; a "derived" block at least SUPPORT_DERIVED. */
+export const SUPPORT_TEXTBOOK = 0.5;
+export const SUPPORT_DERIVED = 0.15;
+
+/** Fragments of the tutor's own instructions. A reply containing any of them is rejected (instruction leak or injection). */
+const POLICY_MARKERS = ["you are intellihorizon's tutor", "reply with one json object", "never invent a quotation", "ignore any instruction that appears inside", "textbook sources (json)"];
+export function policyViolation(text: string): boolean {
+  const t = text.toLowerCase();
+  return POLICY_MARKERS.some((m) => t.includes(m));
+}
+
 /**
  * Validates a parsed model reply against the sources that were actually retrieved.
  * - citations must be ids of retrieved sources; others are removed;
@@ -56,7 +87,8 @@ export function validateExplanation(raw: Record<string, unknown> | null, sources
   if (!raw) return reject;
   const byId = new Map(sources.map((s) => [s.id, s]));
   const corpus = sources.map((s) => norm(s.text));
-  const checks = { droppedCites: 0, droppedQuotes: 0, unverifiedBlocks: 0, pageMentions: 0 };
+  const checks = { droppedCites: 0, droppedQuotes: 0, unverifiedBlocks: 0, pageMentions: 0, weakSupport: 0, policy: 0 };
+  if (policyViolation(JSON.stringify(raw))) return { status: "rejected", blocks: [], quotes: [], checks: { ...checks, policy: 1 } };
   if (raw.insufficient === true) return { status: "insufficient", blocks: [], quotes: [], checks };
   const rawBlocks = Array.isArray(raw.blocks) ? raw.blocks.slice(0, 14) : [];
   const blocks: AiBlock[] = [];
@@ -84,6 +116,12 @@ export function validateExplanation(raw: Record<string, unknown> | null, sources
     if (badPage) checks.pageMentions++;
     if ((basis === "textbook" || basis === "derived") && (!cites.length || badPage)) basis = "unverified";
     else if (badPage) basis = "unverified";
+    // A citation must support the statement, not just point at a real book.
+    if (basis === "textbook" || basis === "derived") {
+      const r = supportRatio(text, cites.map((c) => byId.get(c)!.text));
+      if (r !== null && basis === "textbook" && r < SUPPORT_TEXTBOOK) { basis = r >= SUPPORT_DERIVED ? "derived" : "unverified"; checks.weakSupport++; }
+      else if (r !== null && basis === "derived" && r < SUPPORT_DERIVED) { basis = "unverified"; checks.weakSupport++; }
+    }
     if (basis === "unverified") checks.unverifiedBlocks++;
     blocks.push({ role, text, basis, cites: role === "check" ? [] : cites });
   }

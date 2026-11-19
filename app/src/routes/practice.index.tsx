@@ -56,6 +56,16 @@ function Practice() {
             "প্রতিটি অনুশীলন একটি লার্নিং সেশন: ছোট ধারণা, যাচাই করা প্রশ্ন, শোধরানোর পালা ও সারসংক্ষেপ। পুনরালোচনা সবসময় আগে।",
           )}
         />
+        <Panel tone="lilac" className="flex flex-wrap items-center justify-between gap-4 p-5">
+          <div className="flex items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-brand-soft text-brand"><Icon name="play" /></span>
+            <div>
+              <h2 className="font-display text-[20px] font-bold">{tx("IntelliQuiz", "ইন্টেলিকুইজ")}</h2>
+              <p className="mt-0.5 text-[15px] text-ink-mid">{tx("Daily Five, mistake replay, weak spots, topic practice and timed exam simulation, with a full breakdown afterwards.", "দৈনিক পাঁচ, ভুল আবার করা, দুর্বল জায়গা, টপিক অনুশীলন আর সময় বাঁধা পরীক্ষা, শেষে পুরো বিশ্লেষণসহ।")}</p>
+            </div>
+          </div>
+          <LinkButton to="/quiz" size="sm">{tx("Open IntelliQuiz", "ইন্টেলিকুইজ খোলো")}</LinkButton>
+        </Panel>
         {!data ? (
           <Loading label={tx("Loading practice", "অনুশীলন লোড হচ্ছে")} />
         ) : (

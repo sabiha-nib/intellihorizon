@@ -74,6 +74,14 @@ function HorizonPath() {
                 </Stop>
               );
             })}
+            {[...d.practice].reverse().map((q) => (
+              <Stop key={q.id} icon="practice" tone="done">
+                <a href={`/quiz/${q.id}`} className="block rounded-[16px] border border-line bg-sheet p-4 hover:border-brand">
+                  <p className="text-[13px] font-semibold text-ink-mid">{tx("Practice set", "অনুশীলন সেট")} · {date(q.at)}</p>
+                  <p className="font-display text-[18px] font-bold">{tx(`${q.correct} of ${q.attempted} answered right (${q.total} questions)`, `${N(q.total)}টি প্রশ্ন, ${N(q.attempted)}টির উত্তর, ${N(q.correct)}টি ঠিক`)}</p>
+                </a>
+              </Stop>
+            ))}
             {d.earned.map((a) => (
               <Stop key={a.id} icon="achievements" tone="done">
                 <p className="text-[15px]"><strong>{a.title ? t(a.title) : a.id}</strong> <span className="text-ink-mid">{tx("earned ", "পেয়েছ ")}{date(a.at)}</span></p>

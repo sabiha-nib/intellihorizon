@@ -19,13 +19,13 @@ export const PRIMARY: { to: string; icon: IconName; label: L; match: string[] }[
     to: "/learn",
     icon: "learn",
     label: { en: "Learn", bn: "শেখো" },
-    match: ["/learn", "/subjects", "/books", "/chapters", "/path", "/knowledge-map"],
+    match: ["/learn", "/subjects", "/books", "/chapters", "/path", "/knowledge-map", "/topics"],
   },
   {
     to: "/practice",
     icon: "practice",
     label: { en: "Practice", bn: "অনুশীলন" },
-    match: ["/practice", "/revision"],
+    match: ["/practice", "/revision", "/quiz"],
   },
   { to: "/tutor", icon: "tutor", label: { en: "AI Tutor", bn: "এআই টিউটর" }, match: ["/tutor"] },
   {
@@ -37,6 +37,22 @@ export const PRIMARY: { to: string; icon: IconName; label: L; match: string[] }[
 ];
 
 export const MODULES: Module[] = [
+  {
+    id: "quiz",
+    to: "/quiz",
+    icon: "play",
+    group: "practise",
+    label: { en: "IntelliQuiz", bn: "ইন্টেলিকুইজ" },
+    blurb: { en: "Daily Five, mistake replay, topic practice and timed exam simulation", bn: "দৈনিক পাঁচ, ভুল আবার করা, টপিক অনুশীলন ও সময় বাঁধা পরীক্ষা" },
+  },
+  {
+    id: "topics",
+    to: "/topics",
+    icon: "layers",
+    group: "learn",
+    label: { en: "Topics", bn: "টপিক" },
+    blurb: { en: "Topic by topic: material, practice, evidence and revision", bn: "টপিক ধরে: উপাদান, অনুশীলন, প্রমাণ ও পুনরালোচনা" },
+  },
   {
     id: "horizon",
     to: "/path",

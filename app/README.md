@@ -93,6 +93,44 @@ Validates each book against the registry (id, key, page count), classifies pages
 as the app, flags quality problems, skips repeated text, and writes idempotent SQL (running it twice changes nothing;
 reviewed passages are never touched). Everything arrives as `draft`.
 
+## IntelliCore: services and where they live
+
+Each service is a module with typed inputs and outputs; there is no single giant prompt.
+
+| Service | Module |
+|---|---|
+| Curriculum context | `lib/curriculum/student.server.ts`, `subject-scope.server.ts`, `registry.ts` |
+| Source retrieval | `lib/curriculum/retrieval.server.ts` (FTS5 trigram BM25 + short-word LIKE fallback, metadata filters, reranking by term coverage) |
+| Source trust | `STUDENT_VISIBLE` in `retrieval.server.ts`, `lib/curriculum/quality.ts`, `lib/api/review.functions.ts` |
+| Answer generation | `lib/ai/explain.server.ts` over the provider abstraction `lib/ai/provider.ts` |
+| Citation validation | `lib/ai/grounding.ts` (citation ids, quotation fidelity, page numbers, claim-to-citation support, response policy) |
+| Question engine | `lib/learning/quiz.ts`, `lib/api/quiz.functions.ts`, `lib/learning/rules.ts` (grading) |
+| Misconception analysis | `radar()` in `rules.ts`, `getMistakes`, quiz analysis |
+| Learner modelling | `lib/learning/context.server.ts`, `masteryStatus`, `topicState` |
+| Recommendations | Horizon Path `ahead`, quiz `next`, Knowledge Map node next step |
+| Revision scheduling | `nextReview` / `BOX_DAYS` in `lib/curriculum/text.ts` |
+| Assessment evaluation | `recordAttempt` in `lib/learning/engine.server.ts` (all XP and grading server-side) |
+| AI quality evaluation | `data/ai-eval/cases.json`, `tests/eval.ai.mjs` -> `tests/eval-report.json`; `ai_requests` log |
+
+Evidence policy: no approved text found -> abstain (no model call); matches in two subjects with none chosen -> ask
+which; partial coverage -> the model is told the evidence is partial and must say what isn't covered; enough
+coverage -> answer. Semantic (embedding) retrieval is not used: there is no embedding provider configured, and the
+corpus is 16 passages; English questions are not matched to Bangla-medium text (the tutor abstains).
+
+## IntelliQuiz and TopicWise
+
+- `quiz_sets` + `quiz_responses` (migration 0011). Modes: Daily Five (one per day), quick, chapter, topic, mistake
+  replay, weak spots, exam simulation (90 s a question, feedback only after submit, time limit enforced on the server).
+  Answers are graded only through `recordAttempt` with event id `quiz:<set>:<question>`, so replays add nothing.
+  Results: right / wrong / skipped, accuracy of answered, by topic and difficulty, mistake types (a single mistake is
+  never called a pattern), questions to revisit, a recommended next step with its reason.
+  Formats are the ones the bank holds (single-answer MCQ, numeric, short answer); other formats aren't offered until
+  questions exist with validation.
+- `topics` (migration 0011): created and reviewed by admins (Content Studio > Topics); students see only checked or
+  teacher-reviewed topics. Seeded only for Mathematics Chapter 2 from headings in checked passages and the chapter title.
+  Each topic reports five separate signals (checked material, opened, answers, mastery evidence, revision due);
+  they are never blended into one percentage.
+
 ## Running the checks
 
 ```
@@ -103,6 +141,7 @@ bunx vite build                 # production build
 # end-to-end (needs wrangler dev on :8787 with a fresh local D1, see tests/*.mjs headers)
 node tests/e2e.universe.mjs && node tests/e2e.grade7.mjs && node tests/e2e.curriculum.mjs && node tests/e2e.accounts.mjs
 node tests/e2e.ai.mjs && node tests/e2e.content.mjs && node tests/e2e.inputs.mjs && node tests/e2e.security.mjs
+node tests/e2e.quiz.mjs && node tests/eval.ai.mjs   # eval writes tests/eval-report.json
 # the AI suites need the test double: node tests/mock-ai.mjs (port 8790) and AI_* vars pointing at it
 ```
 

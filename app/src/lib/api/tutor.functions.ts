@@ -235,7 +235,7 @@ export const ask = createServerFn({ method: "POST" })
       if (found && status !== "ambiguous") {
         const lang = mode.lang ?? (/[\u0980-\u09FF]/.test(question) ? "bn" : "en");
         const learner = await learnerContext(g.DB, g.me.id, { chapterId, grade: student.grade, medium: student.medium, lang });
-        ai = await explain(g.DB, aiConfig(bindings() as unknown as Record<string, string | undefined>), { userId: g.me.id, question, persona: data.persona, lang, excerpts: r.excerpts, learner });
+        ai = await explain(g.DB, aiConfig(bindings() as unknown as Record<string, string | undefined>), { userId: g.me.id, question, persona: data.persona, lang, excerpts: r.excerpts, learner, evidence: status === "partial" ? "partial" : "sufficient" });
       }
       payload = {
         ...base, status, excerpts: status === "ambiguous" ? [] : r.excerpts, practice: status === "ambiguous" ? null : practice, teach, choices, ai,

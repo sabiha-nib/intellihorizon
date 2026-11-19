@@ -135,8 +135,38 @@ function Landing() {
               <ul className="mt-2 flex flex-wrap gap-2">{PERSONA_IDS.map((id) => <li key={id}><Badge tone="brand">{t(PERSONAS[id].name)}</Badge></li>)}</ul>
               <p className="mt-5 text-[14px] font-semibold text-ink-mid">{tx("Ask differently, any time", "যেকোনো সময় অন্যভাবে জিজ্ঞেস করো")}</p>
               <ul className="mt-2 flex flex-wrap gap-2">{STYLE_IDS.map((id) => <li key={id}><Badge>{t(STYLES[id])}</Badge></li>)}</ul>
-              <p className="mt-5 text-[14px] leading-relaxed text-ink-low">{tx("The tutor quotes and organises verified material; it does not write textbook content of its own. Photo, PDF and voice questions aren't available yet.", "টিউটর যাচাই করা লেখা উদ্ধৃত করে ও সাজায়; নিজে থেকে পাঠ্যবইয়ের লেখা তৈরি করে না। ছবি, পিডিএফ ও ভয়েস প্রশ্ন এখনো নেই।")}</p>
+              <p className="mt-5 text-[14px] leading-relaxed text-ink-low">{tx("When AI explanations are switched on, the tutor explains in its own words, and every part is labelled: from the book, explained from the book, or general. It never writes textbook content of its own. Questions can be typed, spoken, read from a PDF, or read from a photo where photo reading is switched on.", "এআই ব্যাখ্যা চালু থাকলে টিউটর নিজের ভাষায় বোঝায়, আর প্রতিটি অংশে লেবেল থাকে: বই থেকে, বই থেকে ব্যাখ্যা, বা সাধারণ। নিজে থেকে পাঠ্যবইয়ের লেখা তৈরি করে না। প্রশ্ন লিখে, বলে, পিডিএফ থেকে, বা ছবি পড়া চালু থাকলে ছবি থেকে করা যায়।")}</p>
             </div>
+          </div>
+        </section>
+
+        {/* Learning Twin: an illustrative concept with example data, clearly labelled as such */}
+        <section id="twin" aria-labelledby="twin-h" className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+          <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+            <div>
+              <Badge tone="amber">{tx("Illustrative concept", "উদাহরণ হিসেবে ধারণা")}</Badge>
+              <h2 id="twin-h" className="mt-3 max-w-[16ch] font-display text-[34px] font-bold leading-tight tracking-tight md:text-[44px]">{tx("Learning Twin", "লার্নিং টুইন")}</h2>
+              <p className="mt-4 max-w-[50ch] text-[17px] leading-relaxed text-ink-mid">{tx("A picture of what you know, built only from evidence: the questions you answered, the revision you did, the ideas you explained. Each area says how sure it is, and what would help next.", "তুমি কী জানো তার একটি ছবি, শুধু প্রমাণ থেকে তৈরি: যে প্রশ্নের উত্তর দিয়েছ, যে পুনরালোচনা করেছ, যে ধারণা ব্যাখ্যা করেছ। প্রতিটি অংশ জানায় কতটা নিশ্চিত, আর এরপর কী সাহায্য করবে।")}</p>
+              <p className="mt-4 max-w-[50ch] text-[15px] leading-relaxed text-ink-mid">{tx("Your real learning state lives in Topics and the Knowledge Map, built from your own answers.", "তোমার আসল শেখার অবস্থা আছে টপিক ও জ্ঞান মানচিত্রে, তোমার নিজের উত্তর থেকে তৈরি।")}</p>
+            </div>
+            <figure className="rounded-[28px] border-2 border-dashed border-line-strong bg-sheet p-6 md:p-8" aria-labelledby="twin-cap">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p id="twin-cap" className="font-display text-[22px] font-bold">{tx("Your learning state", "তোমার শেখার অবস্থা")}</p>
+                <Badge tone="neutral">{tx("Example data only — not a real student record", "শুধু উদাহরণ — কোনো আসল শিক্ষার্থীর তথ্য নয়")}</Badge>
+              </div>
+              <dl className="mt-5 divide-y divide-line">
+                {TWIN.map((r) => (
+                  <div key={r.area.en} className="flex items-center justify-between gap-3 py-3">
+                    <dt className="text-[17px] font-semibold">{t(r.area)}</dt>
+                    <dd><Badge tone={r.tone}>{t(r.state)}</Badge></dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-6 font-semibold">{tx("What should happen next?", "এরপর কী হওয়া উচিত?")}</p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[16px] text-ink-mid">
+                {TWIN_NEXT.map((n) => <li key={n.en}>{t(n)}</li>)}
+              </ul>
+            </figure>
           </div>
         </section>
 
@@ -309,6 +339,19 @@ function Landing() {
     </div>
   );
 }
+
+// Learning Twin example rows (illustrative only; shown with an "Example data only" label).
+const TWIN: { area: L; state: L; tone: "mint" | "amber" | "neutral" }[] = [
+  { area: { en: "Fractions", bn: "ভগ্নাংশ" }, state: { en: "Demonstrated", bn: "প্রমাণিত" }, tone: "mint" },
+  { area: { en: "Algebra", bn: "বীজগণিত" }, state: { en: "Developing", bn: "উন্নতি হচ্ছে" }, tone: "amber" },
+  { area: { en: "Geometry", bn: "জ্যামিতি" }, state: { en: "Needs more evidence", bn: "আরও প্রমাণ দরকার" }, tone: "neutral" },
+  { area: { en: "Decimals", bn: "দশমিক" }, state: { en: "Demonstrated", bn: "প্রমাণিত" }, tone: "mint" },
+];
+const TWIN_NEXT: L[] = [
+  { en: "Revise algebraic operations.", bn: "বীজগাণিতিক প্রক্রিয়া পুনরালোচনা করো।" },
+  { en: "Try a geometry diagnostic.", bn: "জ্যামিতির একটি যাচাই-পরীক্ষা দাও।" },
+  { en: "Maintain decimal mastery with occasional recall.", bn: "মাঝে মাঝে মনে করে দশমিকের দক্ষতা ধরে রাখো।" },
+];
 
 const PERSONAL: { icon: "radar" | "practice" | "revision" | "map"; title: L; body: L }[] = [
   { icon: "radar", title: { en: "Misconception Radar.", bn: "ভুল ধারণার রাডার।" }, body: { en: "When the same kind of wrong answer shows up on two or more questions, it names the likely misunderstanding, shows the evidence and tracks whether it's improving.", bn: "একই ধরনের ভুল দুই বা বেশি প্রশ্নে এলে সম্ভাব্য ভুল ধারণাটি জানায়, প্রমাণ দেখায়, আর উন্নতি হচ্ছে কি না দেখে।" } },

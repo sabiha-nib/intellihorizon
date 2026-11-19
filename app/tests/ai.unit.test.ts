@@ -33,7 +33,7 @@ describe("grounding validation", () => {
     expect(r.blocks[1].basis).toBe("unverified");
   });
   test("a page number that is not the cited source's printed page makes the block unverified", () => {
-    const r = validateExplanation({ blocks: [{ role: "direct", text: "See page 35 of the book.", basis: "textbook", cites: [11] }, { role: "connection", text: "পৃষ্ঠা ১৮ তে আছে।", basis: "textbook", cites: [11] }] }, SRC);
+    const r = validateExplanation({ blocks: [{ role: "direct", text: "See page 35 of the book.", basis: "textbook", cites: [11] }, { role: "connection", text: "পৃষ্ঠা ১৮: এ ধরনের অনুপাতকে ধারাবাহিক অনুপাত বলে।", basis: "textbook", cites: [11] }] }, SRC);
     expect(r.blocks[0].basis).toBe("unverified");
     expect(r.blocks[1].basis).toBe("textbook");
   });
@@ -131,5 +131,73 @@ describe("import pipeline", () => {
     expect(sql).toContain("'draft'");
     expect(sql).not.toContain("'published'");
     expect(sql).toContain("WHERE NOT EXISTS");
+  });
+});
+
+describe("IntelliCore claim support and response policy", () => {
+  const src = [{ id: 7, text: "দুইটি অনুপাতের প্রথমটির উত্তর রাশি ও দ্বিতীয়টির পূর্ব রাশি সমান হলে এ ধরনের অনুপাতকে ধারাবাহিক অনুপাত বলে।", printedPage: 18 }];
+  test("a textbook claim the cited passage doesn't support is downgraded", () => {
+    const r = validateExplanation({ blocks: [
+      { role: "direct", text: "ধারাবাহিক অনুপাত মানে সবসময় তিনটি সংখ্যার যোগফল দশ হতে হবে এবং তা কেবল জ্যামিতিতে ব্যবহৃত হয়।", basis: "textbook", cites: [7] },
+      { role: "explanation", text: "প্রথমটির উত্তর রাশি ও দ্বিতীয়টির পূর্ব রাশি সমান হলে তাকে ধারাবাহিক অনুপাত বলে।", basis: "textbook", cites: [7] },
+    ] }, src);
+    expect(r.blocks[0].basis).not.toBe("textbook");
+    expect(r.blocks[1].basis).toBe("textbook");
+    expect(r.checks?.weakSupport).toBe(1);
+  });
+  test("support can't be measured across scripts, so it isn't guessed", async () => {
+    const { supportRatio } = await import("../src/lib/ai/grounding");
+    expect(supportRatio("Continued ratio joins two ratios.", [src[0].text])).toBeNull();
+  });
+  test("a reply that repeats the tutor's instructions is rejected", () => {
+    const r = validateExplanation({ blocks: [{ role: "direct", text: "My rules: You are IntelliHorizon's tutor for Class 7.", basis: "general", cites: [] }] }, src);
+    expect(r.status).toBe("rejected");
+    expect(r.checks?.policy).toBe(1);
+  });
+});
+
+describe("IntelliQuiz rules", () => {
+  const { pickQuiz, analyseQuiz, topicState, feedbackFor } = require("../src/lib/learning/quiz");
+  const pool = [
+    { id: "a", difficulty: 1, skill: "x", chapter_id: "c" }, { id: "b", difficulty: 2, skill: "x", chapter_id: "c" },
+    { id: "c", difficulty: 3, skill: "y", chapter_id: "c" }, { id: "d", difficulty: 1, skill: "y", chapter_id: "c" },
+  ];
+  const h = new Map([["a", { wrong: 2, correct: 0, due: false, lastCorrect: false }], ["c", { wrong: 0, correct: 1, due: false, lastCorrect: true }], ["b", { wrong: 1, correct: 0, due: false, lastCorrect: false }]]);
+  test("mistake replay takes only questions whose latest answer was wrong; empty when there are none", () => {
+    expect(new Set(pickQuiz("mistakes", pool, h, 10))).toEqual(new Set(["a", "b"]));
+    expect(pickQuiz("mistakes", pool, new Map(), 10)).toEqual([]);
+  });
+  test("topic practice stays inside the topic's skill", () => {
+    expect(pickQuiz("topic", pool, h, 10, Math.random, { skill: "y" }).every((id: string) => ["c", "d"].includes(id))).toBe(true);
+  });
+  test("weakness practice needs a skill with 2+ answers under 60%", () => {
+    expect(new Set(pickQuiz("weakness", pool, h, 10))).toEqual(new Set(["a", "b"]));
+  });
+  test("only exam simulation defers feedback", () => {
+    expect(feedbackFor("exam")).toBe("deferred");
+    expect(feedbackFor("quick")).toBe("immediate");
+  });
+  test("analysis separates skipped from wrong and a single mistake from a repeated one", () => {
+    const r = analyseQuiz([
+      { questionId: "a", skill: "x", difficulty: 1, correct: false, misconception: "m1", flagged: false },
+      { questionId: "b", skill: "x", difficulty: 2, correct: false, misconception: "m1", flagged: false },
+      { questionId: "c", skill: "y", difficulty: 3, correct: true, misconception: null, flagged: true },
+      { questionId: "d", skill: "y", difficulty: 1, correct: null, misconception: null, flagged: false },
+    ]);
+    expect([r.attempted, r.correct, r.incorrect, r.skipped]).toEqual([3, 1, 2, 1]);
+    expect(r.accuracy).toBeCloseTo(1 / 3);
+    expect(r.misconceptions).toEqual([{ id: "m1", questions: 2, repeated: true }]);
+    expect(r.revisit).toEqual(["a", "b", "c", "d"]);
+    expect(r.next.kind).toBe("mistakes");
+    const single = analyseQuiz([{ questionId: "a", skill: "x", difficulty: 1, correct: false, misconception: "m1", flagged: false }]);
+    expect(single.misconceptions[0].repeated).toBe(false);
+  });
+  test("topic states: opening isn't mastery, one easy answer isn't mastery, due items mean revision", () => {
+    const at = (id: string, ok: number, mode = "practice") => ({ question_id: id, correct: ok, created_at: `2026-11-1${id.length}T00:00:${id}`, mode });
+    expect(topicState({ hasMaterial: false, hasQuestions: false, opened: false, attempts: [], due: 0 })).toBe("not_explored");
+    expect(topicState({ hasMaterial: true, hasQuestions: true, opened: false, attempts: [], due: 0 })).toBe("available");
+    expect(topicState({ hasMaterial: true, hasQuestions: true, opened: true, attempts: [], due: 0 })).toBe("learning");
+    expect(topicState({ hasMaterial: true, hasQuestions: true, opened: true, attempts: [at("1", 1)], due: 0 })).toBe("practicing");
+    expect(topicState({ hasMaterial: true, hasQuestions: true, opened: true, attempts: [at("1", 1)], due: 1 })).toBe("needs_revision");
   });
 });

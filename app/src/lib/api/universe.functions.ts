@@ -1356,6 +1356,12 @@ export const getHorizonPath = createServerFn({ method: "GET" }).handler(async ()
       return { id: x.id, title: x.title, subject: x.subject_key, at: x.completed_at, level: x.level, attempted: sum.attempted ?? null, correct: sum.correctAtEnd ?? null, xp: sum.xp ?? null, minutes: sum.minutes ?? null };
     }),
     earned: (earned.results ?? []).slice(0, 3).map((r) => ({ id: r.achievement_id, at: r.earned_at, title: ACHIEVEMENTS.find((a) => a.id === r.achievement_id)?.title ?? null })),
+    // Finished IntelliQuiz sets, from their stored results.
+    practice: ((await DB.prepare("SELECT id, mode, submitted_at, result FROM quiz_sets WHERE user_id = ? AND status = 'submitted' ORDER BY submitted_at DESC LIMIT 4").bind(me.id).all<{ id: string; mode: string; submitted_at: string; result: string | null }>()).results ?? []).map((q) => {
+      let r: { correct?: number; attempted?: number; total?: number } = {};
+      try { r = q.result ? JSON.parse(q.result) : {}; } catch { r = {}; }
+      return { id: q.id, mode: q.mode, at: q.submitted_at, correct: r.correct ?? 0, attempted: r.attempted ?? 0, total: r.total ?? 0 };
+    }),
     ahead: ahead.slice(0, 4),
     checkpoints: upcoming.results ?? [],
     nextAchievements,

@@ -44,11 +44,15 @@ import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TutorIndexRouteImport } from './routes/tutor.index'
+import { Route as TopicsIndexRouteImport } from './routes/topics.index'
+import { Route as QuizIndexRouteImport } from './routes/quiz.index'
 import { Route as PracticeIndexRouteImport } from './routes/practice.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as WorldSubjectRouteImport } from './routes/world.$subject'
 import { Route as TutorThreadIdRouteImport } from './routes/tutor.$threadId'
+import { Route as TopicsTopicIdRouteImport } from './routes/topics.$topicId'
 import { Route as SubjectsSubjectIdRouteImport } from './routes/subjects.$subjectId'
+import { Route as QuizSetIdRouteImport } from './routes/quiz.$setId'
 import { Route as PracticeReviewRouteImport } from './routes/practice.review'
 import { Route as PracticeChapterIdRouteImport } from './routes/practice.$chapterId'
 import { Route as LearnTreeRouteImport } from './routes/learn.tree'
@@ -235,6 +239,16 @@ const TutorIndexRoute = TutorIndexRouteImport.update({
   path: '/tutor/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TopicsIndexRoute = TopicsIndexRouteImport.update({
+  id: '/topics/',
+  path: '/topics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizIndexRoute = QuizIndexRouteImport.update({
+  id: '/quiz/',
+  path: '/quiz/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PracticeIndexRoute = PracticeIndexRouteImport.update({
   id: '/practice/',
   path: '/practice/',
@@ -255,9 +269,19 @@ const TutorThreadIdRoute = TutorThreadIdRouteImport.update({
   path: '/tutor/$threadId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TopicsTopicIdRoute = TopicsTopicIdRouteImport.update({
+  id: '/topics/$topicId',
+  path: '/topics/$topicId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubjectsSubjectIdRoute = SubjectsSubjectIdRouteImport.update({
   id: '/subjects/$subjectId',
   path: '/subjects/$subjectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizSetIdRoute = QuizSetIdRouteImport.update({
+  id: '/quiz/$setId',
+  path: '/quiz/$setId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeReviewRoute = PracticeReviewRouteImport.update({
@@ -356,11 +380,15 @@ export interface FileRoutesByFullPath {
   '/learn/tree': typeof LearnTreeRoute
   '/practice/$chapterId': typeof PracticeChapterIdRoute
   '/practice/review': typeof PracticeReviewRoute
+  '/quiz/$setId': typeof QuizSetIdRoute
   '/subjects/$subjectId': typeof SubjectsSubjectIdRouteWithChildren
+  '/topics/$topicId': typeof TopicsTopicIdRoute
   '/tutor/$threadId': typeof TutorThreadIdRoute
   '/world/$subject': typeof WorldSubjectRoute
   '/learn/': typeof LearnIndexRoute
   '/practice/': typeof PracticeIndexRoute
+  '/quiz/': typeof QuizIndexRoute
+  '/topics/': typeof TopicsIndexRoute
   '/tutor/': typeof TutorIndexRoute
   '/practice/session/$sessionId': typeof PracticeSessionSessionIdRoute
   '/subjects/$subjectId/chapters/$chapterId': typeof SubjectsSubjectIdChaptersChapterIdRoute
@@ -408,11 +436,15 @@ export interface FileRoutesByTo {
   '/learn/tree': typeof LearnTreeRoute
   '/practice/$chapterId': typeof PracticeChapterIdRoute
   '/practice/review': typeof PracticeReviewRoute
+  '/quiz/$setId': typeof QuizSetIdRoute
   '/subjects/$subjectId': typeof SubjectsSubjectIdRouteWithChildren
+  '/topics/$topicId': typeof TopicsTopicIdRoute
   '/tutor/$threadId': typeof TutorThreadIdRoute
   '/world/$subject': typeof WorldSubjectRoute
   '/learn': typeof LearnIndexRoute
   '/practice': typeof PracticeIndexRoute
+  '/quiz': typeof QuizIndexRoute
+  '/topics': typeof TopicsIndexRoute
   '/tutor': typeof TutorIndexRoute
   '/practice/session/$sessionId': typeof PracticeSessionSessionIdRoute
   '/subjects/$subjectId/chapters/$chapterId': typeof SubjectsSubjectIdChaptersChapterIdRoute
@@ -461,11 +493,15 @@ export interface FileRoutesById {
   '/learn/tree': typeof LearnTreeRoute
   '/practice/$chapterId': typeof PracticeChapterIdRoute
   '/practice/review': typeof PracticeReviewRoute
+  '/quiz/$setId': typeof QuizSetIdRoute
   '/subjects/$subjectId': typeof SubjectsSubjectIdRouteWithChildren
+  '/topics/$topicId': typeof TopicsTopicIdRoute
   '/tutor/$threadId': typeof TutorThreadIdRoute
   '/world/$subject': typeof WorldSubjectRoute
   '/learn/': typeof LearnIndexRoute
   '/practice/': typeof PracticeIndexRoute
+  '/quiz/': typeof QuizIndexRoute
+  '/topics/': typeof TopicsIndexRoute
   '/tutor/': typeof TutorIndexRoute
   '/practice/session/$sessionId': typeof PracticeSessionSessionIdRoute
   '/subjects/$subjectId/chapters/$chapterId': typeof SubjectsSubjectIdChaptersChapterIdRoute
@@ -515,11 +551,15 @@ export interface FileRouteTypes {
     | '/learn/tree'
     | '/practice/$chapterId'
     | '/practice/review'
+    | '/quiz/$setId'
     | '/subjects/$subjectId'
+    | '/topics/$topicId'
     | '/tutor/$threadId'
     | '/world/$subject'
     | '/learn/'
     | '/practice/'
+    | '/quiz/'
+    | '/topics/'
     | '/tutor/'
     | '/practice/session/$sessionId'
     | '/subjects/$subjectId/chapters/$chapterId'
@@ -567,11 +607,15 @@ export interface FileRouteTypes {
     | '/learn/tree'
     | '/practice/$chapterId'
     | '/practice/review'
+    | '/quiz/$setId'
     | '/subjects/$subjectId'
+    | '/topics/$topicId'
     | '/tutor/$threadId'
     | '/world/$subject'
     | '/learn'
     | '/practice'
+    | '/quiz'
+    | '/topics'
     | '/tutor'
     | '/practice/session/$sessionId'
     | '/subjects/$subjectId/chapters/$chapterId'
@@ -619,11 +663,15 @@ export interface FileRouteTypes {
     | '/learn/tree'
     | '/practice/$chapterId'
     | '/practice/review'
+    | '/quiz/$setId'
     | '/subjects/$subjectId'
+    | '/topics/$topicId'
     | '/tutor/$threadId'
     | '/world/$subject'
     | '/learn/'
     | '/practice/'
+    | '/quiz/'
+    | '/topics/'
     | '/tutor/'
     | '/practice/session/$sessionId'
     | '/subjects/$subjectId/chapters/$chapterId'
@@ -672,11 +720,15 @@ export interface RootRouteChildren {
   LearnTreeRoute: typeof LearnTreeRoute
   PracticeChapterIdRoute: typeof PracticeChapterIdRoute
   PracticeReviewRoute: typeof PracticeReviewRoute
+  QuizSetIdRoute: typeof QuizSetIdRoute
   SubjectsSubjectIdRoute: typeof SubjectsSubjectIdRouteWithChildren
+  TopicsTopicIdRoute: typeof TopicsTopicIdRoute
   TutorThreadIdRoute: typeof TutorThreadIdRoute
   WorldSubjectRoute: typeof WorldSubjectRoute
   LearnIndexRoute: typeof LearnIndexRoute
   PracticeIndexRoute: typeof PracticeIndexRoute
+  QuizIndexRoute: typeof QuizIndexRoute
+  TopicsIndexRoute: typeof TopicsIndexRoute
   TutorIndexRoute: typeof TutorIndexRoute
   PracticeSessionSessionIdRoute: typeof PracticeSessionSessionIdRoute
 }
@@ -928,6 +980,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TutorIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/topics/': {
+      id: '/topics/'
+      path: '/topics'
+      fullPath: '/topics/'
+      preLoaderRoute: typeof TopicsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz/': {
+      id: '/quiz/'
+      path: '/quiz'
+      fullPath: '/quiz/'
+      preLoaderRoute: typeof QuizIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/practice/': {
       id: '/practice/'
       path: '/practice'
@@ -956,11 +1022,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TutorThreadIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/topics/$topicId': {
+      id: '/topics/$topicId'
+      path: '/topics/$topicId'
+      fullPath: '/topics/$topicId'
+      preLoaderRoute: typeof TopicsTopicIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/subjects/$subjectId': {
       id: '/subjects/$subjectId'
       path: '/subjects/$subjectId'
       fullPath: '/subjects/$subjectId'
       preLoaderRoute: typeof SubjectsSubjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz/$setId': {
+      id: '/quiz/$setId'
+      path: '/quiz/$setId'
+      fullPath: '/quiz/$setId'
+      preLoaderRoute: typeof QuizSetIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice/review': {
@@ -1091,11 +1171,15 @@ const rootRouteChildren: RootRouteChildren = {
   LearnTreeRoute: LearnTreeRoute,
   PracticeChapterIdRoute: PracticeChapterIdRoute,
   PracticeReviewRoute: PracticeReviewRoute,
+  QuizSetIdRoute: QuizSetIdRoute,
   SubjectsSubjectIdRoute: SubjectsSubjectIdRouteWithChildren,
+  TopicsTopicIdRoute: TopicsTopicIdRoute,
   TutorThreadIdRoute: TutorThreadIdRoute,
   WorldSubjectRoute: WorldSubjectRoute,
   LearnIndexRoute: LearnIndexRoute,
   PracticeIndexRoute: PracticeIndexRoute,
+  QuizIndexRoute: QuizIndexRoute,
+  TopicsIndexRoute: TopicsIndexRoute,
   TutorIndexRoute: TutorIndexRoute,
   PracticeSessionSessionIdRoute: PracticeSessionSessionIdRoute,
 }

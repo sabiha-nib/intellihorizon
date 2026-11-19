@@ -12,6 +12,7 @@ import { OcrQc } from "../components/admin/OcrQc";
 import { Review } from "../components/admin/Review";
 import { Coverage } from "../components/admin/Coverage";
 import { PassageReview } from "../components/admin/PassageReview";
+import { TopicAdmin } from "../components/admin/TopicAdmin";
 import { aiAdminStatus } from "../lib/api/review.functions";
 import { adminStatus, claimAdmin, importHistory, listBooks, previewPage, saveBook, setBookStatus, type AdminBook, type Row } from "../lib/api/admin.functions";
 import { SUBJECT_KEYS } from "../lib/curriculum/config";
@@ -27,7 +28,7 @@ const empty: Form = { grade: 7, medium: "bangla", subjectKey: "mathematics", sub
 
 function Admin() {
   const [status, setStatus] = useState<{ signedIn: boolean; admin: boolean; configured: boolean; codeAvailable: boolean } | null>(null);
-  const [tab, setTab] = useState<"coverage" | "passages" | "books" | "review" | "ocr" | "audit">("books");
+  const [tab, setTab] = useState<"coverage" | "passages" | "topics" | "books" | "review" | "ocr" | "audit">("books");
   const [reviewBook, setReviewBook] = useState<string | null>(null);
   const [ai, setAi] = useState<{ ai: { configured: boolean; provider: string | null; model: string | null; vision: boolean }; today: { status: string; n: number }[]; email: { configured: boolean } } | null>(null);
   const [token, setToken] = useState("");
@@ -103,7 +104,7 @@ function Admin() {
       <main className="mx-auto w-full max-w-6xl space-y-6 px-4 pt-6 md:px-6">
         <PageHeader title="Content Studio" subtitle="Import and check textbook text, review practice questions, and see every administrative action. Students only ever see text and questions that have been approved here." />
         <div role="tablist" aria-label="Content Studio" className="flex flex-wrap gap-2">
-          {([["books", "Books and import"], ["coverage", "Coverage"], ["passages", "Passage review"], ["review", "Question review"], ["ocr", "OCR quality"], ["audit", "Audit log"]] as const).map(([k, l]) => (
+          {([["books", "Books and import"], ["coverage", "Coverage"], ["passages", "Passage review"], ["topics", "Topics"], ["review", "Question review"], ["ocr", "OCR quality"], ["audit", "Audit log"]] as const).map(([k, l]) => (
             <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`h-11 rounded-[12px] border-2 px-4 font-semibold ${tab === k ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-sheet"}`}>{l}</button>
           ))}
         </div>
@@ -119,6 +120,7 @@ function Admin() {
           </section>
         )}
         {tab === "passages" && <section className={`${card} p-5`}><PassageReview books={books.map((b) => ({ id: b.id, title: b.title, subject_name: b.subject_name }))} initialBook={reviewBook} /></section>}
+        {tab === "topics" && <section className={`${card} p-5`}><TopicAdmin books={books.map((b) => ({ id: b.id, title: b.title, subject_name: b.subject_name }))} /></section>}
         {tab === "review" && <section className={`${card} p-5`}><Review /></section>}
         {tab === "audit" && <section className={`${card} p-5`}><Audit /></section>}
         {tab === "ocr" && (
