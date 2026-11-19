@@ -65,6 +65,12 @@ for (const c of data.cases) {
   if (e.noText) add(`no "${e.noText}" shown`, !JSON.stringify(pay.ai ?? {}).includes(e.noText) && !(await p.content()).includes(e.noText));
   if (e.onlySubject) add(`only ${e.onlySubject} excerpts`, (pay.excerpts ?? []).length > 0 && pay.excerpts.every((x) => x.source.subjectKey === e.onlySubject));
   if (e.bothFixtures) add("conflicting records are both shown, not one picked silently", e.bothFixtures.every((f) => ids.has(fxIds[f])));
+  if (e.noTranslatedQuote) add("translation fidelity: a translated quotation is not shown as a quotation", !(pay.ai?.quotes ?? []).some((q) => q.text.includes(e.noTranslatedQuote)), JSON.stringify(pay.ai?.quotes ?? null));
+  if (e.rewrite) add("cross-language rewrite reported", pay.rewrite?.searched?.includes(e.rewrite), JSON.stringify(pay.rewrite ?? null));
+  if (e.noRewrite) add("no rewrite invented", !pay.rewrite);
+  if (e.explanationLang) add(`language routing: explanation in ${e.explanationLang}`, pay.language?.explanation === e.explanationLang, pay.language?.explanation);
+  if ("firstWrong" in e) add(`working check: first wrong step ${e.firstWrong}`, pay.working?.firstWrong === e.firstWrong, JSON.stringify(pay.working?.firstWrong));
+  if (e.aiIn) add(`AI status in ${e.aiIn.join("/")}`, e.aiIn.includes(pay.ai?.status), pay.ai?.status ?? "none");
   if (e.excerptsShown) add("textbook excerpts still shown", (pay.excerpts ?? []).length > 0);
   results.push({ id: c.id, category: c.category, lang: c.lang, status: pay.status, ai: pay.ai?.status ?? (aiCalled ? "called" : "none"), corrections: pay.ai?.checks ?? null, checks, pass: checks.every((x) => x.ok), note: e.note ?? null });
   console.log(checks.every((x) => x.ok) ? "PASS" : "FAIL", c.id, checks.filter((x) => !x.ok).map((x) => `${x.name} [${x.detail}]`).join("; "));
@@ -86,11 +92,19 @@ const report = {
     unsupportedClaimsShownAsTextbook: rate((x) => x.name.startsWith("no textbook/derived") || x.name.startsWith("unsupported claim")),
     redTeamBlocked: (() => { const r = results.filter((x) => x.category === "red-team"); return { passed: r.filter((x) => x.pass).length, of: r.length }; })(),
     mathFidelity: rate((x) => x.name.startsWith("maths markup")),
+    languageRouting: rate((x) => x.name.startsWith("language routing") || x.name.startsWith("cross-language") || x.name.startsWith("no rewrite")),
+    translationFidelity: rate((x) => x.name.startsWith("translation fidelity")),
+    workingCheck: rate((x) => x.name.startsWith("working check")),
     correctionsMadeByValidation: results.reduce((a, r) => { for (const [k, v] of Object.entries(r.corrections ?? {})) a[k] = (a[k] ?? 0) + v; return a; }, {}),
   },
-  scope: "17 reviewed cases over the 16 checked passages plus 4 temporary fixtures (Mathematics Chapter 2, Science, Bangla). Language quality and answer completeness need a real provider and human review; not measured here.",
+  thresholds: data.thresholds,
+  scope: `${data.cases.length} reviewed cases over the 16 checked passages plus 4 temporary fixtures (Mathematics Chapter 2, Science, Bangla). Language quality and answer completeness need a real provider and human review; not measured here.`,
   results,
 };
 writeFileSync(new URL("./eval-report.json", import.meta.url), JSON.stringify(report, null, 2));
+const below = Object.entries(data.thresholds).filter(([k, t]) => typeof t === "number").filter(([k, t]) => { const m = report.metrics[k]; return m && m.of > 0 && m.passed / m.of < t; }).map(([k]) => k);
+report.belowThreshold = below;
+writeFileSync(new URL("./eval-report.json", import.meta.url), JSON.stringify(report, null, 2));
+console.log(`THRESHOLDS ${below.length ? "BELOW: " + below.join(", ") : "all met"}`);
 console.log(`SUMMARY ${report.casesPassed}/${report.cases}`);
-process.exit(report.casesPassed === report.cases ? 0 : 1);
+process.exit(report.casesPassed === report.cases && !below.length ? 0 : 1);

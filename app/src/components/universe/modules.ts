@@ -37,6 +37,15 @@ export const PRIMARY: { to: string; icon: IconName; label: L; match: string[] }[
 ];
 
 export const MODULES: Module[] = [
+  { id: "twin", to: "/twin", icon: "radar", group: "progress", label: { en: "Learning Twin", bn: "লার্নিং টুইন" }, blurb: { en: "What your evidence says about each topic, and how to correct it", bn: "প্রতিটি টপিক নিয়ে তোমার প্রমাণ কী বলে, আর কীভাবে সংশোধন করবে" } },
+  { id: "exam", to: "/exam-arena", icon: "shield", group: "practise", label: { en: "ExamArena", bn: "পরীক্ষা অঙ্গন" }, blurb: { en: "Chapter readiness from four visible factors, then a timed exam", bn: "চারটি দৃশ্যমান কারণে অধ্যায়ের প্রস্তুতি, তারপর সময় বাঁধা পরীক্ষা" } },
+  { id: "cards", to: "/cards", icon: "revision", group: "practise", label: { en: "MemoryCards", bn: "মেমরি কার্ড" }, blurb: { en: "Flashcards from your book's definitions, spaced for recall", bn: "বইয়ের সংজ্ঞা থেকে ফ্ল্যাশকার্ড, মনে রাখার মতো বিরতিতে" } },
+  { id: "notes", to: "/notes", icon: "pen", group: "learn", label: { en: "SmartNotes", bn: "স্মার্ট নোট" }, blurb: { en: "Your own private notes, searchable, tied to chapters", bn: "তোমার নিজের ব্যক্তিগত নোট, খোঁজা যায়, অধ্যায়ের সঙ্গে যুক্ত" } },
+  { id: "formulas", to: "/formulas", icon: "book", group: "learn", label: { en: "FormulaVault", bn: "সূত্র ভান্ডার" }, blurb: { en: "Checked formulas, each with its textbook page", bn: "যাচাই করা সূত্র, প্রতিটির পাঠ্যবইয়ের পৃষ্ঠাসহ" } },
+  { id: "concepts", to: "/concepts", icon: "map", group: "learn", label: { en: "ConceptConnect", bn: "ধারণা সংযোগ" }, blurb: { en: "Reviewed links between topics, with the reason for each", bn: "টপিকের মধ্যে যাচাই করা সংযোগ, প্রতিটির কারণসহ" } },
+  { id: "summary", to: "/summary", icon: "layers", group: "learn", label: { en: "IntelliSummary", bn: "ইন্টেলিসারাংশ" }, blurb: { en: "Chapter summaries copied from the book's own sentences", bn: "বইয়ের নিজের বাক্য থেকে অধ্যায়ের সারাংশ" } },
+  { id: "reflect", to: "/reflect", icon: "sun", group: "progress", label: { en: "Reflection", bn: "প্রতিফলন" }, blurb: { en: "Write what you learned and what to revisit", bn: "কী শিখলে আর কী আবার দেখবে লেখো" } },
+  { id: "share", to: "/share", icon: "user", group: "you", label: { en: "Teacher and parent access", bn: "শিক্ষক ও অভিভাবকের প্রবেশ" }, blurb: { en: "Share a progress summary with an expiring code", bn: "মেয়াদি কোড দিয়ে অগ্রগতির সারাংশ দেখাও" } },
   {
     id: "quiz",
     to: "/quiz",

@@ -95,3 +95,51 @@ export async function complete(cfg: AiConfig, messages: AiMessage[], opts: { max
     clearTimeout(timer);
   }
 }
+
+/* ─────────── Embeddings (semantic retrieval) ─────────── */
+// Secrets: EMBED_API_KEY and EMBED_MODEL (required), EMBED_BASE_URL (OpenAI-compatible /embeddings endpoint, https;
+// default https://api.openai.com/v1), EMBED_MIN_SIM (default 0.35). Without them retrieval is keyword-only, and the
+// admin Coverage tab and every tutor answer say so.
+export type EmbedConfig = { apiKey: string; model: string; baseUrl: string; minSim: number; timeoutMs: number };
+
+export function embedConfig(env: Env): EmbedConfig | null {
+  const apiKey = (env.EMBED_API_KEY ?? "").trim();
+  const model = (env.EMBED_MODEL ?? "").trim();
+  if (!apiKey || !model) return null;
+  const baseUrl = (env.EMBED_BASE_URL ?? "").trim().replace(/\/+$/, "") || "https://api.openai.com/v1";
+  if (!/^https:\/\//.test(baseUrl) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(baseUrl.replace(/\/v1$/, ""))) return null;
+  const minSim = Math.min(Math.max(Number(env.EMBED_MIN_SIM) || 0.35, 0.05), 0.95);
+  return { apiKey, model, baseUrl, minSim, timeoutMs: Math.min(Math.max(Number(env.AI_TIMEOUT_MS) || 15000, 2000), 60000) };
+}
+
+export async function embed(cfg: EmbedConfig, texts: string[], fetcher: typeof fetch = fetch): Promise<{ ok: true; vectors: number[][] } | { ok: false; code: string }> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), cfg.timeoutMs);
+  try {
+    const res = await fetcher(`${cfg.baseUrl}/embeddings`, { method: "POST", signal: ctrl.signal, headers: { "content-type": "application/json", authorization: `Bearer ${cfg.apiKey}` }, body: JSON.stringify({ model: cfg.model, input: texts }) });
+    if (res.status === 429) return { ok: false, code: "rate_limited" };
+    if (!res.ok) return { ok: false, code: res.status === 401 || res.status === 403 ? "auth_failed" : "provider_error" };
+    const j = (await res.json()) as { data?: { embedding?: number[]; index?: number }[] };
+    const rows = (j.data ?? []).slice().sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+    if (rows.length !== texts.length || rows.some((r) => !Array.isArray(r.embedding) || !r.embedding.length)) return { ok: false, code: "bad_response" };
+    return { ok: true, vectors: rows.map((r) => r.embedding!) };
+  } catch (e) {
+    return { ok: false, code: (e as Error)?.name === "AbortError" ? "timeout" : "provider_error" };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export function cosine(a: number[], b: number[]): number {
+  if (a.length !== b.length || !a.length) return 0;
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+  return na && nb ? dot / Math.sqrt(na * nb) : 0;
+}
+
+/** Reciprocal-rank fusion of ranked id lists (k = 60, the usual constant). */
+export function rrf(lists: number[][], k = 60): number[] {
+  const score = new Map<number, number>();
+  for (const l of lists) l.forEach((id, i) => score.set(id, (score.get(id) ?? 0) + 1 / (k + i + 1)));
+  return [...score].sort((a, b) => b[1] - a[1]).map(([id]) => id);
+}

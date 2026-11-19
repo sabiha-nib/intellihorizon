@@ -9,11 +9,18 @@ import { SUBJECT_IDS, SUBJECTS, isSubjectId, offeringFor, stripScopeNames } from
 import { resolveQuestionScope, validateSubjectContext } from "../curriculum/subject-scope.server";
 import { detectIntent, evalArithmetic, isArithmetic, keyTerms, queryTerms, stem, toAsciiDigits } from "../curriculum/text";
 import type { ThreadSummary, TutorMessage, TutorPayload } from "../tutor/types";
-import { PERSONA_IDS, STYLE_IDS, guideQuestions, styleTerms, teachingMode } from "../tutor/teach";
+import { PERSONA_IDS, STYLE_IDS, STYLE_PROMPT, guideQuestions, styleTerms, teachingMode } from "../tutor/teach";
 import { LESSONS as CHAPTER_LESSONS } from "../learning/lessons";
 import { learnerContext } from "../learning/context.server";
 import { aiConfig } from "../ai/provider";
 import { explain } from "../ai/explain.server";
+import { embedConfig, rrf } from "../ai/provider";
+import { semanticSearch } from "../curriculum/semantic.server";
+import { buildExcerpts, visibleById } from "../curriculum/retrieval.server";
+import { rewriteToBangla, rewriteToEnglish } from "../curriculum/glossary";
+import { MAX_EXCERPTS } from "../curriculum/config";
+import { LANG_MODES, detectLanguage, explanationLanguage } from "../tutor/language";
+import { checkWorking, looksLikeWorking } from "../tutor/working";
 
 type Fail = { ok: false; code: string };
 const fail = (code: string): Fail => ({ ok: false, code });
@@ -38,6 +45,8 @@ function lessonFor(q: string) {
   const l = LESSONS.find((x) => x.words.some((w) => low.includes(w)));
   return l ? { route: l.route, key: l.key } : null;
 }
+
+const CONFUSED = /(বুঝিনি|বুঝতে পারছি না|বুঝলাম না|বুঝি নাই|আবার বলো|সহজ করে|don'?t understand|do not understand|confus|not clear|still lost|simpler|explain again)/i;
 
 function parsePayload(s: string | null): TutorPayload | null {
   if (!s) return null;
@@ -138,6 +147,8 @@ export const ask = createServerFn({ method: "POST" })
     /** Teaching approach. It changes presentation and follow-ups only; retrieval rules stay the same. */
     persona: z.enum(PERSONA_IDS).default("mentor"),
     style: z.enum(STYLE_IDS).nullable().default(null),
+    /** Explanation language: auto (follow the question), Bangla, English or mixed. Remembered on the profile. */
+    langMode: z.enum(LANG_MODES as [string, ...string[]]).default("auto"),
   }))
   .handler(async ({ data }) => {
     const g = await guard();
@@ -156,6 +167,19 @@ export const ask = createServerFn({ method: "POST" })
       if (!data.scopeExplicit && !data.subjectId && !data.textbookId && !data.chapterId)
         requested = { subjectId: th.subject_key && isSubjectId(th.subject_key) ? th.subject_key : null, textbookId: th.textbook_id, chapterId: th.chapter_id };
     }
+    // Learning memory for this conversation: only the previous turn (never the whole history), plus confusion signals.
+    let prev: { question: string; payload: TutorPayload | null } | null = null;
+    let confusion = 0;
+    if (threadId) {
+      const recent = (await g.DB.prepare("SELECT role, text, payload FROM tutor_messages WHERE thread_id = ? ORDER BY id DESC LIMIT 8").bind(threadId).all<{ role: string; text: string; payload: string | null }>()).results ?? [];
+      const lastTutor = recent.find((m) => m.role === "tutor");
+      const lastStudent = recent.find((m) => m.role === "student");
+      if (lastStudent) prev = { question: lastStudent.text, payload: parsePayload(lastTutor?.payload ?? null) };
+      confusion = recent.filter((m) => m.role === "student" && CONFUSED.test(m.text)).length;
+    }
+    if (CONFUSED.test(question)) confusion++;
+    if (data.style === "beginner") confusion++;
+    if (data.langMode !== "auto") await g.DB.prepare("UPDATE profiles SET tutor_lang = ? WHERE user_id = ?").bind(data.langMode, g.me.id).run().catch(() => undefined);
     const checked = await validateSubjectContext(g.DB, student, requested);
     if (!checked.ok) return fail(checked.code);
     const selected = checked.ctx;
@@ -163,7 +187,7 @@ export const ask = createServerFn({ method: "POST" })
     const offering = offeringFor(student.grade, student.medium);
     const resolved = resolveQuestionScope(question, student, selected);
     // A book or subject named in the question decides where to search; its name is not itself a search word.
-    const terms = queryTerms(resolved.kind === "scope" ? stripScopeNames(question, { bookId: resolved.book?.id, subjectId: resolved.from === "question" ? resolved.ctx.subjectId : null }) : question);
+    let terms = queryTerms(resolved.kind === "scope" ? stripScopeNames(question, { bookId: resolved.book?.id, subjectId: resolved.from === "question" ? resolved.ctx.subjectId : null }) : question);
     const base: TutorPayload = {
       status: "needs_context", intent: detectIntent(question), terms, excerpts: [], keyTerms: [],
       scope: { grade: student.grade, medium: student.medium, textbookId: selected.textbookId, chapterId: selected.chapterId, booksInScope: 0, subjectKey: selected.subjectId },
@@ -171,8 +195,22 @@ export const ask = createServerFn({ method: "POST" })
       offering: offering ? { grade: offering.grade, medium: offering.medium, status: offering.status } : null,
       practice: null, lesson: lessonFor(question),
     };
+    const langInfo = detectLanguage(question);
+    const teachMode = teachingMode(data.persona, data.style);
+    const explainLang = explanationLanguage(question, data.langMode as "auto", teachMode.lang);
+    base.language = { question: langInfo.primary, mixed: langInfo.mixed, explanation: explainLang };
+    // A follow-up with few words of its own ("why?", "explain more simply") continues the previous topic.
+    let followUp = false;
+    if (prev?.payload?.terms?.length && terms.length < 2 && !isArithmetic(question)) {
+      terms = [...new Set([...prev.payload.terms, ...terms])].slice(0, 12);
+      followUp = true;
+      base.terms = terms;
+    }
     let payload: TutorPayload;
-    if (isArithmetic(question)) {
+    if (looksLikeWorking(question)) {
+      // Worked steps: checked line by line with exact arithmetic; the first step that doesn't hold is shown.
+      payload = { ...base, status: "working_check", working: checkWorking(question), lesson: null };
+    } else if (isArithmetic(question)) {
       try {
         const r = evalArithmetic(question);
         payload = { ...base, status: "calculation", calc: { expression: question.replace(/[=?]\s*$/, "").trim(), decimal: r.decimal, fraction: r.fraction } };
@@ -188,8 +226,41 @@ export const ask = createServerFn({ method: "POST" })
     } else {
       const ctx = resolved.ctx;
       const scope: Scope = { grade: student.grade, medium: student.medium, subjectKey: ctx.subjectId, textbookId: ctx.textbookId, chapterId: ctx.chapterId };
-      const mode = teachingMode(data.persona, data.style);
-      const r = await retrieve(g.DB, scope, terms);
+      const mode = teachMode;
+      let r = await retrieve(g.DB, scope, terms);
+      // Cross-language retrieval: an English (or mixed) question about Bangla-medium text is rewritten into the book's
+      // own terms with the curriculum glossary, and the rewrite is reported to the student. No match, no rewrite.
+      let rewrite: TutorPayload["rewrite"] = null;
+      if (!r.excerpts.length && r.booksInScope > 0) {
+        const rw = langInfo.primary === "en" || langInfo.mixed ? rewriteToBangla(question) : rewriteToEnglish(question);
+        if (rw.terms.length) {
+          const t2 = [...new Set(rw.terms.flatMap((x) => queryTerms(x)))];
+          const r2 = await retrieve(g.DB, scope, t2);
+          if (r2.excerpts.length) { r = r2; terms = t2; rewrite = { from: langInfo.primary, matched: rw.matched, searched: rw.terms }; }
+        }
+      }
+      // Hybrid retrieval: when an embedding provider is configured and passages are indexed, semantic matches are fused
+      // with keyword matches (reciprocal-rank fusion). Same trust rule and scope; otherwise keyword-only, said plainly.
+      const ecfg = embedConfig(bindings() as unknown as Record<string, string | undefined>);
+      const sem = await semanticSearch(g.DB, ecfg, scope, rewrite ? `${question} ${rewrite.searched.join(" ")}` : question);
+      let topSim: number | null = null;
+      // Fail closed: when keyword search found nothing, a meaning-only match is used only if it is strong (>= 0.6),
+      // and even then the answer is marked partial, never fully grounded.
+      const semUsable = sem.active && sem.hits.length > 0 && (r.excerpts.length > 0 || sem.hits[0].sim >= 0.6);
+      if (sem.active && sem.hits.length) topSim = sem.hits[0].sim;
+      if (semUsable) {
+        const lexIds = r.excerpts.map((e) => e.source.passageId);
+        const order = rrf([lexIds, sem.hits.map((h) => h.id)]).slice(0, MAX_EXCERPTS);
+        const missing = order.filter((id) => !lexIds.includes(id));
+        const extra = await buildExcerpts(g.DB, await visibleById(g.DB, scope, missing), terms);
+        const all = [...r.excerpts, ...extra];
+        const semanticOnly = !r.excerpts.length;
+        r = { ...r, excerpts: order.map((id) => all.find((e) => e.source.passageId === id)).filter((e): e is NonNullable<typeof e> => !!e), topChapter: r.topChapter ?? extra[0]?.source.chapter ?? null };
+        if (semanticOnly) r.bestCoverage = 0.4;
+      }
+      base.retrieval = { mode: sem.active ? "hybrid" : "lexical", semantic: sem.active, reason: sem.active ? null : sem.reason ?? null, topSim, indexed: sem.indexed };
+      base.rewrite = rewrite;
+      base.followUp = followUp;
       // "Example" and "steps" put passages that contain worked examples or solutions first. Coverage is still judged on the question's own words.
       const prefer = styleTerms(data.style);
       if (prefer.length) r.excerpts = [...r.excerpts].sort((a, b) => Number(prefer.some((w) => b.text.includes(w))) - Number(prefer.some((w) => a.text.includes(w))));
@@ -233,9 +304,13 @@ export const ask = createServerFn({ method: "POST" })
       // the student still gets the retrieved passages; nothing is generated without sources.
       let ai: TutorPayload["ai"];
       if (found && status !== "ambiguous") {
-        const lang = mode.lang ?? (/[\u0980-\u09FF]/.test(question) ? "bn" : "en");
-        const learner = await learnerContext(g.DB, g.me.id, { chapterId, grade: student.grade, medium: student.medium, lang });
-        ai = await explain(g.DB, aiConfig(bindings() as unknown as Record<string, string | undefined>), { userId: g.me.id, question, persona: data.persona, lang, excerpts: r.excerpts, learner, evidence: status === "partial" ? "partial" : "sufficient" });
+        const learner = await learnerContext(g.DB, g.me.id, { chapterId, grade: student.grade, medium: student.medium, lang: explainLang === "en" ? "en" : "bn" });
+        const pa = prev?.payload?.ai;
+        const previous = prev ? { question: prev.question, tutorSaid: pa?.blocks.find((b) => b.role === "direct")?.text ?? null, tutorAsked: pa?.blocks.find((b) => b.role === "check")?.text ?? null } : null;
+        ai = await explain(g.DB, aiConfig(bindings() as unknown as Record<string, string | undefined>), {
+          userId: g.me.id, question, persona: data.persona, lang: explainLang, excerpts: r.excerpts, learner, evidence: status === "partial" ? "partial" : "sufficient",
+          style: data.style ? STYLE_PROMPT[data.style] : null, socratic: (data.persona === "socratic" && data.style !== "direct") || data.style === "questions", previous,
+        });
       }
       payload = {
         ...base, status, excerpts: status === "ambiguous" ? [] : r.excerpts, practice: status === "ambiguous" ? null : practice, teach, choices, ai,
@@ -246,6 +321,9 @@ export const ask = createServerFn({ method: "POST" })
       };
     }
 
+    // DoubtDetector: repeated "I don't understand" / "simpler" requests in this conversation. The tutor offers help; it
+    // never guesses how the student feels.
+    if (confusion >= 2 && payload.status !== "working_check") payload.doubt = { signals: confusion };
     const ts = now();
     const keep = payload.subject?.subjectId ?? selected.subjectId;
     if (!threadId) {

@@ -19,6 +19,14 @@ function handle(req, res, raw) {
   {
     if (req.url === "/__mode") { mode = JSON.parse(raw).mode; return send(res, 200, { mode }); }
     if (req.url === "/__last") return send(res, 200, last ?? {});
+    if (req.url === "/v1/embeddings") {
+      // Deterministic bag-of-words vectors (hashed into 64 dimensions): texts sharing words are similar.
+      const b = JSON.parse(raw);
+      last = { body: b, auth: !!req.headers.authorization, mode };
+      if (mode === "fail") return send(res, 503, { error: "unavailable" });
+      const vec = (t) => { const v = new Array(64).fill(0); for (const w of String(t).toLowerCase().split(/[\s,.?!।:;()"'-]+/).filter((x) => x.length > 1)) { let h = 0; for (const ch of w) h = (h * 31 + ch.codePointAt(0)) >>> 0; v[h % 64] += 1; } return v; };
+      return send(res, 200, { model: b.model, data: b.input.map((t, i) => ({ index: i, embedding: vec(t) })) });
+    }
     if (req.url !== "/v1/chat/completions") return send(res, 404, {});
     const body = JSON.parse(raw);
     last = { body, auth: !!req.headers.authorization, mode };
@@ -33,9 +41,20 @@ function handle(req, res, raw) {
       const first = text.split("Key ideas (id: idea):")[1].trim().split(":")[0].trim();
       return send(res, 200, { model: "mock-model-1", choices: [{ message: { content: JSON.stringify({ recognised: [first, "not-a-real-idea"], misunderstandings: [], feedback: "MOCK-FEEDBACK: good start." }) } }] });
     }
+    // QuestionGen: two well-formed questions and one malformed (answer not among options), so validation is exercised.
+    const sys = body.messages.find((m) => m.role === "system")?.content ?? "";
+    if (sys.includes("You write practice questions")) {
+      const qs = [
+        { type: "mcq", prompt: "MOCK-GEN: ধারাবাহিক অনুপাতে কোন রাশি দুটি সমান হয়?", options: ["প্রথমটির উত্তর রাশি ও দ্বিতীয়টির পূর্ব রাশি", "দুটির পূর্ব রাশি", "দুটির উত্তর রাশি", "কোনোটিই নয়"], answer: "প্রথমটির উত্তর রাশি ও দ্বিতীয়টির পূর্ব রাশি", explanation: "MOCK", bloom: "remember", difficulty: 1 },
+        { type: "short", prompt: "MOCK-GEN: ধারাবাহিক অনুপাত কাকে বলে?", answer: "ধারাবাহিক অনুপাত", bloom: "understand", difficulty: 1 },
+        { type: "mcq", prompt: "MOCK-GEN: malformed question with a missing answer", options: ["a", "b", "c", "d"], answer: "e" },
+      ];
+      return send(res, 200, { model: "mock-model-1", choices: [{ message: { content: JSON.stringify({ questions: qs }) } }] });
+    }
     if (!text.includes("Textbook sources (JSON):")) return send(res, 400, { error: "unexpected prompt" });
     const sources = JSON.parse(text.slice(text.indexOf("Textbook sources (JSON):") + "Textbook sources (JSON):".length).trim());
     const s = sources[0];
+    if (mode === "malformed") return send(res, 200, { model: "mock-model-1", choices: [{ message: { content: "Sure! A continued ratio is {blocks: [unterminated" } }] });
     let reply;
     const firstSentence = (s?.text?.split(/[।.!?]/)[0] ?? s?.text ?? "").trim();
     if (mode === "insufficient") reply = { insufficient: true, blocks: [], quotes: [] };
@@ -44,6 +63,7 @@ function handle(req, res, raw) {
       { role: "direct", text: "ধারাবাহিক অনুপাত মানে সবসময় তিনটি সংখ্যার যোগফল দশ হতে হবে এবং তা কেবল জ্যামিতিতে ব্যবহৃত হয়।", basis: "textbook", cites: [s.id] },
       { role: "explanation", text: `${firstSentence}।`, basis: "textbook", cites: [s.id] },
     ], quotes: [] };
+    else if (mode === "translated_quote") reply = { blocks: [{ role: "direct", text: "MOCK-TRANSLATED: The book defines a continued ratio.", basis: "textbook", cites: [s.id] }], quotes: [{ source: s.id, text: "Such a ratio is called a continued ratio" }] };
     else if (mode === "faithful_bn") reply = { blocks: [{ role: "direct", text: `${firstSentence}।`, basis: "textbook", cites: [s.id] }], quotes: [{ source: s.id, text: firstSentence.slice(0, 40) }] };
     else if (mode === "fabricate") reply = {
       blocks: [{ role: "direct", text: "According to page 77 this is always true.", basis: "textbook", cites: [999999] }],

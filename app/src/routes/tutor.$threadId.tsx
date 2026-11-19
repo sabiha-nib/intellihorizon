@@ -2,7 +2,7 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { call, msg } from "../components/auth/messages";
-import { Composer, ContextPicker, MessageList, PersonaPicker, usePersona, type TutorContext } from "../components/app/Tutor";
+import { Composer, ContextPicker, MessageList, PersonaPicker, usePersona, type TutorContext, useTutorLang, LangPicker } from "../components/app/Tutor";
 import { PERSONAS, type StyleId } from "../lib/tutor/teach";
 import { isSubjectId, subjectById, type SubjectId } from "../lib/curriculum/registry";
 import { SignInPrompt, EmptyState } from "../components/app/kit";
@@ -31,6 +31,7 @@ function Thread() {
   const [title, setTitle] = useState(data.ok ? data.thread.title : "");
   const [editing, setEditing] = useState(false);
   const [persona, setPersona] = usePersona();
+  const [tutorLang, setTutorLang] = useTutorLang();
 
   if (!account) return <PaperPage><main className="mx-auto max-w-3xl px-4 pt-6"><SignInPrompt next={`/tutor/${threadId}`} why={{ en: "Sign in to see your conversation.", bn: "তোমার কথোপকথন দেখতে সাইন ইন করো।" }} /></main></PaperPage>;
   if (!data.ok) {
@@ -52,7 +53,7 @@ function Thread() {
     setErr(null);
     const scope = subjectOverride ? { subjectId: subjectOverride, textbookId: null, chapterId: null } : { subjectId: ctx.subject, textbookId: ctx.book, chapterId: ctx.chapter };
     if (subjectOverride) setCtx({ subject: subjectOverride, book: null, chapter: null });
-    const r = await call(ask({ data: { threadId, question: text, ...scope, scopeExplicit: true, persona, style } }), 25000);
+    const r = await call(ask({ data: { threadId, question: text, ...scope, scopeExplicit: true, persona, style, langMode: tutorLang } }), 25000);
     setPending(null);
     if (!r.ok) { setErr(r.code); return false; }
     setMessages((m) => [...m, ...r.messages]);
@@ -86,7 +87,7 @@ function Thread() {
           {tx("Searching in: ", "খোঁজা হচ্ছে: ")}<span className="font-semibold text-ink">{ctxLabel}</span>{" · "}{t(PERSONAS[persona].name)}{" "}
           <button type="button" onClick={() => setShowCtx((v) => !v)} className="font-semibold underline decoration-dashed underline-offset-4">{showCtx ? tx("Done", "ঠিক আছে") : tx("Change", "বদলাও")}</button>
         </div>
-        {showCtx && <div className="edu-rise mt-3 space-y-4"><ContextPicker value={ctx} onChange={setCtx} /><PersonaPicker value={persona} onChange={setPersona} /></div>}
+        {showCtx && <div className="edu-rise mt-3 space-y-4"><ContextPicker value={ctx} onChange={setCtx} /><PersonaPicker value={persona} onChange={setPersona} /><LangPicker value={tutorLang} onChange={setTutorLang} /></div>}
         <div className="mt-6 flex-1 pb-40">
           <MessageList messages={messages} pending={pending} onAppend={(ms) => setMessages((m) => [...m, ...ms])} onAskDifferently={(q, style) => void send(q, style)} onAskInSubject={(q, sid) => { if (isSubjectId(sid)) void send(q, null, sid); }} />
         </div>

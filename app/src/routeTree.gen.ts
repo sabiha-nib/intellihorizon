@@ -10,21 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as TwinRouteImport } from './routes/twin'
 import { Route as TomorrowRouteImport } from './routes/tomorrow'
+import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as SkyRouteImport } from './routes/sky'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
+import { Route as ShareRouteImport } from './routes/share'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RevisionRouteImport } from './routes/revision'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ReflectRouteImport } from './routes/reflect'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PlanRouteImport } from './routes/plan'
 import { Route as PathRouteImport } from './routes/path'
+import { Route as NotesRouteImport } from './routes/notes'
 import { Route as MoreRouteImport } from './routes/more'
 import { Route as MistakesRouteImport } from './routes/mistakes'
 import { Route as MissionsRouteImport } from './routes/missions'
@@ -36,8 +41,13 @@ import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as FormulasRouteImport } from './routes/formulas'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FamilyRouteImport } from './routes/family'
+import { Route as ExamArenaRouteImport } from './routes/exam-arena'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ConceptsRouteImport } from './routes/concepts'
+import { Route as CardsRouteImport } from './routes/cards'
 import { Route as BlueprintRouteImport } from './routes/blueprint'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AchievementsRouteImport } from './routes/achievements'
@@ -69,9 +79,19 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
   path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TwinRoute = TwinRouteImport.update({
+  id: '/twin',
+  path: '/twin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TomorrowRoute = TomorrowRouteImport.update({
   id: '/tomorrow',
   path: '/tomorrow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SummaryRoute = SummaryRouteImport.update({
+  id: '/summary',
+  path: '/summary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SkyRoute = SkyRouteImport.update({
@@ -92,6 +112,11 @@ const SignupRoute = SignupRouteImport.update({
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareRoute = ShareRouteImport.update({
+  id: '/share',
+  path: '/share',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -124,6 +149,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReflectRoute = ReflectRouteImport.update({
+  id: '/reflect',
+  path: '/reflect',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
@@ -142,6 +172,11 @@ const PlanRoute = PlanRouteImport.update({
 const PathRoute = PathRouteImport.update({
   id: '/path',
   path: '/path',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesRoute = NotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MoreRoute = MoreRouteImport.update({
@@ -199,14 +234,39 @@ const HelpRoute = HelpRouteImport.update({
   path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FormulasRoute = FormulasRouteImport.update({
+  id: '/formulas',
+  path: '/formulas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FamilyRoute = FamilyRouteImport.update({
+  id: '/family',
+  path: '/family',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamArenaRoute = ExamArenaRouteImport.update({
+  id: '/exam-arena',
+  path: '/exam-arena',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConceptsRoute = ConceptsRouteImport.update({
+  id: '/concepts',
+  path: '/concepts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CardsRoute = CardsRouteImport.update({
+  id: '/cards',
+  path: '/cards',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlueprintRoute = BlueprintRouteImport.update({
@@ -343,8 +403,13 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AchievementsRoute
   '/admin': typeof AdminRoute
   '/blueprint': typeof BlueprintRoute
+  '/cards': typeof CardsRoute
+  '/concepts': typeof ConceptsRoute
   '/dashboard': typeof DashboardRoute
+  '/exam-arena': typeof ExamArenaRoute
+  '/family': typeof FamilyRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/formulas': typeof FormulasRoute
   '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/home': typeof HomeRoute
@@ -356,21 +421,26 @@ export interface FileRoutesByFullPath {
   '/missions': typeof MissionsRoute
   '/mistakes': typeof MistakesRoute
   '/more': typeof MoreRoute
+  '/notes': typeof NotesRoute
   '/path': typeof PathRoute
   '/plan': typeof PlanRoute
   '/privacy': typeof PrivacyRoute
   '/progress': typeof ProgressRoute
+  '/reflect': typeof ReflectRoute
   '/reset-password': typeof ResetPasswordRoute
   '/revision': typeof RevisionRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/share': typeof ShareRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/summary': typeof SummaryRoute
   '/tomorrow': typeof TomorrowRoute
+  '/twin': typeof TwinRoute
   '/verify-email': typeof VerifyEmailRoute
   '/api/avatar': typeof ApiAvatarRoute
   '/books/$bookId': typeof BooksBookIdRoute
@@ -399,8 +469,13 @@ export interface FileRoutesByTo {
   '/achievements': typeof AchievementsRoute
   '/admin': typeof AdminRoute
   '/blueprint': typeof BlueprintRoute
+  '/cards': typeof CardsRoute
+  '/concepts': typeof ConceptsRoute
   '/dashboard': typeof DashboardRoute
+  '/exam-arena': typeof ExamArenaRoute
+  '/family': typeof FamilyRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/formulas': typeof FormulasRoute
   '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/home': typeof HomeRoute
@@ -412,21 +487,26 @@ export interface FileRoutesByTo {
   '/missions': typeof MissionsRoute
   '/mistakes': typeof MistakesRoute
   '/more': typeof MoreRoute
+  '/notes': typeof NotesRoute
   '/path': typeof PathRoute
   '/plan': typeof PlanRoute
   '/privacy': typeof PrivacyRoute
   '/progress': typeof ProgressRoute
+  '/reflect': typeof ReflectRoute
   '/reset-password': typeof ResetPasswordRoute
   '/revision': typeof RevisionRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/share': typeof ShareRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/summary': typeof SummaryRoute
   '/tomorrow': typeof TomorrowRoute
+  '/twin': typeof TwinRoute
   '/verify-email': typeof VerifyEmailRoute
   '/api/avatar': typeof ApiAvatarRoute
   '/books/$bookId': typeof BooksBookIdRoute
@@ -456,8 +536,13 @@ export interface FileRoutesById {
   '/achievements': typeof AchievementsRoute
   '/admin': typeof AdminRoute
   '/blueprint': typeof BlueprintRoute
+  '/cards': typeof CardsRoute
+  '/concepts': typeof ConceptsRoute
   '/dashboard': typeof DashboardRoute
+  '/exam-arena': typeof ExamArenaRoute
+  '/family': typeof FamilyRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/formulas': typeof FormulasRoute
   '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/home': typeof HomeRoute
@@ -469,21 +554,26 @@ export interface FileRoutesById {
   '/missions': typeof MissionsRoute
   '/mistakes': typeof MistakesRoute
   '/more': typeof MoreRoute
+  '/notes': typeof NotesRoute
   '/path': typeof PathRoute
   '/plan': typeof PlanRoute
   '/privacy': typeof PrivacyRoute
   '/progress': typeof ProgressRoute
+  '/reflect': typeof ReflectRoute
   '/reset-password': typeof ResetPasswordRoute
   '/revision': typeof RevisionRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/share': typeof ShareRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/summary': typeof SummaryRoute
   '/tomorrow': typeof TomorrowRoute
+  '/twin': typeof TwinRoute
   '/verify-email': typeof VerifyEmailRoute
   '/api/avatar': typeof ApiAvatarRoute
   '/books/$bookId': typeof BooksBookIdRoute
@@ -514,8 +604,13 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admin'
     | '/blueprint'
+    | '/cards'
+    | '/concepts'
     | '/dashboard'
+    | '/exam-arena'
+    | '/family'
     | '/forgot-password'
+    | '/formulas'
     | '/help'
     | '/history'
     | '/home'
@@ -527,21 +622,26 @@ export interface FileRouteTypes {
     | '/missions'
     | '/mistakes'
     | '/more'
+    | '/notes'
     | '/path'
     | '/plan'
     | '/privacy'
     | '/progress'
+    | '/reflect'
     | '/reset-password'
     | '/revision'
     | '/robots.txt'
     | '/saved'
     | '/search'
     | '/settings'
+    | '/share'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
     | '/sky'
+    | '/summary'
     | '/tomorrow'
+    | '/twin'
     | '/verify-email'
     | '/api/avatar'
     | '/books/$bookId'
@@ -570,8 +670,13 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admin'
     | '/blueprint'
+    | '/cards'
+    | '/concepts'
     | '/dashboard'
+    | '/exam-arena'
+    | '/family'
     | '/forgot-password'
+    | '/formulas'
     | '/help'
     | '/history'
     | '/home'
@@ -583,21 +688,26 @@ export interface FileRouteTypes {
     | '/missions'
     | '/mistakes'
     | '/more'
+    | '/notes'
     | '/path'
     | '/plan'
     | '/privacy'
     | '/progress'
+    | '/reflect'
     | '/reset-password'
     | '/revision'
     | '/robots.txt'
     | '/saved'
     | '/search'
     | '/settings'
+    | '/share'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
     | '/sky'
+    | '/summary'
     | '/tomorrow'
+    | '/twin'
     | '/verify-email'
     | '/api/avatar'
     | '/books/$bookId'
@@ -626,8 +736,13 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admin'
     | '/blueprint'
+    | '/cards'
+    | '/concepts'
     | '/dashboard'
+    | '/exam-arena'
+    | '/family'
     | '/forgot-password'
+    | '/formulas'
     | '/help'
     | '/history'
     | '/home'
@@ -639,21 +754,26 @@ export interface FileRouteTypes {
     | '/missions'
     | '/mistakes'
     | '/more'
+    | '/notes'
     | '/path'
     | '/plan'
     | '/privacy'
     | '/progress'
+    | '/reflect'
     | '/reset-password'
     | '/revision'
     | '/robots.txt'
     | '/saved'
     | '/search'
     | '/settings'
+    | '/share'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
     | '/sky'
+    | '/summary'
     | '/tomorrow'
+    | '/twin'
     | '/verify-email'
     | '/api/avatar'
     | '/books/$bookId'
@@ -683,8 +803,13 @@ export interface RootRouteChildren {
   AchievementsRoute: typeof AchievementsRoute
   AdminRoute: typeof AdminRoute
   BlueprintRoute: typeof BlueprintRoute
+  CardsRoute: typeof CardsRoute
+  ConceptsRoute: typeof ConceptsRoute
   DashboardRoute: typeof DashboardRoute
+  ExamArenaRoute: typeof ExamArenaRoute
+  FamilyRoute: typeof FamilyRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  FormulasRoute: typeof FormulasRoute
   HelpRoute: typeof HelpRoute
   HistoryRoute: typeof HistoryRoute
   HomeRoute: typeof HomeRoute
@@ -696,21 +821,26 @@ export interface RootRouteChildren {
   MissionsRoute: typeof MissionsRoute
   MistakesRoute: typeof MistakesRoute
   MoreRoute: typeof MoreRoute
+  NotesRoute: typeof NotesRoute
   PathRoute: typeof PathRoute
   PlanRoute: typeof PlanRoute
   PrivacyRoute: typeof PrivacyRoute
   ProgressRoute: typeof ProgressRoute
+  ReflectRoute: typeof ReflectRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RevisionRoute: typeof RevisionRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SavedRoute: typeof SavedRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
+  ShareRoute: typeof ShareRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkyRoute: typeof SkyRoute
+  SummaryRoute: typeof SummaryRoute
   TomorrowRoute: typeof TomorrowRoute
+  TwinRoute: typeof TwinRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiAvatarRoute: typeof ApiAvatarRoute
   BooksBookIdRoute: typeof BooksBookIdRoute
@@ -742,11 +872,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/twin': {
+      id: '/twin'
+      path: '/twin'
+      fullPath: '/twin'
+      preLoaderRoute: typeof TwinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tomorrow': {
       id: '/tomorrow'
       path: '/tomorrow'
       fullPath: '/tomorrow'
       preLoaderRoute: typeof TomorrowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summary': {
+      id: '/summary'
+      path: '/summary'
+      fullPath: '/summary'
+      preLoaderRoute: typeof SummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sky': {
@@ -775,6 +919,13 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin'
       preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share': {
+      id: '/share'
+      path: '/share'
+      fullPath: '/share'
+      preLoaderRoute: typeof ShareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -819,6 +970,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reflect': {
+      id: '/reflect'
+      path: '/reflect'
+      fullPath: '/reflect'
+      preLoaderRoute: typeof ReflectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progress': {
       id: '/progress'
       path: '/progress'
@@ -845,6 +1003,13 @@ declare module '@tanstack/react-router' {
       path: '/path'
       fullPath: '/path'
       preLoaderRoute: typeof PathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes': {
+      id: '/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof NotesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/more': {
@@ -924,6 +1089,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/formulas': {
+      id: '/formulas'
+      path: '/formulas'
+      fullPath: '/formulas'
+      preLoaderRoute: typeof FormulasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -931,11 +1103,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/family': {
+      id: '/family'
+      path: '/family'
+      fullPath: '/family'
+      preLoaderRoute: typeof FamilyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exam-arena': {
+      id: '/exam-arena'
+      path: '/exam-arena'
+      fullPath: '/exam-arena'
+      preLoaderRoute: typeof ExamArenaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/concepts': {
+      id: '/concepts'
+      path: '/concepts'
+      fullPath: '/concepts'
+      preLoaderRoute: typeof ConceptsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cards': {
+      id: '/cards'
+      path: '/cards'
+      fullPath: '/cards'
+      preLoaderRoute: typeof CardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blueprint': {
@@ -1134,8 +1334,13 @@ const rootRouteChildren: RootRouteChildren = {
   AchievementsRoute: AchievementsRoute,
   AdminRoute: AdminRoute,
   BlueprintRoute: BlueprintRoute,
+  CardsRoute: CardsRoute,
+  ConceptsRoute: ConceptsRoute,
   DashboardRoute: DashboardRoute,
+  ExamArenaRoute: ExamArenaRoute,
+  FamilyRoute: FamilyRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  FormulasRoute: FormulasRoute,
   HelpRoute: HelpRoute,
   HistoryRoute: HistoryRoute,
   HomeRoute: HomeRoute,
@@ -1147,21 +1352,26 @@ const rootRouteChildren: RootRouteChildren = {
   MissionsRoute: MissionsRoute,
   MistakesRoute: MistakesRoute,
   MoreRoute: MoreRoute,
+  NotesRoute: NotesRoute,
   PathRoute: PathRoute,
   PlanRoute: PlanRoute,
   PrivacyRoute: PrivacyRoute,
   ProgressRoute: ProgressRoute,
+  ReflectRoute: ReflectRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RevisionRoute: RevisionRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SavedRoute: SavedRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
+  ShareRoute: ShareRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkyRoute: SkyRoute,
+  SummaryRoute: SummaryRoute,
   TomorrowRoute: TomorrowRoute,
+  TwinRoute: TwinRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   ApiAvatarRoute: ApiAvatarRoute,
   BooksBookIdRoute: BooksBookIdRoute,

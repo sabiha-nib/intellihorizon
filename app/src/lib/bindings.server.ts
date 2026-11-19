@@ -38,6 +38,10 @@ type AppEnv = {
   AI_TIMEOUT_MS?: string;
   AI_DAILY_LIMIT?: string;
   AI_VISION?: string;
+  EMBED_API_KEY?: string;
+  EMBED_MODEL?: string;
+  EMBED_BASE_URL?: string;
+  EMBED_MIN_SIM?: string;
 };
 
 export function bindings(): AppEnv {

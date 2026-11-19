@@ -25,7 +25,7 @@ export const STUDENT_VISIBLE = `(p.publish_status = 'published' OR (t.status = '
 
 export type Retrieval = { excerpts: Excerpt[]; bestCoverage: number; booksInScope: number; topChapter: SourceRef["chapter"] };
 
-function scopeSql(scope: Scope): { sql: string; args: (string | number)[] } {
+export function scopeSql(scope: Scope): { sql: string; args: (string | number)[] } {
   const parts = [STUDENT_VISIBLE, "t.version_id = ?"];
   const args: (string | number)[] = [ACTIVE_VERSION];
   if (scope.textbookId) {
@@ -82,15 +82,6 @@ export async function retrieve(DB: D1Database, scope: Scope, terms: string[]): P
   }
   if (!rows.length) return empty;
 
-  const bookIds = [...new Set(rows.map((r) => r.book_id))];
-  const ch = await DB.prepare(`SELECT id, textbook_id, position, label, title, start_page, end_page FROM chapters WHERE textbook_id IN (${bookIds.map(() => "?").join(",")})`)
-    .bind(...bookIds).all<ChapterRow>();
-  const chapters = ch.results ?? [];
-  const chapterFor = (bookId: string, page: number) => {
-    const c = chapters.find((x) => x.textbook_id === bookId && x.start_page !== null && x.end_page !== null && page >= x.start_page && page <= x.end_page);
-    return c ? { id: c.id, position: c.position, label: c.label, title: c.title } : null;
-  };
-
   const minScore = Math.min(...rows.map((r) => r.score));
   const ranked = rows
     .map((r) => {
@@ -107,7 +98,22 @@ export async function retrieve(DB: D1Database, scope: Scope, terms: string[]): P
     picked.push(x);
     if (picked.length >= MAX_EXCERPTS) break;
   }
-  const excerpts: Excerpt[] = picked.map(({ r }) => ({
+  const excerpts = await buildExcerpts(DB, picked.map((x) => x.r), terms);
+  return { excerpts, bestCoverage: picked[0]?.coverage ?? 0, booksInScope, topChapter: excerpts[0]?.source.chapter ?? null };
+}
+
+/** Turns passage rows into student-facing excerpts with their full source records (book, chapter, pages, trust). */
+export async function buildExcerpts(DB: D1Database, rows: HitRow[], terms: string[]): Promise<Excerpt[]> {
+  if (!rows.length) return [];
+  const bookIds = [...new Set(rows.map((r) => r.book_id))];
+  const ch = await DB.prepare(`SELECT id, textbook_id, position, label, title, start_page, end_page FROM chapters WHERE textbook_id IN (${bookIds.map(() => "?").join(",")})`)
+    .bind(...bookIds).all<ChapterRow>();
+  const chapters = ch.results ?? [];
+  const chapterFor = (bookId: string, page: number) => {
+    const c = chapters.find((x) => x.textbook_id === bookId && x.start_page !== null && x.end_page !== null && page >= x.start_page && page <= x.end_page);
+    return c ? { id: c.id, position: c.position, label: c.label, title: c.title } : null;
+  };
+  return rows.map((r) => ({
     text: excerpt(r.text, terms),
     source: {
       passageId: r.id, textbookId: r.book_id, title: r.title, publisher: r.publisher, subjectKey: r.subject_key, subjectName: r.subject_name, paper: r.paper,
@@ -117,5 +123,14 @@ export async function retrieve(DB: D1Database, scope: Scope, terms: string[]): P
       ocrConfidence: r.review_status !== "checked" && r.review_status !== "teacher_reviewed" && r.extraction_method === "ocr" ? r.confidence : null,
     },
   }));
-  return { excerpts, bestCoverage: picked[0]?.coverage ?? 0, booksInScope, topChapter: excerpts[0]?.source.chapter ?? null };
 }
+
+/** Student-visible passages in scope, by id (used to add semantic matches). Ids outside the scope or not visible are dropped. */
+export async function visibleById(DB: D1Database, scope: Scope, ids: number[]): Promise<HitRow[]> {
+  if (!ids.length) return [];
+  const { sql, args } = scopeSql(scope);
+  const r = await DB.prepare(`${SELECT}, 0 AS score FROM passages p JOIN textbooks t ON t.id = p.textbook_id WHERE p.id IN (${ids.map(() => "?").join(",")}) AND ${sql}`)
+    .bind(...ids, ...args).all<HitRow>();
+  return r.results ?? [];
+}
+export type { HitRow };

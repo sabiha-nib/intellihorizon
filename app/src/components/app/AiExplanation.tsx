@@ -3,6 +3,7 @@ import type { AiBlock, AiExplanation as Ai } from "../../lib/ai/grounding";
 import type { Excerpt } from "../../lib/tutor/types";
 import { useLearner } from "../../lib/store";
 import { MathText } from "./MathText";
+import { SpeakButton } from "./Speak";
 
 /** What each part of an AI explanation rests on. Shown on every block so generated wording is never mistaken for the book. */
 const BASIS: Record<AiBlock["basis"], { label: L; cls: string }> = {
@@ -28,7 +29,7 @@ const STATUS: Partial<Record<Ai["status"], L>> = {
   limit: { en: "You've used today's AI explanations. The textbook text still works, and more explanations are available tomorrow.", bn: "আজকের এআই ব্যাখ্যা শেষ। পাঠ্যবইয়ের লেখা দেখা যাবে, কাল আবার ব্যাখ্যা পাবে।" },
 };
 
-export function AiExplanation({ ai, excerpts }: { ai: Ai; excerpts: Excerpt[] }) {
+export function AiExplanation({ ai, excerpts, lang = null }: { ai: Ai; excerpts: Excerpt[]; lang?: "bn" | "en" | "mixed" | null }) {
   const { t, tx } = useLearner();
   const sourceNo = (id: number) => excerpts.findIndex((e) => e.source.passageId === id) + 1;
   if (ai.status !== "ok") {
@@ -64,6 +65,7 @@ export function AiExplanation({ ai, excerpts }: { ai: Ai; excerpts: Excerpt[] })
           })}
         </div>
       )}
+      <SpeakButton lang={lang === "en" ? "en" : "bn"} parts={ai.blocks.map((b) => `${t(BASIS[b.basis].label)}. ${t(ROLE[b.role])}: ${b.text.replace(/\$/g, "")}`)} />
       <p className="text-xs text-ink-low">{tx("Written by an AI model from the sources listed below. Labels show what comes from your book and what doesn't. Check with your teacher if something seems wrong.", "নিচের উৎসগুলো থেকে একটি এআই মডেল লিখেছে। কোনটি বই থেকে আর কোনটি নয়, লেবেলে দেখানো আছে। কিছু ভুল মনে হলে শিক্ষককে জিজ্ঞেস করো।")}</p>
     </section>
   );

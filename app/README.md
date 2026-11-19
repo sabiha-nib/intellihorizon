@@ -53,6 +53,20 @@ Set in Higgsfield website settings (all optional):
   - Optional: `AI_BASE_URL` (https only), `AI_TIMEOUT_MS` (default 20000), `AI_DAILY_LIMIT` per student (default 60),
     `AI_VISION=on` to read homework photos (the model must accept images).
   Without them the tutor shows checked textbook text only and says AI explanations aren't switched on.
+- Meaning-based (semantic) retrieval, optional, all three required: `EMBED_API_KEY`, `EMBED_MODEL`, `EMBED_BASE_URL`
+  (any OpenAI-compatible `/embeddings` endpoint; https only). Optional `EMBED_MIN_SIM` (default 0.35). After setting them,
+  open Admin -> "Formulas, links and AI drafts" -> Build index (repeat until it says all done). Without them, or before
+  the index is built, the tutor uses keyword search only and says so under each answer.
+
+### Owner setup checklist
+
+1. Sign in, open /admin and unlock it with the owner code (shown only to the owner; never logged).
+2. In Higgsfield website settings -> Secrets, add `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL` (and `AI_BASE_URL` if your
+   provider isn't the default for its type). If the site doesn't pick them up, redeploy it.
+3. Optionally add `EMBED_*` (above) and build the index; `RESEND_API_KEY` + `EMAIL_FROM` for email.
+4. Import the Class 7 text pack in Content Studio and review passages. Nothing unreviewed reaches students.
+5. Run `node tests/eval.ai.mjs` against a staging copy with the real provider to measure it (thresholds are in
+   `data/ai-eval/cases.json`). Never paste keys into code or chat.
 
 Migrations in `migrations/` are additive and are applied on deploy.
 
@@ -131,6 +145,32 @@ corpus is 16 passages; English questions are not matched to Bangla-medium text (
   Each topic reports five separate signals (checked material, opened, answers, mastery evidence, revision due);
   they are never blended into one percentage.
 
+## Phase 4: tutor and study tools
+
+Tutor (all in `lib/api/tutor.functions.ts` `ask`, rules in pure modules with unit tests):
+- Explanation language (`lib/tutor/language.ts`): Auto (the question's language; code-switched questions get a mixed
+  explanation), বাংলা, English, or Bangla + English terms. Stored per student (`profiles.tutor_lang`). Quotations and
+  textbook text are never translated; the answer says when the explanation's language differs from the book's.
+- Cross-language retrieval (`lib/curriculum/glossary.ts`): an English question about Bangla text is rewritten with a
+  reviewed curriculum glossary and the rewrite is shown. No glossary match, no rewrite: the tutor still abstains.
+- Hybrid retrieval (`lib/curriculum/semantic.server.ts`): keyword + embeddings fused with reciprocal-rank fusion over the
+  same `STUDENT_VISIBLE` set. A meaning-only match is used only at similarity >= 0.6 and is always marked partial.
+- Working checker (`lib/tutor/working.ts`): one step per line, checked exactly; the first step that doesn't hold is named.
+- Doubt detection (repeated "I don't understand" in one thread) offers steps, an analogy, a check or practice.
+- Bounded memory: the previous question and the tutor's last answer/question go to the model as data.
+- Read aloud uses the device's own voices and says so when there is no Bangla voice; it reads the trust labels too.
+
+Study tools (`lib/api/studio.functions.ts`, rules in `lib/learning/studio.ts`, tables in `migrations/0012_ecosystem.sql`):
+MemoryCards (/cards: own cards, definition cards whose answer is the book's sentence verbatim, SM-2 spacing, duplicate
+reviews ignored), SmartNotes (/notes, private), FormulaVault (/formulas, checked formulas with page and provenance),
+ConceptConnect (/concepts, checked links with written reasons), IntelliSummary (/summary, extractive: book sentences only,
+each with its page), Reflection (/reflect, never evidence), teacher/parent access (/share creates an expiring, revocable
+code stored as a hash; /family shows a progress summary only), ExamArena (/exam-arena, readiness as four visible
+factors, never a percentage), Learning Twin (/twin, topic evidence, improvement only with two non-overlapping windows of
+5 answers at the same difficulty; "this isn't right about me" starts a check and never edits evidence). Admin:
+QuestionGen (AI drafts, structurally validated, saved as drafts with provenance `ai_generated`), formula and link review,
+semantic index.
+
 ## Running the checks
 
 ```
@@ -141,8 +181,8 @@ bunx vite build                 # production build
 # end-to-end (needs wrangler dev on :8787 with a fresh local D1, see tests/*.mjs headers)
 node tests/e2e.universe.mjs && node tests/e2e.grade7.mjs && node tests/e2e.curriculum.mjs && node tests/e2e.accounts.mjs
 node tests/e2e.ai.mjs && node tests/e2e.content.mjs && node tests/e2e.inputs.mjs && node tests/e2e.security.mjs
-node tests/e2e.quiz.mjs && node tests/eval.ai.mjs   # eval writes tests/eval-report.json
-# the AI suites need the test double: node tests/mock-ai.mjs (port 8790) and AI_* vars pointing at it
+node tests/e2e.quiz.mjs && node tests/e2e.studio.mjs && node tests/eval.ai.mjs   # eval writes tests/eval-report.json
+# the AI suites need the test double: node tests/mock-ai.mjs (port 8790) and AI_* / EMBED_* vars pointing at it
 ```
 
 ## Implementation log (IntelliHorizon transformation)
@@ -177,4 +217,7 @@ node tests/e2e.quiz.mjs && node tests/eval.ai.mjs   # eval writes tests/eval-rep
 - Owner action: set the AI_* secrets to switch on AI explanations, and RESEND_API_KEY + EMAIL_FROM for email.
 - Human correction of Mathematics OCR; questions beyond Mathematics Chapter 2; key ideas beyond the three chapters with lessons.
 - English-version books (not supplied) and NCTB's written permission (not received).
-- Teacher accounts (teacher reviews are recorded by an admin with the teacher's name); parent views; leaderboards.
+- Teacher accounts (teacher reviews are recorded by an admin with the teacher's name); leaderboards (off by design).
+- Career paths: not built. It needs dated, sourced information about Bangladeshi careers and courses, which this project
+  doesn't have; inventing it would break the no-invented-content rule.
+- Matching and multi-select question types (need a questions-table rebuild); a real-provider evaluation run (no key).

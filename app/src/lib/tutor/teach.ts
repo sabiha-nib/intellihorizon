@@ -5,7 +5,7 @@ import type { L } from "../../content/types";
 
 export const PERSONA_IDS = ["mentor", "socratic", "challenger", "simplifier", "exam"] as const;
 export type PersonaId = (typeof PERSONA_IDS)[number];
-export const STYLE_IDS = ["beginner", "example", "steps", "bangla", "english", "questions", "harder"] as const;
+export const STYLE_IDS = ["beginner", "example", "steps", "bangla", "english", "questions", "harder", "analogy", "realworld", "derivation", "testme", "direct"] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
 
 export const PERSONAS: Record<PersonaId, { name: L; how: L }> = {
@@ -24,16 +24,37 @@ export const STYLES: Record<StyleId, L> = {
   english: { en: "Explain in English", bn: "ইংরেজিতে বোঝাও" },
   questions: { en: "Ask me questions instead", bn: "বরং আমাকে প্রশ্ন করো" },
   harder: { en: "Give me a harder challenge", bn: "আরও কঠিন চ্যালেঞ্জ দাও" },
+  analogy: { en: "Use an analogy", bn: "একটি তুলনা দিয়ে বোঝাও" },
+  realworld: { en: "Give a real-world example", bn: "বাস্তব জীবনের উদাহরণ দাও" },
+  derivation: { en: "Show the mathematical working", bn: "গাণিতিক ধাপ দেখাও" },
+  testme: { en: "Test my understanding", bn: "আমার বোঝা যাচাই করো" },
+  direct: { en: "Just explain it directly", bn: "সরাসরি বুঝিয়ে দাও" },
+};
+
+/** How each style changes what the AI is asked to do (presentation only; evidence rules never change). */
+export const STYLE_PROMPT: Record<StyleId, string> = {
+  beginner: "Explain as simply as possible, short sentences, everyday words.",
+  example: "Lead with an example taken from the sources if there is one; label any other example as general.",
+  steps: "Give numbered steps.",
+  bangla: "Write in Bangla.",
+  english: "Write in English.",
+  questions: "Teach through questions: ask one guiding question first and do not reveal the full answer yet.",
+  harder: "After explaining, give a harder application question.",
+  analogy: "Use one simple analogy from a Bangladeshi student's daily life, labelled as an analogy (general).",
+  realworld: "Give one real-world example, labelled as general unless it comes from the sources.",
+  derivation: "Show the mathematical working step by step; every arithmetic step must be correct.",
+  testme: "Do not explain again; ask two short questions that test understanding of the sources.",
+  direct: "Explain directly and completely now, even if you were asking guiding questions before.",
 };
 
 /** What a persona plus an optional one-off style means for this answer. A style wins over the persona's default. */
 export function teachingMode(persona: PersonaId, style: StyleId | null) {
   return {
     simplify: style === "beginner" || (style === null && persona === "simplifier"),
-    guide: style === "questions" || (style === null && persona === "socratic"),
+    guide: style === "questions" || style === "testme" || (style === null && persona === "socratic"),
     challenge: style === "harder" || (style === null && persona === "challenger"),
     exam: style === null && persona === "exam",
-    steps: style === "steps" || style === "beginner" || (style === null && persona === "simplifier"),
+    steps: style === "steps" || style === "beginner" || style === "derivation" || (style === null && persona === "simplifier"),
     example: style === "example",
     lang: style === "bangla" ? ("bn" as const) : style === "english" ? ("en" as const) : null,
   };

@@ -32,7 +32,9 @@ export type TutorStatus =
   /** The question names a subject or book that differs from the subject the student selected. */
   | "subject_conflict"
   /** No subject was chosen and the best matches come from more than one subject: the tutor asks which one. */
-  | "ambiguous";
+  | "ambiguous"
+  /** The message was worked steps; each "=" line was checked exactly. */
+  | "working_check";
 
 /** How the tutor decided which subject (and book) to search. */
 export type SubjectResolution = {
@@ -61,6 +63,18 @@ export type TutorPayload = {
   choices?: { subjectId: string; name: string }[];
   /** Validated AI explanation, when configured. Absent on messages saved before it existed. */
   ai?: AiExplanation;
+  /** Question language, whether it code-switches, and the language the explanation was asked for. */
+  language?: { question: "bn" | "en"; mixed: boolean; explanation: "bn" | "en" | "mixed" };
+  /** How evidence was found: keyword-only or hybrid (keyword + semantic), and why semantic wasn't used. */
+  retrieval?: { mode: "lexical" | "hybrid"; semantic: boolean; reason: string | null; topSim: number | null; indexed: number };
+  /** Cross-language search: the glossary terms the question was rewritten into. */
+  rewrite?: { from: "bn" | "en"; matched: string[]; searched: string[] } | null;
+  /** The question continued the previous turn's topic. */
+  followUp?: boolean;
+  /** Step-by-step working check results. */
+  working?: { steps: { line: string; status: "ok" | "wrong" | "unchecked" | "no_equation"; detail: { left: string; right: string } | null }[]; firstWrong: number | null; checked: number };
+  /** Confusion signals in this conversation (DoubtDetector). */
+  doubt?: { signals: number };
   /** How this answer was taught: the persona, any "ask differently" style, and the verified extras attached for it. */
   teach?: {
     persona: string;

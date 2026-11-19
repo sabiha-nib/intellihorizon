@@ -9,8 +9,33 @@ import { AskInputs } from "./AskInputs";
 import { call } from "../auth/messages";
 import { SourceCard } from "./kit";
 import { AiExplanation } from "./AiExplanation";
+import { SpeakButton } from "./Speak";
 import { SUBJECTS, subjectById, type SubjectId } from "../../lib/curriculum/registry";
 import { PERSONAS, PERSONA_IDS, STYLES, STYLE_IDS, type PersonaId, type StyleId } from "../../lib/tutor/teach";
+
+const LANG_KEY = "edu_tutor_lang_v1";
+export type TutorLang = "auto" | "bn" | "en" | "mixed";
+/** The explanation language the student chose for the tutor (separate from the interface language). */
+export function useTutorLang(): [TutorLang, (l: TutorLang) => void] {
+  const [v, setV] = useState<TutorLang>("auto");
+  useEffect(() => { try { const x = window.localStorage.getItem(LANG_KEY); if (x === "bn" || x === "en" || x === "mixed" || x === "auto") setV(x); } catch { /* storage unavailable */ } }, []);
+  return [v, (l) => { setV(l); try { window.localStorage.setItem(LANG_KEY, l); } catch { /* applies for this visit */ } }];
+}
+export function LangPicker({ value, onChange }: { value: TutorLang; onChange: (l: TutorLang) => void }) {
+  const { tx } = useLearner();
+  const opts: [TutorLang, string][] = [["auto", tx("Same as my question", "প্রশ্নের ভাষায়")], ["bn", "বাংলা"], ["en", "English"], ["mixed", tx("Bangla + English terms", "বাংলা + ইংরেজি শব্দ")]];
+  return (
+    <fieldset>
+      <legend className="mb-2 text-sm font-semibold text-ink-mid">{tx("Explanation language", "ব্যাখ্যার ভাষা")}</legend>
+      <div className="flex flex-wrap gap-1.5" role="radiogroup">
+        {opts.map(([id, label]) => (
+          <button key={id} type="button" role="radio" aria-checked={value === id} onClick={() => onChange(id)} className={`inline-flex h-9 items-center rounded-full border px-3 text-sm font-semibold ${value === id ? "border-brand bg-brand text-sheet" : "border-ink-low/30 bg-sheet hover:border-ink"}`}>{label}</button>
+        ))}
+      </div>
+      <p className="mt-2 text-sm text-ink-mid">{tx("Textbook text is always shown in the book's own language; only explanations change language.", "পাঠ্যবইয়ের লেখা সবসময় বইয়ের নিজের ভাষায় থাকে; শুধু ব্যাখ্যার ভাষা বদলায়।")}</p>
+    </fieldset>
+  );
+}
 
 const PERSONA_KEY = "edu_tutor_persona_v1";
 /** The student's chosen teaching approach, remembered on this device. */
@@ -53,6 +78,7 @@ const LEAD: Record<string, L> = {
   no_books: { en: "The textbooks for this search aren't ready for the tutor yet, so I have nothing to check this against.", bn: "এই খোঁজার পাঠ্যবইগুলো এখনো টিউটরের জন্য প্রস্তুত নয়, তাই মেলানোর মতো কিছু নেই।" },
   unsupported_subject: { en: "That subject isn't one IntelliHorizon covers.", bn: "এই বিষয়টি ইন্টেলিহরাইজনে নেই।" },
   subject_conflict: { en: "Your question is about a different book or subject from the one you chose.", bn: "তোমার প্রশ্নটি তোমার বাছাই করা বিষয় বা বইয়ের বাইরের।" },
+  working_check: { en: "I checked your working line by line with exact arithmetic.", bn: "তোমার কাজ লাইন ধরে ধরে নির্ভুল হিসাবে মিলিয়েছি।" },
   ambiguous: { en: "This idea appears in more than one subject. Which one are you studying?", bn: "এই ধারণাটি একাধিক বিষয়ে আছে। তুমি কোনটি পড়ছ?" },
   needs_context: { en: "Tell me a little more. Use a word or two from your textbook, like the name of the idea you're stuck on.", bn: "আরেকটু বলো। পাঠ্যবইয়ের একটি-দুটি শব্দ লেখো, যেমন যে ধারণায় আটকে আছ তার নাম।" },
 };
@@ -196,7 +222,29 @@ function TutorBubble({ m, onAppend, readOnly, onAskDifferently, onAskInSubject }
           {p.choices.map((c) => <Chip key={c.subjectId} onClick={onAskInSubject ? () => onAskInSubject(c.subjectId) : undefined} to={onAskInSubject ? undefined : "/tutor"} search={onAskInSubject ? undefined : { subject: c.subjectId }}>{t(subjectById(c.subjectId)?.label ?? { en: c.name, bn: c.name })}</Chip>)}
         </div>
       )}
-      {p.ai && found && !folded && <AiExplanation ai={p.ai} excerpts={p.excerpts} />}
+      {p.rewrite && (
+        <p className="rounded-[12px] bg-lilac px-3 py-2 text-sm" data-testid="rewrite">{p.rewrite.from === "en" ? tx(`You asked in English and your book is in Bangla, so I searched it for: ${p.rewrite.searched.join(", ")} (from "${p.rewrite.matched.join(", ")}").`, `তুমি ইংরেজিতে জিজ্ঞেস করেছ আর তোমার বই বাংলায়, তাই বইয়ে খুঁজেছি: ${p.rewrite.searched.join(", ")}।`) : tx(`I searched the English book for: ${p.rewrite.searched.join(", ")}.`, `ইংরেজি বইয়ে খুঁজেছি: ${p.rewrite.searched.join(", ")}।`)}</p>
+      )}
+      {p.followUp && <p className="text-xs text-ink-mid">{tx("Continuing from your previous question.", "তোমার আগের প্রশ্নের ধারাবাহিকতায়।")}</p>}
+      {p.working && <WorkingView w={p.working} />}
+      {p.doubt && !readOnly && (
+        <div className="rounded-[14px] border border-brand/25 bg-sheet p-3.5 text-[15px]" role="note">
+          <p>{tx("You've asked for this to be explained again a few times. Would a different way help?", "তুমি কয়েকবার আবার বুঝিয়ে বলতে বলেছ। অন্যভাবে দেখলে কি সুবিধা হবে?")}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {onAskDifferently && <Chip onClick={() => onAskDifferently("steps")}>{tx("Step by step", "ধাপে ধাপে")}</Chip>}
+            {onAskDifferently && <Chip onClick={() => onAskDifferently("analogy")}>{tx("With an analogy", "তুলনা দিয়ে")}</Chip>}
+            {onAskDifferently && <Chip onClick={() => onAskDifferently("testme")}>{tx("Check what I know", "আমি কী জানি যাচাই করো")}</Chip>}
+            <Chip to="/topics">{tx("Pick a topic to practise", "অনুশীলনের টপিক বাছো")}</Chip>
+          </div>
+        </div>
+      )}
+      {p.ai && found && !folded && <AiExplanation ai={p.ai} excerpts={p.excerpts} lang={p.language?.explanation ?? null} />}
+      {found && !folded && (
+        <TrustLine p={p} />
+      )}
+      {found && !folded && !p.ai?.blocks.length && p.excerpts.length > 0 && !readOnly && (
+        <SpeakButton lang={p.excerpts[0].source.language} parts={p.excerpts.map((e) => `${tx("From your textbook", "তোমার পাঠ্যবই থেকে")}: ${e.text}`)} />
+      )}
       {mentioned && !readOnly && (
         <p className="rounded-[12px] bg-thread/15 px-3 py-2 text-sm">
           {tx(`Your question mentions ${mentioned.label.en}, but I only searched the subject you chose. `, `তোমার প্রশ্নে ${mentioned.label.bn}-এর কথা আছে, কিন্তু আমি শুধু তোমার বাছাই করা বিষয়ে খুঁজেছি। `)}
@@ -436,6 +484,48 @@ export function Composer({ onSend, busy, autoFocus }: { onSend: (text: string) =
       </button>
     </form>
     <AskInputs disabled={busy} onText={(t) => { setText((cur) => (cur.trim() ? `${cur.trim()} ${t}` : t).slice(0, 1000)); ref.current?.focus(); }} />
+    </div>
+  );
+}
+
+/** Why this answer can be trusted, or where it is limited: how the evidence was found and what language is what. */
+function TrustLine({ p }: { p: TutorPayload }) {
+  const { tx } = useLearner();
+  const bookLang = p.excerpts[0]?.source.language;
+  const exp = p.language?.explanation;
+  const translated = p.ai?.status === "ok" && bookLang && exp && exp !== "mixed" && exp !== bookLang;
+  return (
+    <p className="text-xs text-ink-low" data-testid="trust-line">
+      {p.retrieval?.mode === "hybrid"
+        ? tx("Found by keyword and meaning search in approved textbook text.", "অনুমোদিত পাঠ্যবইয়ের লেখায় শব্দ ও অর্থ দুইভাবে খুঁজে পাওয়া।")
+        : tx("Found by keyword search in approved textbook text (meaning-based search isn't switched on).", "অনুমোদিত পাঠ্যবইয়ের লেখায় শব্দ মিলিয়ে খুঁজে পাওয়া (অর্থভিত্তিক খোঁজ চালু নেই)।")}
+      {translated ? tx(` The explanation is in ${exp === "en" ? "English" : "Bangla"}; the textbook text and quotations stay in the book's language, as printed.`, ` ব্যাখ্যা ${exp === "en" ? "ইংরেজিতে" : "বাংলায়"}; পাঠ্যবইয়ের লেখা ও উদ্ধৃতি বইয়ের ভাষাতেই, যেমন ছাপা।`) : ""}
+    </p>
+  );
+}
+
+/** Line-by-line result of the working checker: what holds, the earliest step that doesn't, and what it equals. */
+function WorkingView({ w }: { w: NonNullable<TutorPayload["working"]> }) {
+  const { tx } = useLearner();
+  return (
+    <div className="space-y-2 rounded-[14px] border border-ink-low/15 bg-sheet p-3.5" data-testid="working">
+      <ol className="space-y-1.5">
+        {w.steps.map((st, i) => (
+          <li key={i} className={`flex flex-wrap items-baseline gap-2 rounded-[10px] px-2 py-1 text-[15px] ${st.status === "wrong" && i === w.firstWrong ? "bg-again-soft" : st.status === "ok" ? "bg-mint-soft/60" : ""}`}>
+            <span className="font-mono">{st.line}</span>
+            <span className="text-xs font-semibold">
+              {st.status === "ok" ? tx("holds", "ঠিক") : st.status === "wrong" ? tx(`doesn't hold: the left side is ${st.detail?.left}, the right side is ${st.detail?.right}`, `মেলে না: বাম দিক ${st.detail?.left}, ডান দিক ${st.detail?.right}`) : st.status === "unchecked" ? tx("couldn't read this line, not checked", "লাইনটি পড়া যায়নি, যাচাই হয়নি") : tx("no equation to check", "যাচাইয়ের মতো সমীকরণ নেই")}
+            </span>
+          </li>
+        ))}
+      </ol>
+      {w.firstWrong !== null ? (
+        <p className="text-[15px]">{tx(`The first step that doesn't hold is line ${w.firstWrong + 1}. Everything before it is right. Look again at what changed from the line above.`, `প্রথম যে ধাপ মেলে না তা ${w.firstWrong + 1} নম্বর লাইন। তার আগের সব ঠিক। আগের লাইন থেকে কী বদলেছে আবার দেখো।`)}</p>
+      ) : w.checked > 0 ? (
+        <p className="text-[15px]">{tx(`All ${w.checked} checkable steps hold. (This checks the arithmetic, not whether you chose the right method.)`, `যাচাইযোগ্য ${w.checked}টি ধাপই ঠিক। (এটি হিসাব যাচাই করে, পদ্ধতি ঠিক কি না নয়।)`)}</p>
+      ) : (
+        <p className="text-[15px]">{tx("I couldn't read any line as a calculation, so nothing was checked. Write one step per line, like 7 × 8 = 56.", "কোনো লাইন হিসাব হিসেবে পড়া যায়নি, তাই কিছু যাচাই হয়নি। প্রতি লাইনে একটি ধাপ লেখো, যেমন ৭ × ৮ = ৫৬।")}</p>
+      )}
     </div>
   );
 }
