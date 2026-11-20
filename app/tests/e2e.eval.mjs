@@ -49,12 +49,14 @@ await pa.getByRole("tab", { name: "AI providers" }).click();
 await pa.getByTestId("provider-eval").waitFor({ timeout: 15000 });
 
 // Provider status: integrated -> configured -> tested OK / unavailable, from a real call to each (here: the doubles).
-const states = async () => (await pa.locator("[data-provider-state]").evaluateAll((els) => els.map((e) => e.getAttribute("data-provider-state")))).join(" ");
+// The three providers the test doubles stand in for, in a fixed order (the page lists free-tier providers first).
+const states = async () => (await pa.locator("[data-provider-state]").evaluateAll((els) => els.map((e) => e.getAttribute("data-provider-state"))))
+  .filter((s) => /^(anthropic|gemini|openai):/.test(s)).sort().join(" ");
 check("before a test, configured providers are not called working", (await states()) === "anthropic:configured gemini:configured openai:configured", await states());
 await fetch(`${MOCK}/__pmode`, { method: "POST", body: JSON.stringify({ anthropic: "ok", gemini: "fail", openai: "ok" }) });
 await pa.getByRole("button", { name: /Test connections/ }).click();
 await pa.waitForFunction(() => document.querySelectorAll('[data-provider-state$=":tested"], [data-provider-state$=":unavailable"]').length === 3, null, { timeout: 30000 });
-check("a provider whose real request succeeds is 'Tested OK'; one that fails is 'Unavailable' with the reason", (await states()) === "anthropic:tested gemini:unavailable openai:tested" && /Last real request failed: provider_error/.test(await pa.getByTestId("provider-connections").innerText()), await states());
+check("a provider whose real request succeeds is 'Tested OK'; one that fails is 'Unavailable' with the reason", (await states()) === "anthropic:tested gemini:unavailable openai:tested" && /failed: the provider returned an error/.test(await pa.getByTestId("provider-connections").innerText()), await states());
 check("the connection test shows no key", !/test-(anthropic|gemini|openai)-key|(^|[^a-z0-9])sk-[a-z0-9]/i.test(await pa.content()));
 await fetch(`${MOCK}/__pmode`, { method: "POST", body: JSON.stringify({ anthropic: "ok", gemini: "ok", openai: "ok" }) });
 const labels = await pa.getByTestId("provider-eval").locator("fieldset label").allTextContents();

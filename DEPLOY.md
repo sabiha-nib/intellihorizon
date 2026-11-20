@@ -44,22 +44,38 @@ Vercel → intellihorizon → Settings → Git → Connect Git Repository → pi
 deploys to production; every pull request gets a private preview. (Claude can do this step through the Vercel connector
 once the Vercel GitHub app can see the repository.)
 
-## 3. AI keys (you): Vercel → intellihorizon → Settings → Environment Variables → Add (type **Sensitive**)
+## 3. AI provider (you): free tiers, no purchase needed
 
-| Name | Where to get it |
-|---|---|
-| `ANTHROPIC_API_KEY` | console.anthropic.com → API keys |
-| `GEMINI_API_KEY` | aistudio.google.com → Get API key |
-| `OPENAI_API_KEY` | platform.openai.com → API keys |
+IntelliTutor needs **one** working AI provider. All of these are free to start (no card), all keys go in Vercel →
+intellihorizon → Settings → Environment Variables → Add, type **Sensitive**, environment Production, then Deployments →
+… → Redeploy. Never put a key in the repo or in a chat.
 
-Optional: `EDU_ADMIN_TOKEN` (32+ random characters), `RESEND_API_KEY` + `EMAIL_FROM` (email),
-`SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (store uploads in Supabase Storage instead of the private `app_files`
-table). Then Deployments → … → Redeploy. Never put keys in the repo or in a chat.
+| Priority | Name | Free key | Model variable (already set) | Free limits (checked 20 Nov 2026, can change) |
+|---|---|---|---|---|
+| 1 (main) | `GEMINI_API_KEY` | aistudio.google.com/apikey (Google account) | `GEMINI_MODEL` | Flash-class models only; per-model daily caps on aistudio.google.com/rate-limit. Outside the EU/UK/EEA, free-tier prompts may be used by Google to improve its products. |
+| 2 (checker) | `GROQ_API_KEY` | console.groq.com/keys | `GROQ_MODEL` = `openai/gpt-oss-120b` | 30 requests/min, 1,000/day, 8K tokens/min |
+| 3 (fallback) | `OPENROUTER_API_KEY` | openrouter.ai/settings/keys | `OPENROUTER_MODEL` = a model ending in `:free` | 20 requests/min, 50/day |
 
-Model names and spending limits are ordinary variables already set: `ANTHROPIC_MODEL`, `GEMINI_MODEL`, `OPENAI_MODEL`,
-`AI_MONTHLY_BUDGET_USD` (25), `AI_DAILY_BUDGET_USD` (3), `AI_DAILY_LIMIT` (60 per student), `JUDGE_AI_DAILY_LIMIT`
-(40), `JUDGE_AI_TOTAL_DAILY` (400). A provider counts as configured only when its key and model are both set; Admin →
-AI providers → "Test connection" makes one real request per provider and reports the result.
+With Gemini alone the tutor works (one model). Adding Groq gives maths and translation answers an independent second
+check. Hugging Face is not used: it removed free inference credits on 15 Oct 2026. Ollama works only on a local computer
+(set `GROQ_BASE_URL=http://localhost:11434/v1` and `GROQ_MODEL` to a pulled model when running the app locally); Vercel
+can't reach it.
+
+The app keeps free-tier use low on its own: a validated answer is reused for the same student, question and evidence;
+each student has a daily limit (`AI_DAILY_LIMIT`, 60) and judges share `JUDGE_AI_TOTAL_DAILY` (400); and each provider has a
+daily cap a little under its free limit (`GEMINI_DAILY_LIMIT` 200, `GROQ_DAILY_LIMIT` 800, `OPENROUTER_DAILY_LIMIT` 45,
+change any of them in Vercel). When every provider is at its cap or unavailable, the tutor still shows the checked
+textbook passages and says the AI explanation is unavailable; it never invents one. Textbook retrieval, source
+checks and arithmetic checks run on the server whichever provider answers.
+
+Admin → AI providers shows each provider's model, free-tier note, today's calls against the cap, the exact missing
+variable, and "Test connections", which makes one tiny real request per provider and reports the result and error.
+
+Paid providers stay supported but off: `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` are only used if you add them.
+
+Optional: `EDU_ADMIN_TOKEN` (32+ random characters), `RESEND_API_KEY` + `EMAIL_FROM` (needed to send verification
+and password-reset emails), `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (store uploads in Supabase Storage instead of the
+private `app_files` table).
 
 ## 4. After deploying
 

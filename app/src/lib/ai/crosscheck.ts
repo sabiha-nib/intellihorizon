@@ -31,7 +31,7 @@ export const DEFAULT_ROUTES: Record<Task, { strategy: Strategy; order: ProviderI
 
 export type RoutingPolicy = { verify: "off" | "auto" | "always"; collaborate: "off" | "auto"; overrides: Partial<Record<Task, { strategy?: Strategy; order?: ProviderId[]; verifiers?: ProviderId[]; independent?: ProviderId }>> };
 
-const PIDS: ProviderId[] = ["anthropic", "gemini", "openai"];
+const PIDS: ProviderId[] = ["anthropic", "gemini", "openai", "groq", "openrouter"];
 const isPid = (x: unknown): x is ProviderId => typeof x === "string" && (PIDS as string[]).includes(x);
 
 export function routingPolicy(env: Record<string, string | undefined>): RoutingPolicy {

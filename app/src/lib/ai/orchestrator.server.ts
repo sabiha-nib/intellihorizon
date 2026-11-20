@@ -112,6 +112,7 @@ export async function generate(ctx: OrchestratorCtx, task: Task, msg: CallMessag
   let unusable: { text: string; provider: ProviderId; model: string; i: number } | null = null;
   for (let i = 0; i < r.order.length; i++) {
     const cfg = providerFor(ctx.env, r.order[i])!;
+    if (await overDailyCap(ctx.DB, cfg)) { failures.push({ provider: cfg.id, code: "daily_cap" }); continue; }
     const res = await callProvider(cfg, msg, opts, ctx.fetcher, retries);
     const role: CallRole = i === 0 ? "primary" : "fallback";
     if (res.ok && (!opts.accept || opts.accept(res.text))) {
@@ -138,9 +139,32 @@ export async function generate(ctx: OrchestratorCtx, task: Task, msg: CallMessag
 export async function consult(ctx: OrchestratorCtx, group: string, r: Route, id: ProviderId, role: CallRole, msg: CallMessage, opts: CallOptions = {}): Promise<CallResult | null> {
   const cfg = providerFor(ctx.env, id);
   if (!cfg) return null;
+  // A second opinion is optional, so a provider at its free-tier cap is simply not consulted.
+  if (await overDailyCap(ctx.DB, cfg)) return null;
   const res = await callProvider(cfg, msg, opts, ctx.fetcher, num(ctx.env.AI_RETRIES, 1, 0, 3));
   await logCall(ctx, { group, task: r.task, strategy: r.strategy, role, cfg, res, status: res.ok ? "ok" : res.code });
   return res;
+}
+
+/**
+ * Free tiers cap requests per day per account. This deployment stops calling a provider a little before its cap (the
+ * configured *_DAILY_LIMIT, default per FREE_TIER) so students get the next provider or the textbook-only answer
+ * instead of a run of 429s. Counts every call this app made to that provider today (UTC), all users together.
+ */
+export async function overDailyCap(DB: D1Database, cfg: ProviderConfig): Promise<boolean> {
+  if (cfg.dailyCap === null) return false;
+  try {
+    const r = await DB.prepare("SELECT COUNT(*) AS n FROM ai_requests WHERE provider = ? AND created_at >= ?").bind(cfg.id, dayStart()).first<{ n: number }>();
+    return (r?.n ?? 0) >= cfg.dailyCap;
+  } catch {
+    return false;
+  }
+}
+
+/** Calls made to each provider today (UTC), for the admin page. */
+export async function callsToday(DB: D1Database): Promise<Record<string, number>> {
+  const r = await DB.prepare("SELECT provider, COUNT(*) AS n FROM ai_requests WHERE created_at >= ? AND provider IS NOT NULL GROUP BY provider").bind(dayStart()).all<{ provider: string; n: number }>();
+  return Object.fromEntries((r.results ?? []).map((x) => [x.provider, x.n]));
 }
 
 /* ─────────── Cache of validated answers (same student, same evidence, same request) ─────────── */

@@ -43,7 +43,7 @@ export const EVAL_CASES: EvalCase[] = [
 
 export type EvalConfig = { id: string; label: string; providers: ProviderId[]; strategy: "routed" | "primary" | "verify" | "collaborate" };
 
-const NAME: Record<ProviderId, string> = { anthropic: "Claude", gemini: "Gemini", openai: "OpenAI" };
+const NAME: Record<ProviderId, string> = { anthropic: "Claude", gemini: "Gemini", openai: "OpenAI", groq: "Groq", openrouter: "OpenRouter" };
 const TASK_KEYS = ["tutoring", "conceptual", "math", "image_homework", "translation", "socratic", "mcq_generation", "high_impact", "explain_back"];
 
 /** The configurations that can run with the providers actually configured. The first named provider authors. */
@@ -52,13 +52,13 @@ export function evalConfigs(configured: ProviderId[]): EvalConfig[] {
   const out: EvalConfig[] = [];
   if (configured.length) out.push({ id: "routed", label: "Production routing (IntelliCore decides)", providers: PROVIDER_IDS.filter(has), strategy: "routed" });
   for (const p of PROVIDER_IDS) if (has(p)) out.push({ id: p, label: `${NAME[p]} alone`, providers: [p], strategy: "primary" });
-  const pairs: [ProviderId, ProviderId][] = [["anthropic", "gemini"], ["anthropic", "openai"], ["gemini", "openai"]];
+  const pairs: [ProviderId, ProviderId][] = [["anthropic", "gemini"], ["anthropic", "openai"], ["gemini", "openai"], ["gemini", "groq"], ["gemini", "openrouter"], ["groq", "openrouter"]];
   for (const [a, b] of pairs) if (has(a) && has(b)) out.push({ id: `${a}+${b}`, label: `${NAME[a]} writes, ${NAME[b]} verifies`, providers: [a, b], strategy: "verify" });
-  if (PROVIDER_IDS.every(has)) out.push({ id: "trio", label: "Three-model collaboration (Claude writes, Gemini answers independently, OpenAI reviews)", providers: [...PROVIDER_IDS], strategy: "collaborate" });
+  if (["anthropic", "gemini", "openai"].every((p) => has(p as ProviderId))) out.push({ id: "trio", label: "Three-model collaboration (Claude writes, Gemini answers independently, OpenAI reviews)", providers: ["anthropic", "gemini", "openai"], strategy: "collaborate" });
   return out;
 }
 
-const PREFIX: Record<ProviderId, string> = { anthropic: "ANTHROPIC", gemini: "GEMINI", openai: "OPENAI" };
+const PREFIX: Record<ProviderId, string> = { anthropic: "ANTHROPIC", gemini: "GEMINI", openai: "OPENAI", groq: "GROQ", openrouter: "OPENROUTER" };
 
 /**
  * The environment the orchestrator sees for one configuration: other providers are switched off, the strategy is

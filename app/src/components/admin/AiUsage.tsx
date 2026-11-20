@@ -41,7 +41,8 @@ export function AiUsage() {
           <caption className="sr-only">AI usage by provider</caption>
           <thead><tr className="border-b border-line">{["Provider", "Calls", "Authored", "Verifications", "Independent", "Fallbacks", "Error rate", "Avg latency", "Tokens in / out", "Est. cost", "Reviews with disagreement"].map((h) => <th key={h} scope="col" className="px-2 py-2 font-semibold">{h}</th>)}</tr></thead>
           <tbody>
-            {d.providers.map((p) => {
+            {/* Only providers that are set up or have been used; unconfigured free-tier options are listed on the panel above. */}
+            {d.providers.filter((p) => p.configured || Number(row(p.id)?.calls ?? 0) > 0).map((p) => {
               const u = row(p.id);
               const calls = Number(u?.calls ?? 0);
               return (

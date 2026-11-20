@@ -9,10 +9,12 @@ import { Badge, Button, Loading, PageTitle, Panel, SectionTitle } from "../compo
 import type { L } from "../content/types";
 import { quizHome, startQuiz } from "../lib/api/quiz.functions";
 import { requireAccount } from "../lib/guard";
-import type { QuizMode } from "../lib/learning/quiz";
+import { QUIZ_MODES, type QuizMode } from "../lib/learning/quiz";
 import { useLearner } from "../lib/store";
 
 export const Route = createFileRoute("/quiz/")({
+  // ?mode= opens a mode directly (the dashboard's DailyHorizon, Mistake Replay and Weak Spots cards).
+  validateSearch: (s: Record<string, unknown>): { mode?: QuizMode } => ({ mode: (QUIZ_MODES as readonly string[]).includes(String(s.mode)) ? (s.mode as QuizMode) : undefined }),
   beforeLoad: () => requireAccount("/quiz"),
   head: () => ({ meta: [{ title: "IntelliQuiz | IntelliHorizon" }, { name: "robots", content: "noindex" }] }),
   component: QuizHome,
@@ -34,7 +36,8 @@ function QuizHome() {
   const { tx, t, lang } = useLearner();
   const nav = useNavigate();
   const [d, setD] = useState<Data | null>(null);
-  const [mode, setMode] = useState<QuizMode>("quick");
+  const initialMode = Route.useSearch().mode;
+  const [mode, setMode] = useState<QuizMode>(initialMode ?? "quick");
   const [chapterId, setChapterId] = useState("");
   const [topicId, setTopicId] = useState("");
   const [count, setCount] = useState(5);

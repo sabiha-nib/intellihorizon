@@ -74,7 +74,18 @@ function TutorHome() {
             <h2 id="ask-h" className="font-display text-xl font-bold">{tx("Ask a new question", "নতুন প্রশ্ন করো")}</h2>
             <ContextPicker value={ctx} onChange={setCtx} />
             <PersonaPicker value={persona} onChange={setPersona} /><LangPicker value={tutorLang} onChange={setTutorLang} />
-            <Composer onSend={send} busy={busy} autoFocus initial={search.q ?? ""} />
+            {/* Suggested questions: only topics the checked Class 7 Mathematics passages actually cover. */}
+            <div data-testid="tutor-suggestions">
+              <p className="text-[13px] font-semibold text-ink-mid">{tx("Try one (from the checked Class 7 Mathematics passages):", "একটি চেষ্টা করো (যাচাই করা ৭ম শ্রেণির গণিতের অংশ থেকে):")}</p>
+              <ul className="mt-2 flex flex-wrap gap-2">
+                {["ধারাবাহিক অনুপাত কাকে বলে?", "সমানুপাত কী? একটি উদাহরণ দাও।", "বহুরাশিক অনুপাত কীভাবে লিখতে হয়?", "What is a ratio? Explain with an example.", "৫০০ টাকার ২০% কত?"].map((q) => (
+                  <li key={q}>
+                    <Link to="/tutor" search={{ q }} className="inline-flex min-h-[36px] items-center rounded-full border border-[#f9a8d4] bg-[#fce7f3] px-3 text-[14px] font-medium text-[#191d23] hover:bg-[#f9d3e8]" lang={/[a-z]/i.test(q) ? "en" : "bn"}>{q}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Composer key={search.q ?? ""} onSend={send} busy={busy} autoFocus initial={search.q ?? ""} />
             {err && <p className="text-sm font-medium text-again" role="alert">{err === "rate_limited" ? tx("You've asked a lot in a short time. Take a short break and try again.", "অল্প সময়ে অনেক প্রশ্ন হয়েছে। একটু বিরতি নিয়ে আবার চেষ্টা করো।") : t(msg(err) ?? msg("unknown")!)}</p>}
             <details className="rounded-[14px] bg-paper/70 p-4 text-sm leading-relaxed text-ink-mid">
               <summary className="cursor-pointer font-semibold text-ink">{tx("How the tutor works", "টিউটর কীভাবে কাজ করে")}</summary>

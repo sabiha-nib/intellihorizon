@@ -10,6 +10,7 @@ import { bindings } from "../bindings.server";
 import { requireAdmin } from "../curriculum/admin.server";
 import { retrieve } from "../curriculum/retrieval.server";
 import { explain } from "../ai/explain.server";
+import { callsToday } from "../ai/orchestrator.server";
 import { EVAL_CASES, THRESHOLDS, autoChecks, envForConfig, evalConfigs, isRealRun, needsHuman, passed } from "../ai/eval-cases";
 import { PROVIDER_IDS, callProvider, configuredProviders, providerStatus } from "../ai/providers";
 import { learnerContext } from "../learning/context.server";
@@ -153,7 +154,7 @@ export const rateProviderEvalResult = createServerFn({ method: "POST" })
 
 /* ─────────── Connection test: integrated -> configured -> tested OK / unavailable ─────────── */
 
-type ProviderTest = { ok: boolean; code: string | null; model: string | null; ms: number; at: string };
+type ProviderTest = { ok: boolean; code: string | null; status?: number | null; model: string | null; ms: number; at: string };
 
 /** Last connection test per provider (admin only). Never includes a key or any reply text. */
 export const providerTests = createServerFn({ method: "GET" }).handler(async () => {
@@ -161,7 +162,9 @@ export const providerTests = createServerFn({ method: "GET" }).handler(async () 
   if (g.error) return g.error;
   const rows = (await g.DB.prepare("SELECT key, value FROM app_settings WHERE key LIKE 'provider_test:%'").all<{ key: string; value: string }>()).results ?? [];
   const tests = Object.fromEntries(rows.map((r) => [r.key.slice("provider_test:".length), JSON.parse(r.value) as ProviderTest]));
-  return { ok: true as const, providers: providerStatus(g.env), tests };
+  let today: Record<string, number> = {};
+  try { today = await callsToday(g.DB); } catch { today = {}; }
+  return { ok: true as const, providers: providerStatus(g.env), tests, today };
 });
 
 /**
@@ -178,7 +181,7 @@ export const testProviderConnections = createServerFn({ method: "POST" }).handle
     if (!cfg) continue;
     const r = await callProvider(cfg, { system: "You are a connectivity check. Reply with JSON only.", user: 'Reply with exactly {"ok": true}' }, { json: true, maxTokens: 300 }, fetch, 1);
     const ok = r.ok && /"ok"\s*:\s*true/.test(r.text);
-    out[id] = { ok, code: r.ok ? (ok ? null : "unexpected_reply") : r.code, model: r.ok ? r.model : cfg.model, ms: r.ms, at: now() };
+    out[id] = { ok, code: r.ok ? (ok ? null : "unexpected_reply") : r.code, status: r.ok ? null : (r.status ?? null), model: r.ok ? r.model : cfg.model, ms: r.ms, at: now() };
     await g.DB.prepare("INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)").bind(`provider_test:${id}`, JSON.stringify(out[id])).run();
     await g.DB.prepare("INSERT INTO ai_requests (user_id, purpose, provider, model, status, latency_ms, input_tokens, output_tokens, sources, created_at, role, task, strategy) VALUES (?, 'connection_test', ?, ?, ?, ?, ?, ?, 0, ?, 'primary', 'connection_test', 'primary')")
       .bind(g.admin.id, id, out[id].model, r.ok ? (ok ? "ok" : "bad_response") : r.code, r.ms, r.ok ? r.usage.input : null, r.ok ? r.usage.output : null, now()).run();

@@ -21,7 +21,7 @@ export type AiExplanation = {
 
 export type OrchestrationInfo = {
   task: string; strategy: string; reason: string;
-  calls: { provider: "anthropic" | "gemini" | "openai"; label: string; role: "author" | "fallback" | "reviewer" | "independent"; ok: boolean; model?: string }[];
+  calls: { provider: "anthropic" | "gemini" | "openai" | "groq" | "openrouter"; label: string; role: "author" | "fallback" | "reviewer" | "independent"; ok: boolean; model?: string }[];
   verified: boolean; verifyFailed: boolean; fellBack: boolean; economy: boolean;
   removed: number; downgraded: number; disagreements: number; arithmeticChecked: boolean;
   assurance: { level: "checked_twice" | "checked" | "limited"; reasons: string[] };

@@ -73,10 +73,10 @@ function SideLink({ to, icon, label, match }: { to: string; icon: string; label:
     <Link
       to={to as "/"}
       aria-current={on ? "page" : undefined}
-      className={`ih-side-link group relative flex min-h-[36px] items-center gap-2.5 rounded-[10px] px-2.5 text-[14px] font-semibold transition-colors ${on ? "bg-[rgba(249,168,212,0.14)] text-white" : "text-[#dedcdc] hover:bg-[rgba(222,220,220,0.08)] hover:text-white"}`}
+      className={`ih-side-link group relative flex min-h-[36px] items-center gap-2.5 rounded-[10px] px-2.5 text-[14px] font-semibold transition-colors ${on ? "bg-[#fce7f3] text-[#191d23]" : "text-[#465c65] hover:bg-[#f4f0f3] hover:text-[#191d23]"}`}
     >
       {on && <span aria-hidden className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full bg-[#f9a8d4]" />}
-      <Icon name={icon} size={18} className={on ? "text-[#f9a8d4]" : "text-[#989daa] group-hover:text-[#dedcdc]"} />
+      <Icon name={icon} size={18} className={on ? "text-[#b0386f]" : "text-[#7b919c] group-hover:text-[#57707a]"} />
       <span className="truncate">{label}</span>
     </Link>
   );
@@ -88,9 +88,9 @@ function ScopeChip() {
   const version = account.curriculum === "nctb-bangla" ? tx("Bangla Version", "বাংলা ভার্সন") : account.curriculum === "nctb-english" ? tx("English Version", "ইংলিশ ভার্সন") : null;
   const label = [account.grade ? t(gradeLabel(account.grade)) : null, "NCTB", version].filter(Boolean).join(" · ");
   return (
-    <Link to="/start" className="block rounded-[12px] border border-[rgba(222,220,220,0.16)] px-3 py-2 text-[13px] font-semibold text-[#dedcdc] hover:border-[rgba(222,220,220,0.35)]" data-testid="scope-chip"
+    <Link to="/start" className="block rounded-[12px] border border-[#dedcdc] bg-[#f7f6f6] px-3 py-2 text-[13px] font-semibold text-[#191d23] hover:border-[#c5bac4]" data-testid="scope-chip"
       aria-label={tx(`Your curriculum: ${label}. Change class or version`, `তোমার পাঠ্যক্রম: ${label}। শ্রেণি বা ভার্সন বদলাও`)}>
-      <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#989daa]">{tx("Studying", "পড়ছ")}</span>
+      <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#57707a]">{tx("Studying", "পড়ছ")}</span>
       {label}
     </Link>
   );
@@ -111,19 +111,19 @@ function Sidebar() {
   const mods = MODULES.filter((m) => !m.admin || account?.role === "admin");
   const lv = xp === null ? null : levelInfo(xp);
   return (
-    <aside className="ih-sidebar ih-appbar fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-[rgba(222,220,220,0.12)] bg-[#191d23] lg:flex" lang={lang} aria-label={tx("App", "অ্যাপ")}>
+    <aside className="ih-sidebar ih-appbar fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-[#dedcdc] bg-white lg:flex" lang={lang} aria-label={tx("App", "অ্যাপ")}>
       <div className="flex items-center gap-2 px-5 pb-3 pt-5">
         <Link to="/dashboard" className="flex items-center gap-2" aria-label={tx("IntelliHorizon, go to your dashboard", "ইন্টেলিহরাইজন, ড্যাশবোর্ডে যাও")}>
           <Mark />
-          <span className="font-display text-[19px] font-extrabold tracking-tight text-white" lang="en">IntelliHorizon</span>
+          <span className="font-display text-[19px] font-extrabold tracking-tight text-[#191d23]" lang="en">IntelliHorizon</span>
         </Link>
       </div>
       <div className="space-y-2 px-4 pb-3">
-        <Link to="/tutor" className="flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[#f9a8d4] px-4 text-[15px] font-bold text-[#191d23] transition-colors hover:bg-[#fce7f3]" data-testid="ask-tutor">
+        <Link to="/tutor" className="flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[#f9a8d4] px-4 text-[15px] font-bold text-[#191d23] transition-colors hover:bg-[#f7bfdf]" data-testid="ask-tutor">
           <Icon name="spark" size={18} />
           {tx("Ask IntelliTutor", "ইন্টেলিটিউটরকে জিজ্ঞেস করো")}
         </Link>
-        <Link to="/search" className="flex min-h-[38px] items-center gap-2 rounded-[10px] border border-[rgba(222,220,220,0.16)] px-3 text-[14px] font-medium text-[#989daa] hover:text-white">
+        <Link to="/search" className="flex min-h-[38px] items-center gap-2 rounded-[10px] border border-[#dedcdc] px-3 text-[14px] font-medium text-[#57707a] hover:border-[#c5bac4] hover:text-[#191d23]">
           <Icon name="search" size={17} />
           {tx("Search", "খোঁজো")}
         </Link>
@@ -137,7 +137,7 @@ function Sidebar() {
           return (
             <div key={g.id} className="mt-4">
               <button type="button" aria-expanded={open} aria-controls={`nav-${g.id}`} onClick={() => toggle(g.id)}
-                className="flex w-full items-center justify-between rounded-[8px] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[#989daa] hover:text-[#dedcdc]">
+                className="flex w-full items-center justify-between rounded-[8px] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[#57707a] hover:text-[#191d23]">
                 {t(g.label)}
                 <Icon name="arrow" size={14} className={`transition-transform ${open ? "rotate-90" : ""}`} />
               </button>
@@ -150,18 +150,18 @@ function Sidebar() {
           );
         })}
       </nav>
-      <div className="space-y-2 border-t border-[rgba(222,220,220,0.12)] px-4 py-3">
+      <div className="space-y-2 border-t border-[#dedcdc] px-4 py-3">
         <ScopeChip />
         <div className="flex items-center justify-between gap-2">
           <LangSwitch compact />
           <SyncPill />
         </div>
         {account && (
-          <Link to="/account" className="flex items-center gap-2.5 rounded-[12px] px-1 py-1 hover:bg-[rgba(222,220,220,0.08)]" aria-label={tx("Your account", "তোমার অ্যাকাউন্ট")}>
+          <Link to="/account" className="flex items-center gap-2.5 rounded-[12px] px-1 py-1 hover:bg-[#f4f0f3]" aria-label={tx("Your account", "তোমার অ্যাকাউন্ট")}>
             <AccountAvatar avatar={account.avatar} name={account.fullName} size={34} />
             <span className="min-w-0">
-              <span className="block truncate text-[14px] font-semibold text-white">{account.fullName}</span>
-              {lv && <span className="block text-[12px] text-[#989daa] tnum">{tx(`Level ${lv.level} · ${xp} XP`, `লেভেল ${lv.level} · ${xp} এক্সপি`)}</span>}
+              <span className="block truncate text-[14px] font-semibold text-[#191d23]">{account.fullName}</span>
+              {lv && <span className="block text-[12px] text-[#57707a] tnum">{tx(`Level ${lv.level} · ${xp} XP`, `লেভেল ${lv.level} · ${xp} এক্সপি`)}</span>}
             </span>
           </Link>
         )}

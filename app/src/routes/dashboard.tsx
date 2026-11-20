@@ -5,9 +5,9 @@ import { call, msg } from "../components/auth/messages";
 import { JourneyList, MissionList } from "../components/universe/dash";
 import { Frame } from "../components/universe/Shell";
 import { JudgeWelcome } from "../components/app/JudgeWelcome";
+import { ModuleExplorer } from "../components/app/ModuleExplorer";
 import { Icon, SubjectDot } from "../components/universe/icons";
 import { bnDigits } from "../components/universe/learning";
-import { MODULES } from "../components/universe/modules";
 import {
   Badge,
   Button,
@@ -107,7 +107,7 @@ function Dashboard() {
           aria-labelledby="hello-h"
           className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]"
         >
-          <div className="flex flex-col justify-between gap-6 rounded-[28px] bg-lilac p-6 md:p-7">
+          <div className="flex flex-col justify-between gap-6 rounded-[28px] bg-[#FCE7F3] p-6 md:p-7">
             <div>
               <p className="text-[15px] font-semibold text-ink-mid">{greeting(tx)}</p>
               <h1
@@ -285,6 +285,9 @@ function Dashboard() {
             )}
           </Panel>
         </section>
+
+        {/* C: every module, grouped (Learn, Practice, Assess, My Progress, Study Tools) */}
+        <ModuleExplorer />
 
         {/* C: today's journey + missions */}
         <section
@@ -513,39 +516,14 @@ function Dashboard() {
         </section>
 
         {/* F: universe */}
-        <section aria-labelledby="uni-h">
-          <SectionTitle id="uni-h" title={tx("Your learning universe", "তোমার শেখার জগৎ")} />
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {MODULES.filter((m) =>
-              ["path", "mastery", "missions", "achievements", "revision", "mistakes"].includes(m.id),
-            ).map((m) => (
-              <li key={m.id}>
-                <Link
-                  to={m.to as "/"}
-                  className="flex h-full flex-col gap-2 rounded-[18px] border border-line bg-sheet p-4 hover:border-brand"
-                >
-                  <Icon name={m.icon} className="text-brand" />
-                  <span className="text-[15px] font-semibold leading-tight">{t(m.label)}</span>
-                  <span className="text-[13px] leading-snug text-ink-mid">
-                    {m.id === "achievements"
-                      ? tx(
-                          `${d.achievements.earned} of ${d.achievements.total} earned`,
-                          `${bnDigits(d.achievements.total)}টির ${bnDigits(d.achievements.earned)}টি পেয়েছ`,
-                        )
-                      : t(m.blurb)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          {latest && (
-            <p className="mt-3 flex items-center gap-2 text-[14px] text-ink-mid">
-              <Icon name="achievements" size={16} className="text-amber" />
-              {tx("Latest achievement: ", "সর্বশেষ অর্জন: ")}
-              <strong className="text-ink">{t(latest.title)}</strong>
-            </p>
-          )}
-        </section>
+        {latest && (
+          <p className="flex items-center gap-2 text-[14px] text-ink-mid">
+            <Icon name="achievements" size={16} className="text-amber" />
+            {tx("Latest achievement: ", "সর্বশেষ অর্জন: ")}
+            <strong className="text-ink">{t(latest.title)}</strong>
+            <span>· {tx(`${d.achievements.earned} of ${d.achievements.total} earned`, `${bnDigits(d.achievements.total)}টির ${bnDigits(d.achievements.earned)}টি পেয়েছ`)}</span>
+          </p>
+        )}
 
         {/* H: recent */}
         <section aria-labelledby="rec-h">

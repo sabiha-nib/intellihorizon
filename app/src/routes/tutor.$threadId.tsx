@@ -68,6 +68,7 @@ function Thread() {
       <main className="mx-auto flex w-full max-w-3xl flex-col px-4 pt-4 md:px-6">
         <div className="flex flex-wrap items-center gap-3">
           <Link to="/tutor" className="text-sm text-ink-mid hover:text-ink">{tx("All conversations", "সব কথোপকথন")}</Link>
+          <Link to="/tutor" className="ml-auto inline-flex min-h-[36px] items-center rounded-full bg-[#f9a8d4] px-3 text-sm font-semibold text-[#191d23] hover:bg-[#f7bfdf]" data-testid="new-conversation">{tx("New conversation", "নতুন কথোপকথন")}</Link>
         </div>
         <div className="mt-2 flex items-start justify-between gap-3">
           {editing ? (

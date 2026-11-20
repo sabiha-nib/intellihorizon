@@ -10,10 +10,30 @@
 //              generationConfig.maxOutputTokens / responseMimeType. Gemini 3.6+ ignores temperature, so none is sent.
 //   OpenAI     POST {base}/v1/responses  Bearer; instructions, input (input_text / input_image), max_output_tokens,
 //              text.format {type: "json_object"}, optional reasoning.effort, store: false.
+//   Groq       POST https://api.groq.com/openai/v1/chat/completions  Bearer; OpenAI-compatible Chat Completions.
+//   OpenRouter POST https://openrouter.ai/api/v1/chat/completions    Bearer; OpenAI-compatible Chat Completions.
+//              (Both also cover a local Ollama server for testing: GROQ_BASE_URL=http://localhost:11434/v1.)
+//
+// Free tiers (checked 20 Nov 2026; vendors change these without notice, and none is guaranteed):
+//   Gemini via Google AI Studio: free key, no card, Flash-class models only, daily request caps shown at
+//     aistudio.google.com/rate-limit. Outside the EU/UK/EEA, free-tier prompts may be used to improve Google products.
+//   Groq free plan: no card; e.g. openai/gpt-oss-120b 30 req/min, 1,000 req/day, 8K tokens/min (console.groq.com/settings/limits).
+//   OpenRouter ":free" models: no card; 20 req/min and 50 req/day per account (1,000/day only after buying credits).
+//   Hugging Face removed free Inference Providers credits on 15 Oct 2026, so it is not offered here.
 
-export type ProviderId = "anthropic" | "gemini" | "openai";
-export const PROVIDER_IDS: ProviderId[] = ["anthropic", "gemini", "openai"];
-export const PROVIDER_LABEL: Record<ProviderId, string> = { anthropic: "Anthropic Claude", gemini: "Google Gemini", openai: "OpenAI" };
+export type ProviderId = "anthropic" | "gemini" | "openai" | "groq" | "openrouter";
+export const PROVIDER_IDS: ProviderId[] = ["anthropic", "gemini", "openai", "groq", "openrouter"];
+export const PROVIDER_LABEL: Record<ProviderId, string> = { anthropic: "Anthropic Claude", gemini: "Google Gemini", openai: "OpenAI", groq: "Groq", openrouter: "OpenRouter" };
+/** Providers that speak OpenAI-compatible Chat Completions at {base}/chat/completions. */
+const CHAT_COMPAT: ProviderId[] = ["groq", "openrouter"];
+/** What the admin page shows about each provider's free access. Informational; the live limits are on the vendor's page. */
+export const FREE_TIER: Record<ProviderId, { free: boolean; note: string; signup: string; limitsUrl: string; defaultDailyCap: number | null }> = {
+  gemini: { free: true, note: "Free key from Google AI Studio, no card. Flash-class models; per-model daily caps.", signup: "https://aistudio.google.com/apikey", limitsUrl: "https://aistudio.google.com/rate-limit", defaultDailyCap: 200 },
+  groq: { free: true, note: "Free plan, no card. openai/gpt-oss-120b: 30 req/min, 1,000 req/day, 8K tokens/min.", signup: "https://console.groq.com/keys", limitsUrl: "https://console.groq.com/settings/limits", defaultDailyCap: 800 },
+  openrouter: { free: true, note: "Models ending in :free, no card. 20 req/min, 50 req/day per account.", signup: "https://openrouter.ai/settings/keys", limitsUrl: "https://openrouter.ai/docs/api-reference/limits", defaultDailyCap: 45 },
+  anthropic: { free: false, note: "Paid API (prepaid credits).", signup: "https://platform.claude.com", limitsUrl: "https://platform.claude.com", defaultDailyCap: null },
+  openai: { free: false, note: "Paid API (prepaid credits).", signup: "https://platform.openai.com", limitsUrl: "https://platform.openai.com", defaultDailyCap: null },
+};
 
 export type ProviderConfig = {
   id: ProviderId;
@@ -29,6 +49,8 @@ export type ProviderConfig = {
   /** USD per million tokens, for cost estimates only. */
   price: { input: number; output: number } | null;
   legacyChat?: boolean;
+  /** Calls per UTC day this deployment will make to the provider (keeps free-tier use under the vendor's cap). null = no cap. */
+  dailyCap: number | null;
 };
 
 export type CallMessage = { system: string; user: string; image?: { mime: string; base64: string } | null };
@@ -65,9 +87,11 @@ const DEFAULT_BASE: Record<ProviderId, string> = {
   anthropic: "https://api.anthropic.com",
   gemini: "https://generativelanguage.googleapis.com",
   openai: "https://api.openai.com",
+  groq: "https://api.groq.com/openai/v1",
+  openrouter: "https://openrouter.ai/api/v1",
 };
 
-const PREFIX: Record<ProviderId, string> = { anthropic: "ANTHROPIC", gemini: "GEMINI", openai: "OPENAI" };
+const PREFIX: Record<ProviderId, string> = { anthropic: "ANTHROPIC", gemini: "GEMINI", openai: "OPENAI", groq: "GROQ", openrouter: "OPENROUTER" };
 
 /** https only, except loopback http for local tests. */
 function safeBase(raw: string | undefined, fallback: string): string | null {
@@ -82,7 +106,18 @@ function priceFor(env: Env, id: ProviderId, model: string) {
   const p = PREFIX[id];
   const i = Number(env[`${p}_PRICE_IN`]), o = Number(env[`${p}_PRICE_OUT`]);
   if (Number.isFinite(i) && i > 0 && Number.isFinite(o) && o > 0) return { input: i, output: o };
+  // Free-tier access costs nothing (the owner can set *_PRICE_IN/OUT if they ever move to a paid plan).
+  if (id === "groq" || id === "openrouter" || (id === "gemini" && (env.GEMINI_TIER ?? "free").trim().toLowerCase() === "free")) return { input: 0, output: 0 };
   return KNOWN_PRICES[model] ?? null;
+}
+
+function capFor(env: Env, id: ProviderId): number | null {
+  const raw = (env[`${PREFIX[id]}_DAILY_LIMIT`] ?? "").trim();
+  if (raw === "0" || raw.toLowerCase() === "none") return null;
+  const n = Number(raw);
+  if (raw && Number.isFinite(n) && n > 0) return Math.floor(n);
+  if (id === "gemini" && (env.GEMINI_TIER ?? "free").trim().toLowerCase() !== "free") return null;
+  return FREE_TIER[id].defaultDailyCap;
 }
 
 /** Providers configured through ANTHROPIC_* / GEMINI_* / OPENAI_* secrets, plus the legacy AI_* pair if set. */
@@ -98,12 +133,15 @@ export function configuredProviders(env: Env): ProviderConfig[] {
     out.push({
       id, source: "native", apiKey, model, baseUrl,
       timeoutMs: num(env[`${p}_TIMEOUT_MS`] ?? env.AI_TIMEOUT_MS, 30000, 2000, 90000),
-      maxTokens: num(env[`${p}_MAX_TOKENS`], 4096, 256, 16000),
+      // Free-tier token-per-minute limits are small (Groq: 8K including the reply), so the compatible providers default lower.
+      maxTokens: num(env[`${p}_MAX_TOKENS`], CHAT_COMPAT.includes(id) ? 1500 : 4096, 256, 16000),
       effort: (env[`${p}_EFFORT`] ?? "").trim().toLowerCase() || null,
       // All current Claude, Gemini and OpenAI flagship models accept images (per each vendor's model pages); the owner can
       // switch it off for a model that doesn't.
-      vision: (env[`${p}_VISION`] ?? "on").trim().toLowerCase() !== "off",
+      // Groq/OpenRouter free text models don't take images unless the owner says the chosen model does.
+      vision: (env[`${p}_VISION`] ?? (CHAT_COMPAT.includes(id) ? "off" : "on")).trim().toLowerCase() !== "off",
       price: priceFor(env, id, model),
+      dailyCap: capFor(env, id),
     });
   }
   // Legacy single-provider secrets (AI_PROVIDER/AI_API_KEY/AI_MODEL) still work, as one more provider, unless the same
@@ -117,7 +155,7 @@ export function configuredProviders(env: Env): ProviderConfig[] {
     if (baseUrl) out.push({
       id: lp, source: "legacy", apiKey: lk, model: lm, baseUrl,
       timeoutMs: num(env.AI_TIMEOUT_MS, 20000, 2000, 60000), maxTokens: 1500, effort: null,
-      vision: (env.AI_VISION ?? "").trim().toLowerCase() === "on", price: priceFor(env, lp, lm), legacyChat: true,
+      vision: (env.AI_VISION ?? "").trim().toLowerCase() === "on", price: priceFor(env, lp, lm), legacyChat: true, dailyCap: null,
     });
   }
   return out;
@@ -128,7 +166,14 @@ export function providerStatus(env: Env) {
   const set = configuredProviders(env);
   return PROVIDER_IDS.map((id) => {
     const c = set.find((x) => x.id === id);
-    return { id, label: PROVIDER_LABEL[id], configured: !!c, source: c?.source ?? null, model: c?.model ?? null, vision: c?.vision ?? false, priced: !!c?.price };
+    const keySet = !!(env[`${PREFIX[id]}_API_KEY`] ?? "").trim();
+    const f = FREE_TIER[id];
+    return {
+      id, label: PROVIDER_LABEL[id], configured: !!c, source: c?.source ?? null, model: c?.model ?? null, vision: c?.vision ?? false, priced: !!c?.price,
+      free: f.free, freeNote: f.note, signup: f.signup, limitsUrl: f.limitsUrl, dailyCap: c?.dailyCap ?? null,
+      // Says what is missing without revealing anything about the key itself.
+      missing: c ? null : !keySet ? `${PREFIX[id]}_API_KEY` : `${PREFIX[id]}_MODEL`,
+    };
   });
 }
 
@@ -140,12 +185,13 @@ export function estimateCost(c: ProviderConfig, usage: { input: number | null; o
 function request(c: ProviderConfig, m: CallMessage, o: CallOptions): { url: string; headers: Record<string, string>; body: unknown } {
   // Native models think before answering and thinking counts toward the limit, so they get the configured ceiling.
   const max = c.legacyChat ? (o.maxTokens ?? 900) : Math.max(c.maxTokens, o.maxTokens ?? 0);
-  if (c.legacyChat && c.id === "openai") {
+  if ((c.legacyChat && c.id === "openai") || CHAT_COMPAT.includes(c.id)) {
+    const extra: Record<string, string> = c.id === "openrouter" ? { "x-title": "IntelliHorizon" } : {};
     return {
       url: `${c.baseUrl}/chat/completions`,
-      headers: { "content-type": "application/json", authorization: `Bearer ${c.apiKey}` },
+      headers: { "content-type": "application/json", authorization: `Bearer ${c.apiKey}`, ...extra },
       body: {
-        model: c.model, max_tokens: o.maxTokens ?? 900, temperature: 0.2,
+        model: c.model, max_tokens: c.legacyChat ? (o.maxTokens ?? 900) : max, temperature: 0.2,
         ...(o.json ? { response_format: { type: "json_object" } } : {}),
         messages: [
           { role: "system", content: m.system },
@@ -192,7 +238,7 @@ function request(c: ProviderConfig, m: CallMessage, o: CallOptions): { url: stri
 type Parsed = { text: string; model: string | null; input: number | null; output: number | null; truncated: boolean };
 
 function parse(c: ProviderConfig, j: Record<string, unknown>): Parsed | null {
-  if (c.legacyChat && c.id === "openai") {
+  if ((c.legacyChat && c.id === "openai") || CHAT_COMPAT.includes(c.id)) {
     const choice = (j.choices as { message?: { content?: unknown }; finish_reason?: string }[] | undefined)?.[0];
     const u = j.usage as { prompt_tokens?: number; completion_tokens?: number } | undefined;
     const text = typeof choice?.message?.content === "string" ? choice.message.content : "";
