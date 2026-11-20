@@ -44,7 +44,7 @@ function Learn() {
           <p className="max-w-[46ch] text-sm text-ink-mid">{tx("The version is about the books. The language of buttons is set at the top of the page, and the tutor's explanation language is in your account.", "ভার্সন মানে কোন বই। বোতামের ভাষা পাতার ওপরে বদলানো যায়, আর টিউটরের ব্যাখ্যার ভাষা অ্যাকাউন্টে।")}</p>
         </div>
         {data && data.profileGrade !== null && data.profileGrade !== 7 && (
-          <p className="rounded-[14px] bg-sheet p-4 text-ink-mid">{tx(`Your profile says Class ${data.profileGrade}. IntelliHorizon supports Class 7 only for now, so these are the Class 7 books.`, `তোমার প্রোফাইলে ${data.profileGrade} শ্রেণি দেওয়া আছে। ইন্টেলিহরাইজন আপাতত শুধু ৭ম শ্রেণি সমর্থন করে, তাই এগুলো ৭ম শ্রেণির বই।`)}</p>
+          <p className="rounded-[14px] bg-sheet p-4 text-ink-mid">{tx(`Your profile says Class ${data.profileGrade}. IntelliHorizon is built for Classes 6–10, but so far only Class 7 has textbooks, so these are the Class 7 books.`, `তোমার প্রোফাইলে ${data.profileGrade} শ্রেণি দেওয়া আছে। ইন্টেলিহরাইজন ৬ষ্ঠ–১০ম শ্রেণির জন্য তৈরি, তবে এখন পর্যন্ত শুধু ৭ম শ্রেণির পাঠ্যবই আছে, তাই এগুলো ৭ম শ্রেণির বই।`)}</p>
         )}
         {err && <EmptyState title={tx("Couldn't load the subjects", "বিষয়গুলো লোড হয়নি")} body={tx("Check your connection and try again.", "সংযোগ দেখে আবার চেষ্টা করো।")} />}
         {!err && data === null && <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <div key={i} className={`${card} h-40 animate-pulse motion-reduce:animate-none`} />)}</div>}

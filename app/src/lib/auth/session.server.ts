@@ -7,7 +7,7 @@ export const SID = "edu_sid";
 const TTL = 30 * 24 * 3600; // seconds
 const now = () => Math.floor(Date.now() / 1000);
 
-export type SessionUser = { id: string; email: string; emailVerified: boolean; pendingEmail: string | null; sessionHash: string; role: "student" | "admin" };
+export type SessionUser = { id: string; email: string; emailVerified: boolean; pendingEmail: string | null; sessionHash: string; role: "student" | "admin"; isDemo: boolean };
 
 function cookieValue(header: string | null, name: string): string | null {
   if (!header) return null;
@@ -23,20 +23,22 @@ async function userFromToken(token: string | null | undefined): Promise<SessionU
   if (!DB || !token || token.length < 32 || token.length > 64) return null;
   const hash = await sha256Hex(token);
   const row = await DB.prepare(
-    "SELECT s.user_id, s.expires_at, u.email, u.email_verified_at, u.pending_email, u.role FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id_hash = ? AND u.status = 'active'",
+    "SELECT s.user_id, s.expires_at, u.email, u.email_verified_at, u.pending_email, u.role, u.is_demo, u.demo_expires_at FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id_hash = ? AND u.status = 'active'",
   )
     .bind(hash)
-    .first<{ user_id: string; expires_at: number; email: string; email_verified_at: string | null; pending_email: string | null; role: string | null }>();
+    .first<{ user_id: string; expires_at: number; email: string; email_verified_at: string | null; pending_email: string | null; role: string | null; is_demo: number | null; demo_expires_at: string | null }>();
   if (!row) return null;
   const t = now();
-  if (row.expires_at <= t) {
+  const demo = !!row.is_demo;
+  // A judge-demo workspace ends at its fixed expiry; its session is never extended.
+  if (row.expires_at <= t || (demo && (!row.demo_expires_at || Date.parse(row.demo_expires_at) <= t * 1000))) {
     await DB.prepare("DELETE FROM sessions WHERE id_hash = ?").bind(hash).run();
     return null;
   }
-  if (row.expires_at - t < TTL / 2) {
+  if (!demo && row.expires_at - t < TTL / 2) {
     await DB.prepare("UPDATE sessions SET expires_at = ?, last_seen_at = ? WHERE id_hash = ?").bind(t + TTL, t, hash).run();
   }
-  return { id: row.user_id, email: row.email, emailVerified: !!row.email_verified_at, pendingEmail: row.pending_email, sessionHash: hash, role: row.role === "admin" ? "admin" : "student" };
+  return { id: row.user_id, email: row.email, emailVerified: !!row.email_verified_at, pendingEmail: row.pending_email, sessionHash: hash, role: !demo && row.role === "admin" ? "admin" : "student", isDemo: demo };
 }
 
 /** Current user inside a server function or loader. */
@@ -49,15 +51,15 @@ export async function userFromRequest(request: Request): Promise<SessionUser | n
   return userFromToken(cookieValue(request.headers.get("cookie"), SID));
 }
 
-export async function startSession(userId: string): Promise<void> {
+export async function startSession(userId: string, ttl = TTL): Promise<void> {
   const { DB } = bindings();
   if (!DB) throw new Error("storage_unavailable");
   const token = randomToken(32);
   const t = now();
   await DB.prepare("INSERT INTO sessions (id_hash, user_id, created_at, expires_at, last_seen_at) VALUES (?, ?, ?, ?, ?)")
-    .bind(await sha256Hex(token), userId, t, t + TTL, t)
+    .bind(await sha256Hex(token), userId, t, t + ttl, t)
     .run();
-  setCookie(SID, token, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: TTL });
+  setCookie(SID, token, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: ttl });
 }
 
 export async function endSession(): Promise<void> {

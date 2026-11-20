@@ -184,7 +184,7 @@ function TutorBubble({ m, onAppend, readOnly, onAskDifferently, onAskInSubject }
   const mentioned = p.conflict && p.status !== "subject_conflict" ? subjectById(p.conflict.named) : null;
   const noBooksWhy = p.status === "no_books"
     ? !p.offering
-      ? tx("IntelliHorizon supports Class 7 only for now. Your profile is set to a different class; you can still browse the Class 7 books.", "ইন্টেলিহরাইজন আপাতত শুধু ৭ম শ্রেণি সমর্থন করে। তোমার প্রোফাইলে অন্য শ্রেণি দেওয়া আছে; তবু ৭ম শ্রেণির বই দেখতে পারো।")
+      ? tx("IntelliHorizon is built for Classes 6–10, but only Class 7 has textbooks so far. Your profile is set to a different class, so I won't answer from another class's books; you can still browse the Class 7 books.", "ইন্টেলিহরাইজন ৬ষ্ঠ–১০ম শ্রেণির জন্য তৈরি, তবে এখন পর্যন্ত শুধু ৭ম শ্রেণির পাঠ্যবই আছে। তোমার প্রোফাইলে অন্য শ্রেণি দেওয়া আছে, তাই অন্য শ্রেণির বই থেকে উত্তর দেব না; তবু ৭ম শ্রেণির বই দেখতে পারো।")
       : p.offering.status === "books_not_supplied"
         ? tx("The English-version textbooks haven't been added yet. Nothing has been made up to fill the gap.", "ইংলিশ ভার্সনের পাঠ্যবই এখনো যোগ হয়নি। ফাঁক পূরণে কিছু বানানো হয়নি।")
         : tx("These books are registered but their text hasn't been imported and checked yet.", "বইগুলো নিবন্ধিত, কিন্তু লেখা এখনো আমদানি ও যাচাই হয়নি।")
@@ -446,16 +446,16 @@ export function ContextPicker({ value, onChange }: { value: TutorContext; onChan
           </label>
         </div>
       )}
-      {ok && !ok.offering && <p className="text-sm text-ink-mid">{tx("IntelliHorizon supports Class 7 only for now. Set your class to 7 in your profile to search the textbooks.", "ইন্টেলিহরাইজন আপাতত শুধু ৭ম শ্রেণি সমর্থন করে। বইয়ে খুঁজতে প্রোফাইলে শ্রেণি ৭ দাও।")}</p>}
+      {ok && !ok.offering && <p className="text-sm text-ink-mid">{tx("IntelliHorizon is built for Classes 6–10, but your class's textbooks haven't been imported yet, so the tutor has no book of yours to quote. It will say so rather than use another class's books.", "ইন্টেলিহরাইজন ৬ষ্ঠ–১০ম শ্রেণির জন্য তৈরি, তবে তোমার শ্রেণির পাঠ্যবই এখনো আমদানি হয়নি, তাই টিউটরের কাছে তোমার বই থেকে উদ্ধৃতি নেই। অন্য শ্রেণির বই ব্যবহার না করে সেটিই জানাবে।")}</p>}
       {ok && ok.offering?.status === "books_not_supplied" && <p className="text-sm text-ink-mid">{tx("English-version textbooks haven't been added yet, so the tutor has no book to quote for you. It will say so rather than guess.", "ইংলিশ ভার্সনের বই এখনো যোগ হয়নি, তাই টিউটরের কাছে উদ্ধৃত করার মতো বই নেই। অনুমান না করে সেটিই জানাবে।")}</p>}
       {ok && ok.offering?.status === "books_supplied" && ok.books.length === 0 && <p className="text-sm text-ink-mid">{tx("Your eight subjects are set up, but no book text has been imported and approved yet. You can ask; I'll say honestly that I can't check it.", "তোমার আটটি বিষয় প্রস্তুত, তবে কোনো বইয়ের লেখা এখনো আমদানি ও অনুমোদিত হয়নি। প্রশ্ন করতে পারো; মেলাতে না পারলে সরাসরি জানাব।")}</p>}
     </div>
   );
 }
 
-export function Composer({ onSend, busy, autoFocus }: { onSend: (text: string) => Promise<boolean>; busy: boolean; autoFocus?: boolean }) {
+export function Composer({ onSend, busy, autoFocus, initial = "" }: { onSend: (text: string) => Promise<boolean>; busy: boolean; autoFocus?: boolean; initial?: string }) {
   const { tx } = useLearner();
-  const [text, setText] = useState("");
+  const [text, setText] = useState(initial);
   const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { if (autoFocus) ref.current?.focus(); }, [autoFocus]);
   const submit = async () => {

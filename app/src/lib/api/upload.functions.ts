@@ -9,7 +9,7 @@ import { z } from "zod";
 import { sha256Hex } from "../auth/crypto.server";
 import { currentUser, rateLimit, sameOrigin } from "../auth/session.server";
 import { bindings } from "../bindings.server";
-import { aiConfig, complete } from "../ai/provider";
+import { aiAvailable, generate } from "../ai/orchestrator.server";
 import { parseJsonObject } from "../ai/grounding";
 
 type Fail = { ok: false; code: string };
@@ -34,8 +34,7 @@ async function purgeExpired() {
 }
 
 export const photoReadingStatus = createServerFn({ method: "GET" }).handler(async () => {
-  const cfg = aiConfig(bindings() as unknown as Record<string, string | undefined>);
-  return { enabled: !!cfg?.vision };
+  return { enabled: aiAvailable(bindings() as unknown as Record<string, string | undefined>, { vision: true }) };
 });
 
 export const readPhoto = createServerFn({ method: "POST" })
@@ -45,9 +44,9 @@ export const readPhoto = createServerFn({ method: "POST" })
     if (!DB || !sameOrigin()) return fail("unavailable_now");
     const me = await currentUser();
     if (!me) return fail("signed_out");
-    const cfg = aiConfig(bindings() as unknown as Record<string, string | undefined>);
-    // Without a configured reader nothing is processed or recorded.
-    if (!cfg?.vision) return fail("photo_reading_off");
+    const env = bindings() as unknown as Record<string, string | undefined>;
+    // Without a configured vision-capable reader nothing is processed or recorded. A text-only model is never used.
+    if (!aiAvailable(env, { vision: true })) return fail("photo_reading_off");
     if (!(await rateLimit(`photo:${me.id}`, 15, 3600))) return fail("rate_limited");
     let bytes: Uint8Array;
     try { bytes = b64ToBytes(data.data); } catch { return fail("bad_image"); }
@@ -64,15 +63,12 @@ export const readPhoto = createServerFn({ method: "POST" })
     const ts = new Date();
     await DB.prepare("INSERT OR REPLACE INTO uploads (id, user_id, r2_key, mime, bytes, sha256, status, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, 'stored', ?, ?)")
       .bind(id, me.id, key, kind, bytes.length, hash, ts.toISOString(), new Date(ts.getTime() + RETENTION_DAYS * 86400_000).toISOString()).run();
-    const res = await complete(cfg, [
-      { role: "system", content: 'You read photos of school homework for a Class 7 student. Transcribe the question exactly as written, in its own language and script. Do not solve it, explain it or add anything. Where a word, number or symbol cannot be read with confidence, write […] in its place and list your best reading in "uncertain". Write fractions as a/b and powers as x^2. Reply with JSON only: {"readable": true|false, "text": "...", "uncertain": ["..."]}. If there is no readable question, reply {"readable": false, "text": "", "uncertain": []}.' },
-      { role: "user", content: "Transcribe the question in this photo.", image: { mime: kind, base64: bytesToB64(bytes) } },
-    ], { maxTokens: 600, json: true });
-    const log = (status: string) => DB.prepare("INSERT INTO ai_requests (user_id, purpose, provider, model, status, latency_ms, input_tokens, output_tokens, sources, checks, created_at) VALUES (?, 'image_read', ?, ?, ?, ?, ?, ?, 0, NULL, ?)")
-      .bind(me.id, cfg.provider, res.ok ? res.model : cfg.model, status, res.ms, res.ok ? res.usage.input : null, res.ok ? res.usage.output : null, new Date().toISOString()).run();
+    const res = await generate({ DB, env, userId: me.id, purpose: "image_read" }, "image_homework", {
+      system: 'You read photos of school homework for a Class 7 student. Transcribe the question exactly as written, in its own language and script. Do not solve it, explain it or add anything. Where a word, number or symbol cannot be read with confidence, write […] in its place and list your best reading in "uncertain". Write fractions as a/b and powers as x^2. Reply with JSON only: {"readable": true|false, "text": "...", "uncertain": ["..."]}. If there is no readable question, reply {"readable": false, "text": "", "uncertain": []}.' ,
+      user: "Transcribe the question in this photo.", image: { mime: kind, base64: bytesToB64(bytes) },
+    }, { maxTokens: 600, json: true, accept: (t) => parseJsonObject(t) !== null, status: (t) => (parseJsonObject(t)?.readable === true ? "ok" : "unreadable") });
     if (!res.ok) {
       await DB.prepare("UPDATE uploads SET status = 'failed' WHERE id = ?").bind(id).run();
-      await log(res.code);
       return fail("reader_unavailable");
     }
     const j = parseJsonObject(res.text);
@@ -80,11 +76,9 @@ export const readPhoto = createServerFn({ method: "POST" })
     const uncertain = Array.isArray(j?.uncertain) ? j.uncertain.filter((x): x is string => typeof x === "string").slice(0, 10).map((x) => x.slice(0, 80)) : [];
     if (j?.readable !== true || text.replace(/[\s…[\]]/g, "").length < 3) {
       await DB.prepare("UPDATE uploads SET status = 'unreadable' WHERE id = ?").bind(id).run();
-      await log("unreadable");
       return fail("unreadable");
     }
     await DB.prepare("UPDATE uploads SET status = 'read', extracted_text = ? WHERE id = ?").bind(JSON.stringify({ text, uncertain }), id).run();
-    await log("ok");
     return { ok: true as const, id, text, uncertain, repeated: false };
   });
 

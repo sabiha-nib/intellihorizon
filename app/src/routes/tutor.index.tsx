@@ -11,7 +11,8 @@ import type { ThreadSummary } from "../lib/tutor/types";
 import { useLearner } from "../lib/store";
 
 export const Route = createFileRoute("/tutor/")({
-  validateSearch: (s: Record<string, unknown>): { subject?: SubjectId; book?: string; chapter?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { subject?: SubjectId; book?: string; chapter?: string; q?: string } => ({
+    q: typeof s.q === "string" ? s.q.slice(0, 300) : undefined,
     subject: isSubjectId(s.subject) ? s.subject : undefined,
     book: typeof s.book === "string" ? s.book : undefined,
     chapter: typeof s.chapter === "string" ? s.chapter : undefined,
@@ -73,12 +74,12 @@ function TutorHome() {
             <h2 id="ask-h" className="font-display text-xl font-bold">{tx("Ask a new question", "নতুন প্রশ্ন করো")}</h2>
             <ContextPicker value={ctx} onChange={setCtx} />
             <PersonaPicker value={persona} onChange={setPersona} /><LangPicker value={tutorLang} onChange={setTutorLang} />
-            <Composer onSend={send} busy={busy} autoFocus />
+            <Composer onSend={send} busy={busy} autoFocus initial={search.q ?? ""} />
             {err && <p className="text-sm font-medium text-again" role="alert">{err === "rate_limited" ? tx("You've asked a lot in a short time. Take a short break and try again.", "অল্প সময়ে অনেক প্রশ্ন হয়েছে। একটু বিরতি নিয়ে আবার চেষ্টা করো।") : t(msg(err) ?? msg("unknown")!)}</p>}
             <details className="rounded-[14px] bg-paper/70 p-4 text-sm leading-relaxed text-ink-mid">
               <summary className="cursor-pointer font-semibold text-ink">{tx("How the tutor works", "টিউটর কীভাবে কাজ করে")}</summary>
               <ul className="mt-2 list-disc space-y-1 pl-5">
-                <li>{tx("It searches only the eight Class 7 subjects, and only inside the subject or book you choose. Name a book (like Anandapath) and it searches that book.", "শুধু ৭ম শ্রেণির আটটি বিষয়ে খোঁজে, আর তুমি যে বিষয় বা বই বাছবে শুধু তার ভেতরে। বইয়ের নাম লিখলে (যেমন আনন্দপাঠ) সেই বইয়েই খোঁজে।")}</li>
+                <li>{tx("It searches only your own class and textbook version (today: the eight Class 7 subjects, Bangla Version), and only inside the subject or book you choose. Name a book (like Anandapath) and it searches that book.", "শুধু তোমার নিজের শ্রেণি ও পাঠ্যবইয়ের ভার্সনে খোঁজে (আজ: ৭ম শ্রেণির আটটি বিষয়, বাংলা ভার্সন), আর তুমি যে বিষয় বা বই বাছবে শুধু তার ভেতরে। বইয়ের নাম লিখলে (যেমন আনন্দপাঠ) সেই বইয়েই খোঁজে।")}</li>
                 <li>{tx("It shows short passages from your book, each with its chapter and page. When an AI model is switched on, it explains only from those passages, and every part is labelled: from your textbook, worked out from it, general knowledge, or couldn't be checked.", "তোমার বই থেকে ছোট অংশ দেখায়, প্রতিটির অধ্যায় ও পৃষ্ঠাসহ। এআই মডেল চালু থাকলে শুধু ওই অংশ থেকেই ব্যাখ্যা করে, আর প্রতিটি অংশে লেবেল থাকে: পাঠ্যবই থেকে, তা থেকে বের করা, সাধারণ জ্ঞান, বা যাচাই করা যায়নি।")}</li>
                 <li>{tx("It searches words, not meaning, so using your textbook's own words works best.", "এটি অর্থ নয়, শব্দ খোঁজে, তাই বইয়ের শব্দ ব্যবহার করলে ভালো কাজ করে।")}</li>
                 <li>{tx("Sums typed like 3/4 + 1/6 are worked out exactly by a calculator.", "৩/৪ + ১/৬ এর মতো হিসাব ক্যালকুলেটরে নির্ভুলভাবে করা হয়।")}</li>

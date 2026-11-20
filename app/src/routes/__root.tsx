@@ -36,7 +36,7 @@ function toOwnAssetUrl(value: string | null | undefined): string | null {
 
 function buildHead(meta: AppMeta) {
   const title = meta.og_title ?? "IntelliHorizon";
-  const description = meta.og_description ?? "Learn your Class 7 NCTB books one short session at a time: a clear idea, checked questions, feedback and revision.";
+  const description = meta.og_description ?? "IntelliHorizon: an AI-powered personalised learning ecosystem for NCTB Classes 6–10, Bangla Version and English Version, with a curriculum-grounded bilingual tutor.";
   const ogImage = toOwnAssetUrl(meta.og_image_url);
   const favicon = toOwnAssetUrl(meta.favicon_url) ?? "/favicon.svg";
   const ogVideo = toOwnAssetUrl(meta.og_video_url);

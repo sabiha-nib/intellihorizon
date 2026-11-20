@@ -350,3 +350,54 @@ export const publicCoverage = createServerFn({ method: "GET" }).handler(async ()
   ).bind(ACTIVE_VERSION).all<{ subject_key: string; books: number; indexed: number; chapters: number; questions: number }>();
   return { indexed: r?.indexed ?? 0, total: r?.total ?? 0, subjects: subjects.results ?? [] };
 });
+
+/**
+ * Product scope matrix (Classes 6–10 × Bangla Version / English Version) with availability computed from real counts:
+ * registered books, chapters, books with published student-visible text, published passages, questions and topics.
+ */
+export const curriculumMatrix = createServerFn({ method: "GET" }).handler(async () => {
+  const { buildMatrix } = await import("../curriculum/scope");
+  const { DB } = bindings();
+  if (!DB) return { ok: true as const, cells: buildMatrix([]) };
+  type G = { grade: number; medium: string; n: number };
+  const live = "t.version_id = ? AND t.status != 'retired'";
+  const q = (sql: string) => DB.prepare(sql).bind(ACTIVE_VERSION).all<G>().then((r) => r.results ?? []);
+  const [books, chapters, withText, passages, questions, topics] = await Promise.all([
+    q(`SELECT t.grade, t.medium, COUNT(*) AS n FROM textbooks t WHERE ${live} GROUP BY t.grade, t.medium`),
+    q(`SELECT t.grade, t.medium, COUNT(*) AS n FROM chapters c JOIN textbooks t ON t.id = c.textbook_id WHERE ${live} GROUP BY t.grade, t.medium`),
+    q(`SELECT t.grade, t.medium, COUNT(DISTINCT p.textbook_id) AS n FROM passages p JOIN textbooks t ON t.id = p.textbook_id WHERE ${live} AND ${STUDENT_VISIBLE} GROUP BY t.grade, t.medium`),
+    q(`SELECT t.grade, t.medium, COUNT(*) AS n FROM passages p JOIN textbooks t ON t.id = p.textbook_id WHERE ${live} AND ${STUDENT_VISIBLE} GROUP BY t.grade, t.medium`),
+    q(`SELECT t.grade, t.medium, COUNT(*) AS n FROM questions x JOIN chapters c ON c.id = x.chapter_id JOIN textbooks t ON t.id = c.textbook_id WHERE ${live} AND x.status = 'published' GROUP BY t.grade, t.medium`),
+    q(`SELECT t.grade, t.medium, COUNT(*) AS n FROM topics x JOIN chapters c ON c.id = x.chapter_id JOIN textbooks t ON t.id = c.textbook_id WHERE ${live} AND x.review_status IN ('checked', 'teacher_reviewed') GROUP BY t.grade, t.medium`),
+  ]);
+  const keyOf = (r: { grade: number; medium: string }) => `${r.grade}:${r.medium}`;
+  const merged = new Map<string, Record<string, number | string>>();
+  const add = (list: G[], field: string) => { for (const r of list) { const k = keyOf(r); const m = merged.get(k) ?? { grade: r.grade, medium: r.medium }; m[field] = r.n; merged.set(k, m); } };
+  add(books, "books"); add(chapters, "chapters"); add(withText, "booksWithText"); add(passages, "publishedPassages"); add(questions, "publishedQuestions"); add(topics, "topics");
+  const rows = { results: [...merged.values()] as unknown as { grade: number; medium: string }[] };
+  return { ok: true as const, cells: buildMatrix(rows.results ?? []) };
+});
+
+/** Sets the student's class and textbook medium (onboarding and Settings). Interface language is not touched. */
+export const setCurriculum = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ grade: z.number().int().min(6).max(10), medium: z.enum(["bangla", "english"]) }))
+  .handler(async ({ data }) => {
+    const { DB } = bindings();
+    if (!DB) return { ok: false as const, code: "unavailable_now" };
+    const { currentUser, sameOrigin } = await import("../auth/session.server");
+    if (!sameOrigin()) return { ok: false as const, code: "bad_origin" };
+    const me = await currentUser();
+    if (!me) return { ok: false as const, code: "signed_out" };
+    const ts = new Date().toISOString();
+    await DB.batch([
+      DB.prepare("UPDATE profiles SET grade = ?, curriculum = ?, curriculum_other = NULL, curriculum_other_text = NULL, updated_at = ? WHERE user_id = ?").bind(data.grade, data.medium === "bangla" ? "nctb-bangla" : "nctb-english", ts, me.id),
+      DB.prepare("UPDATE learners SET grade = ?, medium = ? WHERE user_id = ?").bind(data.grade, data.medium, me.id),
+    ]);
+    return { ok: true as const };
+  });
+
+/** Public, non-secret: whether AI explanations are switched on (any provider configured). Used for honest copy. */
+export const homeStatus = createServerFn({ method: "GET" }).handler(async () => {
+  const { aiAvailable } = await import("../ai/orchestrator.server");
+  return { aiOn: aiAvailable(bindings() as unknown as Record<string, string | undefined>) };
+});

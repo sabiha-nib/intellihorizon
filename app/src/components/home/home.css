@@ -1,0 +1,120 @@
+/* IntelliHorizon homepage design system. Scoped to .ih-home so the in-app product keeps its own identity.
+ *
+ * Palette (from the Phase 5 brief) and roles, with measured contrast:
+ *   --ih-night  #191D23  dark surface; text on light (16.9:1 on white, 14.4:1 on blush)
+ *   --ih-slate  #57707A  brand accent and interactive fill (white label 5.2:1); muted text on white (5.2:1)
+ *   --ih-slate-deep #465C65  hover/pressed shade of slate (derived; 6.0:1 with white)
+ *   --ih-mist   #7B919C  secondary accents and graph lines; text only on night (5.1:1)
+ *   --ih-haze   #989DAA  muted text on night (6.2:1); never on light
+ *   --ih-mauve  #C5BAC4  hairlines and soft borders (decorative only)
+ *   --ih-fog    #DEDCDC  primary text on night (12.4:1); light separators
+ *   --ih-blush  #FCE7F3  soft light surface; night text 14.4:1
+ *   --ih-rose   #F9A8D4  highlight and selected state on night (9.3:1); focus ring on night
+ * Typography: Montserrat (headlines, navigation emphasis), Open Sans (interface and body), Playfair Display (one
+ * italic editorial word per moment, never body). Bangla always renders in Hind Siliguri. */
+@layer components {
+.ih-home {
+  --ih-night: #191d23;
+  --ih-night-2: #20252d;
+  --ih-slate: #57707a;
+  --ih-slate-deep: #465c65;
+  --ih-mist: #7b919c;
+  --ih-haze: #989daa;
+  --ih-mauve: #c5bac4;
+  --ih-fog: #dedcdc;
+  --ih-blush: #fce7f3;
+  --ih-rose: #f9a8d4;
+  --ih-white: #ffffff;
+  --ih-line-dark: rgba(222, 220, 220, 0.14);
+  --ih-shadow: 0 1px 2px rgba(25, 29, 35, 0.08), 0 24px 60px -32px rgba(25, 29, 35, 0.45);
+  --ih-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --ih-display: "Montserrat", "Hind Siliguri", system-ui, sans-serif;
+  --ih-body: "Open Sans", "Hind Siliguri", system-ui, sans-serif;
+  --ih-editorial: "Playfair Display", "Hind Siliguri", Georgia, serif;
+  background: var(--ih-white);
+  color: var(--ih-night);
+  font-family: var(--ih-body);
+  overflow-x: clip;
+}
+.ih-home :focus-visible { outline: 3px solid var(--ih-slate); outline-offset: 3px; border-radius: 10px; }
+.ih-dark :focus-visible { outline-color: var(--ih-rose); }
+.ih-home [lang="bn"], .ih-home:lang(bn) { line-height: 1.75; }
+.ih-display { font-family: var(--ih-display); letter-spacing: -0.025em; }
+.ih-home:lang(bn) .ih-display, .ih-display:lang(bn) { font-family: "Hind Siliguri", system-ui, sans-serif; letter-spacing: 0; }
+.ih-editorial { font-family: var(--ih-editorial); font-style: italic; font-weight: 500; letter-spacing: -0.01em; }
+.ih-editorial:lang(bn) { font-family: "Hind Siliguri", system-ui, sans-serif; font-style: normal; font-weight: 700; }
+.ih-dark { background: var(--ih-night); color: var(--ih-fog); }
+.ih-muted-dark { color: var(--ih-haze); }
+.ih-muted { color: var(--ih-slate); }
+.ih-eyebrow { font-family: var(--ih-display); font-weight: 600; font-size: 0.8125rem; letter-spacing: 0.08em; text-transform: uppercase; text-wrap: balance; }
+.ih-eyebrow:lang(bn) { letter-spacing: 0; text-transform: none; font-size: 0.9375rem; }
+
+/* Buttons keep familiar sizing (44px minimum target). */
+.ih-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 48px; padding: 0 1.4rem; border-radius: 999px; font-family: var(--ih-display); font-weight: 600; font-size: 1rem; transition: background-color 180ms var(--ih-ease), color 180ms var(--ih-ease), transform 180ms var(--ih-ease), box-shadow 180ms var(--ih-ease); }
+.ih-btn:lang(bn) { font-family: "Hind Siliguri", system-ui, sans-serif; }
+.ih-btn-primary { background: var(--ih-slate); color: var(--ih-white); }
+.ih-btn-primary:hover { background: var(--ih-slate-deep); }
+.ih-dark .ih-btn-primary { background: var(--ih-blush); color: var(--ih-night); }
+.ih-dark .ih-btn-primary:hover { background: var(--ih-white); }
+.ih-btn-ghost { border: 1px solid var(--ih-mauve); color: var(--ih-night); background: transparent; }
+.ih-btn-ghost:hover { background: var(--ih-blush); }
+.ih-dark .ih-btn-ghost { border-color: rgba(222, 220, 220, 0.35); color: var(--ih-fog); }
+.ih-dark .ih-btn-ghost:hover { background: rgba(252, 231, 243, 0.08); }
+.ih-btn:active { transform: scale(0.98); }
+
+/* Navigation: floats over the hero, gains a solid night surface after scrolling (no glass). */
+.ih-nav { transition: background-color 240ms var(--ih-ease), border-color 240ms var(--ih-ease), box-shadow 240ms var(--ih-ease); border: 1px solid transparent; }
+.ih-nav[data-scrolled="true"] { background: rgba(25, 29, 35, 0.96); border-color: var(--ih-line-dark); box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.6); }
+.ih-navlink { color: var(--ih-fog); font-weight: 600; font-size: 0.9375rem; padding: 0.5rem 0.75rem; border-radius: 999px; transition: background-color 160ms var(--ih-ease), color 160ms var(--ih-ease); }
+.ih-navlink:hover { background: rgba(222, 220, 220, 0.1); color: var(--ih-white); }
+
+/* Hero horizon: layered depth driven by --ih-scroll (0..1) and --ih-px/--ih-py (pointer, -1..1). */
+.ih-hero { position: relative; isolation: isolate; }
+.ih-layer { position: absolute; inset: 0; pointer-events: none; will-change: transform; }
+.ih-sky { background: radial-gradient(120% 70% at 50% 108%, rgba(249, 168, 212, 0.55) 0%, rgba(197, 186, 196, 0.22) 28%, rgba(87, 112, 122, 0.12) 46%, rgba(25, 29, 35, 0) 64%), linear-gradient(180deg, #191d23 0%, #1c2128 60%, #222832 100%); }
+.ih-horizon { transform: translate3d(calc(var(--ih-px, 0) * -6px), calc(var(--ih-scroll, 0) * 60px), 0); }
+.ih-stars { transform: translate3d(calc(var(--ih-px, 0) * 14px), calc(var(--ih-scroll, 0) * -40px + var(--ih-py, 0) * 10px), 0); }
+.ih-nodes { transform: translate3d(calc(var(--ih-px, 0) * 24px), calc(var(--ih-scroll, 0) * -90px + var(--ih-py, 0) * 16px), 0); }
+.ih-card-float { transform: translate3d(calc(var(--ih-px, 0) * -10px), calc(var(--ih-scroll, 0) * -30px + var(--ih-py, 0) * -6px), 0); transition: transform 120ms linear; }
+@keyframes ih-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+@keyframes ih-dash { to { stroke-dashoffset: 0; } }
+@keyframes ih-glow { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+.ih-node-pulse { animation: ih-pulse 5.5s ease-in-out infinite; }
+.ih-link-draw { stroke-dasharray: 220; stroke-dashoffset: 220; animation: ih-dash 2.4s var(--ih-ease) 0.4s forwards; }
+.ih-glow { animation: ih-glow 9s ease-in-out infinite; }
+
+/* Scroll reveals: content is visible by default; motion is only added when JS confirms it's allowed. */
+.ih-motion .ih-reveal { opacity: 0; transform: translate3d(0, 18px, 0); transition: opacity 700ms var(--ih-ease), transform 700ms var(--ih-ease); }
+.ih-motion .ih-reveal[data-shown="true"] { opacity: 1; transform: none; }
+.ih-motion .ih-reveal-2 { transition-delay: 90ms; }
+.ih-motion .ih-reveal-3 { transition-delay: 180ms; }
+
+/* Learning cycle ring. */
+.ih-ring-seg { transition: stroke 300ms var(--ih-ease), stroke-width 300ms var(--ih-ease); }
+.ih-step { transition: opacity 300ms var(--ih-ease), border-color 300ms var(--ih-ease); }
+
+/* Cards and chips. */
+.ih-card { background: var(--ih-white); border: 1px solid rgba(197, 186, 196, 0.7); border-radius: 24px; box-shadow: var(--ih-shadow); }
+.ih-card-dark { background: var(--ih-night-2); border: 1px solid var(--ih-line-dark); border-radius: 24px; }
+.ih-chip { display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 999px; padding: 0.25rem 0.7rem; font-size: 0.8125rem; font-weight: 600; }
+.ih-seg { display: inline-flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.25rem; border-radius: 24px; background: rgba(222, 220, 220, 0.08); border: 1px solid var(--ih-line-dark); }
+.ih-seg button { min-height: 40px; padding: 0 0.9rem; border-radius: 999px; font-weight: 600; font-size: 0.875rem; color: var(--ih-fog); transition: background-color 160ms var(--ih-ease), color 160ms var(--ih-ease); }
+.ih-seg button[aria-pressed="true"], .ih-seg button[aria-selected="true"], .ih-seg button[aria-checked="true"] { background: var(--ih-rose); color: var(--ih-night); }
+.ih-seg-light { background: var(--ih-blush); border-color: rgba(197, 186, 196, 0.7); }
+.ih-seg-light button { color: var(--ih-night); }
+/* The class picker stays on one row down to 320px: five equal segments. */
+.ih-seg-grades { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: 100%; max-width: 34rem; }
+.ih-seg-grades button { padding: 0 0.25rem !important; white-space: nowrap; }
+.ih-seg-light button[aria-selected="true"], .ih-seg-light button[aria-pressed="true"] { background: var(--ih-night); color: var(--ih-white); }
+.ih-module { transition: transform 260ms var(--ih-ease), box-shadow 260ms var(--ih-ease), border-color 260ms var(--ih-ease); }
+.ih-module:hover, .ih-module:focus-within { transform: translate3d(0, -3px, 0); border-color: var(--ih-slate); }
+.ih-gradient-text { background: linear-gradient(90deg, var(--ih-blush), var(--ih-rose) 55%, var(--ih-mauve)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ih-layer, .ih-card-float { transform: none !important; transition: none !important; }
+  .ih-node-pulse, .ih-link-draw, .ih-glow { animation: none !important; stroke-dashoffset: 0 !important; }
+  .ih-module:hover, .ih-module:focus-within { transform: none; }
+}
+html[data-motion="reduce"] .ih-layer, html[data-motion="reduce"] .ih-card-float { transform: none !important; }
+html[data-motion="reduce"] .ih-link-draw { stroke-dashoffset: 0 !important; }
+}

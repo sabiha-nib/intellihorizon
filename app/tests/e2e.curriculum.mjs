@@ -153,7 +153,7 @@ await register(pc, { name: "Class Eight", username: "class_eight", email: "c8@ex
 await pc.goto(`${BASE}/tutor`);
 await pc.getByPlaceholder(/Ask a question/).fill("What is photosynthesis?");
 await pc.getByRole("button", { name: "Send" }).click();
-await pc.getByText(/IntelliHorizon supports Class 7 only for now\. Your profile/).first().waitFor({ timeout: 15000 });
+await pc.getByText(/IntelliHorizon is built for Classes 6–10, but only Class 7 has textbooks so far\. Your profile/).first().waitFor({ timeout: 15000 });
 check("class 8 student is not served the class 7 book", true);
 
 // 6. Practice and progress

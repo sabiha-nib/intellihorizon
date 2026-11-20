@@ -8,13 +8,24 @@ export type AiBlock = { role: BlockRole; text: string; basis: Basis; cites: numb
 export type AiQuote = { passageId: number; text: string };
 
 export type AiExplanation = {
-  status: "ok" | "insufficient" | "not_configured" | "unavailable" | "rejected" | "limit";
+  status: "ok" | "insufficient" | "not_configured" | "unavailable" | "rejected" | "limit" | "disputed";
   provider?: string;
   model?: string;
   blocks: AiBlock[];
   quotes: AiQuote[];
   /** What validation removed or relabelled, so the record shows how much the model was corrected. */
   checks?: { droppedCites: number; droppedQuotes: number; unverifiedBlocks: number; pageMentions: number; weakSupport?: number; policy?: number };
+  /** What the multi-model orchestrator did (which providers, which checks). Absent on older messages. */
+  orchestration?: OrchestrationInfo;
+};
+
+export type OrchestrationInfo = {
+  task: string; strategy: string; reason: string;
+  calls: { provider: "anthropic" | "gemini" | "openai"; label: string; role: "author" | "fallback" | "reviewer" | "independent"; ok: boolean; model?: string }[];
+  verified: boolean; verifyFailed: boolean; fellBack: boolean; economy: boolean;
+  removed: number; downgraded: number; disagreements: number; arithmeticChecked: boolean;
+  assurance: { level: "checked_twice" | "checked" | "limited"; reasons: string[] };
+  cached?: boolean;
 };
 
 /** A retrieved, student-visible source the model was allowed to use. */

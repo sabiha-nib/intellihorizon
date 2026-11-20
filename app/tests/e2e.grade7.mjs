@@ -242,7 +242,7 @@ await register(pc, { name: "Class Eight", username: "class_eight", email: "c8@ex
 await pc.goto(`${BASE}/tutor`);
 await pc.getByPlaceholder(/Ask a question/).fill("কাবুলিওয়ালা মিনিকে কী দিত?");
 await pc.getByRole("button", { name: "Send" }).click();
-await pc.getByText(/IntelliHorizon supports Class 7 only for now\. Your profile/).first().waitFor({ timeout: 15000 });
+await pc.getByText(/IntelliHorizon is built for Classes 6–10, but only Class 7 has textbooks so far\. Your profile/).first().waitFor({ timeout: 15000 });
 check("class 8 student is told honestly, with no Class 7 text served", lastPayload().excerpts.length === 0 && lastPayload().status === "no_books");
 const D = await browser.newContext(); const pd = await D.newPage();
 await register(pd, { name: "English Version", username: "eng_version", email: "ev@example.com", curriculum: /NCTB, English Version/ });

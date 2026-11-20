@@ -22,7 +22,7 @@ export function validateName(raw: string): string | null {
 const RESERVED = new Set([
   "admin", "administrator", "root", "support", "help", "educerro", "moderator", "mod", "staff", "teacher", "system", "null",
   "undefined", "official", "security", "api", "www", "mail", "owner", "account", "accounts", "signin", "signup", "login",
-  "logout", "privacy", "settings", "anonymous", "guest", "nctb", "rumi",
+  "logout", "privacy", "settings", "anonymous", "guest", "nctb", "rumi", "ihjudge", "judge",
 ]);
 // Blocked substrings, stored ROT13-encoded so offensive words do not appear in plain source.
 const BLOCKED = ["shpx", "fuvg", "ovgpu", "phag", "fyhg", "juber", "cbea", "anmv", "encr", "qvpx", "chffl", "avttre", "snttbg", "onfgneq", "nffubyr"].map((w) => w.replace(/[a-z]/g, (c) => String.fromCharCode(((c.charCodeAt(0) - 97 + 13) % 26) + 97)));
@@ -37,6 +37,7 @@ export function validateUsername(raw: string): string | null {
   if (v.length > 20) return "username_too_long";
   if (!/^[a-z][a-z0-9_.]*$/.test(v) || v.endsWith(".") || v.includes("..")) return "username_format";
   if (RESERVED.has(v.replace(/[_.]/g, ""))) return "username_reserved";
+  if (v.startsWith("demo_") || v.startsWith("demo.")) return "username_reserved"; // judge-demo workspaces
   const flat = v.replace(/[_.0-9]/g, "");
   if (BLOCKED.some((b) => flat.includes(b))) return "username_inappropriate";
   return null;

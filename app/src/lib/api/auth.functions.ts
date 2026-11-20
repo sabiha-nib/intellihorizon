@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { accountSummary, mediumFor } from "../auth/account.server";
+import { isJudgeUsername, judgeLogin } from "../auth/judge.server";
 import { dummyVerify, hashPassword, isBreachedPassword, randomToken, sha256Hex, verifyPassword } from "../auth/crypto.server";
 import { emailConfigured, sendEmailChange, sendResetEmail, sendVerifyEmail, type Delivery } from "../auth/email.server";
 import { appOrigin, clientKey, currentUser, endOtherSessions, endSession, rateCheck, rateHit, rateLimit, sameOrigin, startSession } from "../auth/session.server";
@@ -197,6 +198,11 @@ export const signIn = createServerFn({ method: "POST" })
     if (!sameOrigin()) return fail("bad_origin");
     const ident = data.identifier.includes("@") ? normalizeEmail(data.identifier) : normalizeUsername(data.identifier);
     if (!ident || !data.password) return fail("invalid_credentials");
+    // The judge-demo credential works here too; it opens a fresh isolated demo workspace instead of an account.
+    if (!ident.includes("@") && (await isJudgeUsername(ident))) {
+      const j = await judgeLogin(ident, data.password);
+      return j.ok ? { ok: true as const, account: null, redirect: j.redirect } : fail(j.code === "judge_disabled" ? "invalid_credentials" : j.code);
+    }
     const ipKey = `login-ip:${await clientKey()}`;
     const acctKey = `login-acct:${(await sha256Hex(ident)).slice(0, 24)}`;
     if (!(await rateCheck(ipKey, 40, 900)) || !(await rateCheck(acctKey, 8, 900))) return fail("rate_limited");
@@ -399,6 +405,7 @@ export const changePassword = createServerFn({ method: "POST" })
     if (!sameOrigin()) return fail("bad_origin");
     const me = await currentUser();
     if (!me) return fail("signed_out");
+    if (me.isDemo) return fail("demo_account");
     const bucket = `pw:${me.id}`;
     if (!(await rateCheck(bucket, 6, 900))) return fail("rate_limited");
     const row = await DB.prepare("SELECT u.password_hash, p.username FROM users u JOIN profiles p ON p.user_id = u.id WHERE u.id = ?").bind(me.id).first<{ password_hash: string; username: string }>();
@@ -422,6 +429,7 @@ export const requestEmailChange = createServerFn({ method: "POST" })
     if (!sameOrigin()) return fail("bad_origin");
     const me = await currentUser();
     if (!me) return fail("signed_out");
+    if (me.isDemo) return fail("demo_account");
     if (!emailConfigured()) return fail("email_not_configured");
     const email = normalizeEmail(data.email);
     if (validateEmail(email)) return fail("invalid", { email: "email_invalid" });
@@ -445,6 +453,7 @@ export const deleteAccount = createServerFn({ method: "POST" })
     if (!sameOrigin()) return fail("bad_origin");
     const me = await currentUser();
     if (!me) return fail("signed_out");
+    if (me.isDemo) return fail("demo_account");
     const row = await DB.prepare("SELECT u.password_hash, p.avatar_key FROM users u JOIN profiles p ON p.user_id = u.id WHERE u.id = ?").bind(me.id).first<{ password_hash: string; avatar_key: string | null }>();
     if (!row || !(await verifyPassword(data.password, row.password_hash))) return fail("invalid", { password: "current_wrong" });
     if (row.avatar_key && STORAGE) await STORAGE.delete(row.avatar_key).catch(() => undefined);

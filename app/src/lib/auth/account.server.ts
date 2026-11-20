@@ -7,7 +7,7 @@ type Row = {
   full_name: string; username: string; avatar_key: string | null; avatar_preset: string | null; school: string | null;
   country: string; district: string | null; region: string | null; grade: number; curriculum: string;
   curriculum_other: string | null; curriculum_other_text: string | null; updated_at: string;
-  explain_lang: string | null; goals: string | null; role: string | null;
+  explain_lang: string | null; goals: string | null; role: string | null; is_demo: number | null; demo_expires_at: string | null;
 };
 
 export async function accountSummary(userId: string): Promise<AccountSummary | null> {
@@ -15,7 +15,7 @@ export async function accountSummary(userId: string): Promise<AccountSummary | n
   if (!DB) return null;
   const r = await DB.prepare(
     `SELECT u.email, u.email_verified_at, u.pending_email, u.created_at, p.full_name, p.username, p.avatar_key, p.avatar_preset, p.school,
-            p.country, p.district, p.region, p.grade, p.curriculum, p.curriculum_other, p.curriculum_other_text, p.updated_at, p.explain_lang, p.goals, u.role
+            p.country, p.district, p.region, p.grade, p.curriculum, p.curriculum_other, p.curriculum_other_text, p.updated_at, p.explain_lang, p.goals, u.role, u.is_demo, u.demo_expires_at
        FROM users u JOIN profiles p ON p.user_id = u.id WHERE u.id = ? AND u.status = 'active'`,
   )
     .bind(userId)
@@ -40,7 +40,8 @@ export async function accountSummary(userId: string): Promise<AccountSummary | n
     emailDelivery: emailConfigured(),
     explainLang: r.explain_lang === "bn" || r.explain_lang === "en" ? r.explain_lang : null,
     goals: (() => { try { const g = JSON.parse(r.goals ?? "[]"); return Array.isArray(g) ? g.filter((x) => typeof x === "string") : []; } catch { return []; } })(),
-    role: r.role === "admin" ? "admin" : "student",
+    role: !r.is_demo && r.role === "admin" ? "admin" : "student",
+    demo: r.is_demo ? { expiresAt: r.demo_expires_at ?? "" } : null,
   };
 }
 

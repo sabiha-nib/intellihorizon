@@ -38,6 +38,8 @@ export const claimAdmin = createServerFn({ method: "POST" })
     if (!DB || !sameOrigin()) return fail("unavailable_now");
     const me = await currentUser();
     if (!me) return fail("signed_out");
+    // A judge-demo workspace can never become an administrator, even with a valid code.
+    if (me.isDemo) return fail("demo_account");
     if (!(await rateLimit(`admin-claim:${me.id}`, 5, 3600))) return fail("rate_limited");
     const code = data.token.trim().toUpperCase();
     // 1. The one-time owner code: only its hash is stored, and the UPDATE claims it atomically, so it works exactly once.

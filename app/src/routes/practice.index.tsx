@@ -124,8 +124,8 @@ function Practice() {
                     "তোমার শ্রেণির জন্য এখনো যাচাই করা প্রশ্ন নেই",
                   )}
                   body={tx(
-                    "IntelliHorizon currently has checked questions for Class 7 (Bangla medium). If that's your class, set it in your account.",
-                    "এখন ৭ম শ্রেণির (বাংলা মাধ্যম) জন্য যাচাই করা প্রশ্ন আছে। এটি তোমার শ্রেণি হলে অ্যাকাউন্টে ঠিক করো।",
+                    "IntelliHorizon is built for Classes 6–10. Checked questions exist so far for Class 7, Bangla Version. If that's your class, set it in your account.",
+                    "ইন্টেলিহরাইজন ৬ষ্ঠ–১০ম শ্রেণির জন্য তৈরি। এখন পর্যন্ত যাচাই করা প্রশ্ন আছে ৭ম শ্রেণি, বাংলা ভার্সনের জন্য। এটি তোমার শ্রেণি হলে অ্যাকাউন্টে ঠিক করো।",
                   )}
                   action={
                     <LinkButton to="/account" variant="secondary">

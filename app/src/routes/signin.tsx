@@ -41,6 +41,8 @@ function SignIn() {
       return;
     }
     setPassword("");
+    // The judge credential opens a fresh demo workspace; a full load makes sure nothing from before carries over.
+    if ("redirect" in r && typeof r.redirect === "string") { window.location.assign(r.redirect); return; }
     await refresh();
     void navigate({ to: safeNext(next) });
   };
@@ -75,6 +77,10 @@ function SignIn() {
       <p className="mt-8 text-center text-[15px] text-ink-mid">
         {tx("New to IntelliHorizon? ", "ইন্টেলিহরাইজনে নতুন? ")}
         <Link to="/signup" className="font-semibold text-ink underline decoration-dashed underline-offset-4">{tx("Create an account", "অ্যাকাউন্ট খোলো")}</Link>
+      </p>
+      <p className="mt-3 text-center text-sm text-ink-mid">
+        {tx("Competition judge? ", "প্রতিযোগিতার বিচারক? ")}
+        <Link to="/judge" className="font-semibold text-ink underline decoration-dashed underline-offset-4">{tx("Use judge access", "বিচারক প্রবেশ ব্যবহার করুন")}</Link>
       </p>
       <p className="mt-3 text-center text-sm text-ink-low">{tx("You can also keep learning without an account. Your progress then stays on this device only.", "অ্যাকাউন্ট ছাড়াও শেখা যায়। তখন অগ্রগতি শুধু এই ডিভাইসেই থাকে।")}</p>
     </AuthLayout>

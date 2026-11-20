@@ -1,5 +1,5 @@
 import type { L } from "../../content/types";
-import type { AiBlock, AiExplanation as Ai } from "../../lib/ai/grounding";
+import type { AiBlock, AiExplanation as Ai, OrchestrationInfo } from "../../lib/ai/grounding";
 import type { Excerpt } from "../../lib/tutor/types";
 import { useLearner } from "../../lib/store";
 import { MathText } from "./MathText";
@@ -26,6 +26,7 @@ const STATUS: Partial<Record<Ai["status"], L>> = {
   unavailable: { en: "The AI explanation couldn't be made just now. Here is the textbook text; nothing has been made up.", bn: "এই মুহূর্তে এআই ব্যাখ্যা তৈরি করা যায়নি। এখানে পাঠ্যবইয়ের লেখা আছে; কিছু বানানো হয়নি।" },
   rejected: { en: "The AI's explanation didn't match your textbook closely enough, so I'm not showing it. Read the textbook text below.", bn: "এআই-এর ব্যাখ্যা তোমার বইয়ের সঙ্গে যথেষ্ট মেলেনি, তাই দেখাচ্ছি না। নিচের লেখাটি পড়ো।" },
   insufficient: { en: "The checked text I found doesn't explain this fully, so there's no AI explanation. Read the passage below, or ask a narrower question.", bn: "যাচাই করা যে লেখা পেয়েছি তা এটি পুরোপুরি ব্যাখ্যা করে না, তাই এআই ব্যাখ্যা নেই। নিচের অংশটি পড়ো, বা আরও নির্দিষ্ট প্রশ্ন করো।" },
+  disputed: { en: "Independent checks disagreed about this explanation and your textbook text couldn't settle it, so I'm not showing it. A teacher will look at it. Read the textbook text below.", bn: "এই ব্যাখ্যা নিয়ে স্বাধীন যাচাইগুলো একমত হয়নি, আর তোমার বইয়ের লেখা দিয়েও মীমাংসা হয়নি, তাই দেখাচ্ছি না। একজন শিক্ষক এটি দেখবেন। নিচের পাঠ্যবইয়ের লেখাটি পড়ো।" },
   limit: { en: "You've used today's AI explanations. The textbook text still works, and more explanations are available tomorrow.", bn: "আজকের এআই ব্যাখ্যা শেষ। পাঠ্যবইয়ের লেখা দেখা যাবে, কাল আবার ব্যাখ্যা পাবে।" },
 };
 
@@ -66,7 +67,41 @@ export function AiExplanation({ ai, excerpts, lang = null }: { ai: Ai; excerpts:
         </div>
       )}
       <SpeakButton lang={lang === "en" ? "en" : "bn"} parts={ai.blocks.map((b) => `${t(BASIS[b.basis].label)}. ${t(ROLE[b.role])}: ${b.text.replace(/\$/g, "")}`)} />
+      {ai.orchestration && <HowChecked o={ai.orchestration} />}
       <p className="text-xs text-ink-low">{tx("Written by an AI model from the sources listed below. Labels show what comes from your book and what doesn't. Check with your teacher if something seems wrong.", "নিচের উৎসগুলো থেকে একটি এআই মডেল লিখেছে। কোনটি বই থেকে আর কোনটি নয়, লেবেলে দেখানো আছে। কিছু ভুল মনে হলে শিক্ষককে জিজ্ঞেস করো।")}</p>
     </section>
+  );
+}
+
+const LEVEL: Record<OrchestrationInfo["assurance"]["level"], { label: L; cls: string }> = {
+  checked_twice: { label: { en: "Checked against your textbook and by a second, independent AI model", bn: "তোমার পাঠ্যবইয়ের সঙ্গে এবং আরেকটি স্বাধীন এআই মডেল দিয়ে যাচাই করা" }, cls: "text-mint" },
+  checked: { label: { en: "Checked against your textbook", bn: "তোমার পাঠ্যবইয়ের সঙ্গে যাচাই করা" }, cls: "text-brand-deep" },
+  limited: { label: { en: "Checked against your textbook, with limits (see below)", bn: "পাঠ্যবইয়ের সঙ্গে যাচাই করা, কিছু সীমাবদ্ধতাসহ (নিচে দেখো)" }, cls: "text-amber" },
+};
+const ROLE_LINE: Record<OrchestrationInfo["calls"][number]["role"], (n: string, ok: boolean) => L> = {
+  author: (n) => ({ en: `Written by ${n}`, bn: `লিখেছে ${n}` }),
+  reviewer: (n, ok) => (ok ? { en: `Checked independently by ${n}`, bn: `স্বাধীনভাবে যাচাই করেছে ${n}` } : { en: `${n} couldn't do the second check this time`, bn: `${n} এবার দ্বিতীয় যাচাই করতে পারেনি` }),
+  independent: (n, ok) => (ok ? { en: `Answered separately by ${n}, for comparison`, bn: `তুলনার জন্য আলাদাভাবে উত্তর দিয়েছে ${n}` } : { en: `${n} couldn't give a separate answer this time`, bn: `${n} এবার আলাদা উত্তর দিতে পারেনি` }),
+  fallback: (n) => ({ en: `${n} didn't respond, so another model answered`, bn: `${n} সাড়া দেয়নি, তাই অন্য মডেল উত্তর দিয়েছে` }),
+};
+
+/** "How this was checked": which models took part and which checks ran. Never a confidence score from a model. */
+function HowChecked({ o }: { o: OrchestrationInfo }) {
+  const { t, tx } = useLearner();
+  const lv = LEVEL[o.assurance.level];
+  return (
+    <details className="rounded-[12px] bg-paper px-3 py-2 text-sm" data-assurance={o.assurance.level} data-strategy={o.strategy}>
+      <summary className={`cursor-pointer font-semibold ${lv.cls}`}>{t(lv.label)}</summary>
+      <ul className="mt-2 list-disc space-y-1 pl-5 text-ink-mid">
+        {o.calls.map((c, i) => <li key={i} data-role={c.role} data-provider={c.provider}>{t(ROLE_LINE[c.role](c.label, c.ok))}</li>)}
+        <li>{tx("Every citation and quotation was matched against the retrieved textbook text.", "প্রতিটি উৎসনির্দেশ ও উদ্ধৃতি খুঁজে পাওয়া পাঠ্যবইয়ের লেখার সঙ্গে মেলানো হয়েছে।")}</li>
+        {o.arithmeticChecked && <li>{tx("Every calculation was recalculated exactly by the app, not by a model.", "প্রতিটি হিসাব অ্যাপ নিজে হুবহু আবার কষেছে, কোনো মডেল নয়।")}</li>}
+        {o.removed > 0 && <li>{tx(`${o.removed} part(s) were removed because they failed a check.`, `যাচাইয়ে টেকেনি বলে ${o.removed}টি অংশ বাদ দেওয়া হয়েছে।`)}</li>}
+        {o.downgraded > 0 && <li>{tx(`${o.downgraded} part(s) are no longer labelled as from your book.`, `${o.downgraded}টি অংশকে আর বই থেকে বলে দেখানো হচ্ছে না।`)}</li>}
+        {o.assurance.reasons.includes("partial_evidence") && <li>{tx("Your textbook text only partly covers this question.", "তোমার বইয়ের লেখা এই প্রশ্নের শুধু একাংশ জুড়ে আছে।")}</li>}
+        {o.economy && <li>{tx("The second check was skipped to stay within today's AI budget.", "আজকের এআই বাজেটের মধ্যে থাকতে দ্বিতীয় যাচাই বাদ দেওয়া হয়েছে।")}</li>}
+        <li>{tx("Agreement between AI models is never treated as proof; only your textbook is.", "এআই মডেলগুলো একমত হলেই তা প্রমাণ ধরা হয় না; প্রমাণ শুধু তোমার পাঠ্যবই।")}</li>
+      </ul>
+    </details>
   );
 }

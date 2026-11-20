@@ -13,6 +13,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as TwinRouteImport } from './routes/twin'
 import { Route as TomorrowRouteImport } from './routes/tomorrow'
 import { Route as SummaryRouteImport } from './routes/summary'
+import { Route as StartRouteImport } from './routes/start'
 import { Route as SkyRouteImport } from './routes/sky'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -37,6 +38,7 @@ import { Route as MirrorRouteImport } from './routes/mirror'
 import { Route as MasteryRouteImport } from './routes/mastery'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as KnowledgeMapRouteImport } from './routes/knowledge-map'
+import { Route as JudgeRouteImport } from './routes/judge'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as HistoryRouteImport } from './routes/history'
@@ -92,6 +94,11 @@ const TomorrowRoute = TomorrowRouteImport.update({
 const SummaryRoute = SummaryRouteImport.update({
   id: '/summary',
   path: '/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StartRoute = StartRouteImport.update({
+  id: '/start',
+  path: '/start',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SkyRoute = SkyRouteImport.update({
@@ -212,6 +219,11 @@ const LoginRoute = LoginRouteImport.update({
 const KnowledgeMapRoute = KnowledgeMapRouteImport.update({
   id: '/knowledge-map',
   path: '/knowledge-map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JudgeRoute = JudgeRouteImport.update({
+  id: '/judge',
+  path: '/judge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InsightsRoute = InsightsRouteImport.update({
@@ -414,6 +426,7 @@ export interface FileRoutesByFullPath {
   '/history': typeof HistoryRoute
   '/home': typeof HomeRoute
   '/insights': typeof InsightsRoute
+  '/judge': typeof JudgeRoute
   '/knowledge-map': typeof KnowledgeMapRoute
   '/login': typeof LoginRoute
   '/mastery': typeof MasteryRoute
@@ -438,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/start': typeof StartRoute
   '/summary': typeof SummaryRoute
   '/tomorrow': typeof TomorrowRoute
   '/twin': typeof TwinRoute
@@ -480,6 +494,7 @@ export interface FileRoutesByTo {
   '/history': typeof HistoryRoute
   '/home': typeof HomeRoute
   '/insights': typeof InsightsRoute
+  '/judge': typeof JudgeRoute
   '/knowledge-map': typeof KnowledgeMapRoute
   '/login': typeof LoginRoute
   '/mastery': typeof MasteryRoute
@@ -504,6 +519,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/start': typeof StartRoute
   '/summary': typeof SummaryRoute
   '/tomorrow': typeof TomorrowRoute
   '/twin': typeof TwinRoute
@@ -547,6 +563,7 @@ export interface FileRoutesById {
   '/history': typeof HistoryRoute
   '/home': typeof HomeRoute
   '/insights': typeof InsightsRoute
+  '/judge': typeof JudgeRoute
   '/knowledge-map': typeof KnowledgeMapRoute
   '/login': typeof LoginRoute
   '/mastery': typeof MasteryRoute
@@ -571,6 +588,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/start': typeof StartRoute
   '/summary': typeof SummaryRoute
   '/tomorrow': typeof TomorrowRoute
   '/twin': typeof TwinRoute
@@ -615,6 +633,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/home'
     | '/insights'
+    | '/judge'
     | '/knowledge-map'
     | '/login'
     | '/mastery'
@@ -639,6 +658,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/sky'
+    | '/start'
     | '/summary'
     | '/tomorrow'
     | '/twin'
@@ -681,6 +701,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/home'
     | '/insights'
+    | '/judge'
     | '/knowledge-map'
     | '/login'
     | '/mastery'
@@ -705,6 +726,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/sky'
+    | '/start'
     | '/summary'
     | '/tomorrow'
     | '/twin'
@@ -747,6 +769,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/home'
     | '/insights'
+    | '/judge'
     | '/knowledge-map'
     | '/login'
     | '/mastery'
@@ -771,6 +794,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/sky'
+    | '/start'
     | '/summary'
     | '/tomorrow'
     | '/twin'
@@ -814,6 +838,7 @@ export interface RootRouteChildren {
   HistoryRoute: typeof HistoryRoute
   HomeRoute: typeof HomeRoute
   InsightsRoute: typeof InsightsRoute
+  JudgeRoute: typeof JudgeRoute
   KnowledgeMapRoute: typeof KnowledgeMapRoute
   LoginRoute: typeof LoginRoute
   MasteryRoute: typeof MasteryRoute
@@ -838,6 +863,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkyRoute: typeof SkyRoute
+  StartRoute: typeof StartRoute
   SummaryRoute: typeof SummaryRoute
   TomorrowRoute: typeof TomorrowRoute
   TwinRoute: typeof TwinRoute
@@ -891,6 +917,13 @@ declare module '@tanstack/react-router' {
       path: '/summary'
       fullPath: '/summary'
       preLoaderRoute: typeof SummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/start': {
+      id: '/start'
+      path: '/start'
+      fullPath: '/start'
+      preLoaderRoute: typeof StartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sky': {
@@ -1059,6 +1092,13 @@ declare module '@tanstack/react-router' {
       path: '/knowledge-map'
       fullPath: '/knowledge-map'
       preLoaderRoute: typeof KnowledgeMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/judge': {
+      id: '/judge'
+      path: '/judge'
+      fullPath: '/judge'
+      preLoaderRoute: typeof JudgeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/insights': {
@@ -1345,6 +1385,7 @@ const rootRouteChildren: RootRouteChildren = {
   HistoryRoute: HistoryRoute,
   HomeRoute: HomeRoute,
   InsightsRoute: InsightsRoute,
+  JudgeRoute: JudgeRoute,
   KnowledgeMapRoute: KnowledgeMapRoute,
   LoginRoute: LoginRoute,
   MasteryRoute: MasteryRoute,
@@ -1369,6 +1410,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkyRoute: SkyRoute,
+  StartRoute: StartRoute,
   SummaryRoute: SummaryRoute,
   TomorrowRoute: TomorrowRoute,
   TwinRoute: TwinRoute,

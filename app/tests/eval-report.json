@@ -1,5 +1,5 @@
 {
-  "run": "2026-11-19T17:12:31.850Z",
+  "run": "2026-11-20T05:02:12.153Z",
   "provider": "local mock (tests/mock-ai.mjs): measures the pipeline, not a real model's language quality",
   "cases": 25,
   "casesPassed": 25,

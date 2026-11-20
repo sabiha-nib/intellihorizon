@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { call, msg } from "../components/auth/messages";
 import { JourneyList, MissionList } from "../components/universe/dash";
 import { Frame } from "../components/universe/Shell";
+import { JudgeWelcome } from "../components/app/JudgeWelcome";
 import { Icon, SubjectDot } from "../components/universe/icons";
 import { bnDigits } from "../components/universe/learning";
 import { MODULES } from "../components/universe/modules";
@@ -100,6 +101,7 @@ function Dashboard() {
   return (
     <Frame>
       <div className="space-y-10">
+        {account?.demo && <JudgeWelcome expiresAt={account.demo.expiresAt} />}
         {/* A + B: welcome and continue learning */}
         <section
           aria-labelledby="hello-h"
@@ -270,8 +272,8 @@ function Dashboard() {
                   {d.offering
                     ? tx("Your books are listed below.", "তোমার বইগুলো নিচে আছে।")
                     : tx(
-                        "IntelliHorizon currently covers Class 7. You can change your class in Settings.",
-                        "ইন্টেলিহরাইজন এখন ৭ম শ্রেণি নিয়ে কাজ করে। সেটিংসে শ্রেণি বদলাতে পারো।",
+                        "IntelliHorizon is built for Classes 6–10, Bangla Version and English Version. Textbooks for your class and version haven't been imported yet; today the content is Class 7, Bangla Version. You can change your class or version any time.",
+                        "ইন্টেলিহরাইজন ৬ষ্ঠ–১০ম শ্রেণি, বাংলা ভার্সন ও ইংলিশ ভার্সনের জন্য তৈরি। তোমার শ্রেণি ও ভার্সনের পাঠ্যবই এখনো আমদানি হয়নি; আজ বিষয়বস্তু আছে ৭ম শ্রেণি, বাংলা ভার্সনের। যেকোনো সময় শ্রেণি বা ভার্সন বদলাতে পারো।",
                       )}
                 </p>
                 <div className="mt-5">

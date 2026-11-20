@@ -2,14 +2,21 @@
 
 *Expand the horizons of human learning.* (Formerly Educerro.)
 
-A personalised learning platform for Bangladeshi students, starting with the Class 7 NCTB curriculum.
+An AI-powered personalised learning ecosystem for Classes 6–10, aligned with Bangladesh's NCTB curriculum, for both
+Bangla Version and English Version students. **Product scope** is Classes 6–10 × both versions; **implemented content**
+today is Class 7, Bangla Version (16 checked passages, 22 published questions). Every other class/version is shown with
+an honest availability label computed from the database (Available / Partially available / Content under review /
+Coming soon), and the tutor never answers from another class's or another edition's books.
 Live at https://educerro.higgsfield.app (the address is a deployed resource and keeps its original name).
 
 ## Stack
 
 - React 19 + TanStack Start, server-rendered on a Cloudflare Worker (Higgsfield hosting).
 - D1 (SQLite, FTS5 trigram search) for all data; R2 for profile pictures.
-- No external AI model. The tutor is retrieval-grounded: it finds and quotes approved textbook passages and never generates textbook content.
+- AI: the IntelliCore multi-model orchestrator (`src/lib/ai/orchestrator.server.ts`) over three server-side adapters
+  (`src/lib/ai/providers.ts`): Anthropic Messages, Google Gemini generateContent, OpenAI Responses. The textbook evidence
+  and validation rules (`grounding.ts`, `crosscheck.ts`) are the final authority; without any key configured, the tutor
+  quotes approved textbook passages only and says so.
 - Tailwind v4 tokens in `src/styles.css`. The colour palette is unchanged by the rename.
 
 ## What is where
@@ -46,13 +53,22 @@ Set in Higgsfield website settings (all optional):
 - `EDU_ADMIN_TOKEN` (32+ characters): a second way to unlock admin.
 - `RESEND_API_KEY`, `EMAIL_FROM`: enables verification and password-reset email. Without them the app says email isn't set up.
 - `APP_ORIGIN`: overrides the site origin used in emailed links.
-- AI explanations (all three required to switch on; there is no built-in default model):
-  - `AI_PROVIDER`: `openai` (any OpenAI-compatible Chat Completions API) or `anthropic`.
-  - `AI_API_KEY`: the provider key. Read only on the server; never in the browser bundle (a test checks this).
-  - `AI_MODEL`: the model id.
-  - Optional: `AI_BASE_URL` (https only), `AI_TIMEOUT_MS` (default 20000), `AI_DAILY_LIMIT` per student (default 60),
-    `AI_VISION=on` to read homework photos (the model must accept images).
-  Without them the tutor shows checked textbook text only and says AI explanations aren't switched on.
+- AI providers (each pair switches that provider on; any one is enough; all three enable verification and collaboration):
+  - `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL` (suggested: `claude-sonnet-5-5`; `claude-opus-5-5` for higher quality)
+  - `GEMINI_API_KEY` + `GEMINI_MODEL` (suggested: `gemini-3.8-flash` or `gemini-4-argon`)
+  - `OPENAI_API_KEY` + `OPENAI_MODEL` (suggested: `gpt-6.2-sol`)
+  - Optional per provider: `*_MAX_TOKENS` (default 4096; thinking counts toward it), `*_TIMEOUT_MS` (default 30000),
+    `*_EFFORT` (sent as `output_config.effort` / `reasoning.effort`), `*_VISION=off` for a text-only model,
+    `*_PRICE_IN` / `*_PRICE_OUT` (USD per million tokens, for cost estimates when the model isn't in the built-in list),
+    `*_BASE_URL` (https only).
+  - Orchestration: `AI_VERIFY` = `auto` (default) | `always` | `off`; `AI_COLLABORATE` = `auto` | `off`;
+    `AI_ROUTING` (JSON per task, e.g. `{"conceptual":{"order":["gemini","anthropic"]}}`); `AI_RETRIES` (default 1);
+    `AI_CACHE_SECONDS` (default 21600; 0 turns the answer cache off).
+  - Limits: `AI_DAILY_LIMIT` per student (default 60 requests), `AI_DAILY_BUDGET_USD`, `AI_MONTHLY_BUDGET_USD`
+    (estimated spend caps; at 80% of the daily cap second opinions are skipped), `JUDGE_AI_DAILY_LIMIT` per judge
+    workspace (default 25), `JUDGE_AI_TOTAL_DAILY` across all judges (default 300).
+  - The older `AI_PROVIDER` / `AI_API_KEY` / `AI_MODEL` / `AI_BASE_URL` / `AI_VISION` secrets still work as one provider.
+  Keys are read only on the server; they never reach the browser, logs, API responses or the admin page (tests check this).
 - Meaning-based (semantic) retrieval, optional, all three required: `EMBED_API_KEY`, `EMBED_MODEL`, `EMBED_BASE_URL`
   (any OpenAI-compatible `/embeddings` endpoint; https only). Optional `EMBED_MIN_SIM` (default 0.35). After setting them,
   open Admin -> "Formulas, links and AI drafts" -> Build index (repeat until it says all done). Without them, or before
@@ -61,12 +77,20 @@ Set in Higgsfield website settings (all optional):
 ### Owner setup checklist
 
 1. Sign in, open /admin and unlock it with the owner code (shown only to the owner; never logged).
-2. In Higgsfield website settings -> Secrets, add `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL` (and `AI_BASE_URL` if your
-   provider isn't the default for its type). If the site doesn't pick them up, redeploy it.
+2. In Higgsfield website settings -> Secrets, add `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL`, `GEMINI_API_KEY` +
+   `GEMINI_MODEL`, `OPENAI_API_KEY` + `OPENAI_MODEL` (get keys at console.anthropic.com, aistudio.google.com and
+   platform.openai.com). Optionally set `AI_DAILY_BUDGET_USD` / `AI_MONTHLY_BUDGET_USD`. Then redeploy (secrets apply
+   on the next deploy). Admin -> "AI providers" shows which are configured, without showing keys.
+2b. Judge demo: judges sign in at `/judge` with the username `ih.judge` and the password handed to you privately. Rotate
+   it any time in Admin -> "Judge demo" (the new password is shown once; old sessions end).
 3. Optionally add `EMBED_*` (above) and build the index; `RESEND_API_KEY` + `EMAIL_FROM` for email.
 4. Import the Class 7 text pack in Content Studio and review passages. Nothing unreviewed reaches students.
-5. Run `node tests/eval.ai.mjs` against a staging copy with the real provider to measure it (thresholds are in
-   `data/ai-eval/cases.json`). Never paste keys into code or chat.
+5. Measure the real providers: Admin -> "AI providers" -> Provider evaluation -> Run evaluation. It runs 9 fixed cases
+   under each provider alone, each pair (one writes, one verifies), all three together and the production routing,
+   through the same pipeline students use, and records latency, calls, estimated cost and automatic checks. Then score
+   each answer for meaning, fluency and teaching (pass marks fixed in `src/lib/ai/eval-cases.ts`: every automatic check,
+   and a human average of at least 4 of 5). Set `AI_ROUTING` from those results. A full run with three providers is 72
+   answers (about 150 billed calls). Never paste keys into code or chat.
 
 Migrations in `migrations/` are additive and are applied on deploy.
 
@@ -183,6 +207,10 @@ node tests/e2e.universe.mjs && node tests/e2e.grade7.mjs && node tests/e2e.curri
 node tests/e2e.ai.mjs && node tests/e2e.content.mjs && node tests/e2e.inputs.mjs && node tests/e2e.security.mjs
 node tests/e2e.quiz.mjs && node tests/e2e.studio.mjs && node tests/eval.ai.mjs   # eval writes tests/eval-report.json
 # the AI suites need the test double: node tests/mock-ai.mjs (port 8790) and AI_* / EMBED_* vars pointing at it
+# Phase 5 (three-provider doubles on :8791, config with ANTHROPIC_/GEMINI_/OPENAI_* pointing at them):
+node tests/mock-providers.mjs & node tests/e2e.multi.mjs && node tests/e2e.judge.mjs && node tests/e2e.home.mjs && node tests/e2e.eval.mjs
+# Real providers: set the real keys on a staging copy and run node tests/eval.ai.mjs; mock results are never reported
+# as real-model results.
 ```
 
 ## Implementation log (IntelliHorizon transformation)
@@ -221,3 +249,28 @@ node tests/e2e.quiz.mjs && node tests/e2e.studio.mjs && node tests/eval.ai.mjs  
 - Career paths: not built. It needs dated, sourced information about Bangladeshi careers and courses, which this project
   doesn't have; inventing it would break the no-invented-content rule.
 - Matching and multi-select question types (need a questions-table rebuild); a real-provider evaluation run (no key).
+
+## Phase 5: scope, IntelliCore orchestrator, judge demo, homepage
+
+- **Scope vs coverage.** `src/lib/curriculum/scope.ts` defines Classes 6–10 × Bangla/English Version and computes
+  availability from real counts (`curriculumMatrix` server function). `/start` is the class → version → subject
+  onboarding; it saves to the profile when signed in (`setCurriculum`) and never changes the interface language.
+- **IntelliCore.** Task classification (`crosscheck.ts`: tutoring, conceptual, math, image_homework, translation,
+  socratic, mcq_generation, high_impact, explain_back) → route (primary / verify / collaborate) from configured providers
+  → generate with retry and fallback (vision tasks only to vision-capable providers) → `validateExplanation` → reviewer
+  verdicts and, for collaboration, an independent answer written in parallel → `coordinate()`: exact arithmetic first,
+  then disagreements settled only by the textbook evidence; if the direct answer can't be supported the explanation is
+  withheld (`disputed`) and queued in `ai_disputes` for human review. Models agreeing never promotes a claim.
+- **Logging.** `ai_requests` gains request_group, task, strategy, role, cost_usd, attempts, disagreements (metadata only).
+  Admin -> "AI providers" shows per-provider calls, errors, latency, tokens, estimated cost, verification and
+  disagreement counts, spend vs caps, and the dispute queue.
+- **Judge demo.** `demo_access` holds one PBKDF2 hash (seeded by migration 0013; rotate in Admin). Each judge sign-in
+  creates an isolated demo student (Class 7, Bangla Version, tutor in Bangla) that expires after 24 hours, can't claim
+  admin or change credentials, and has its own AI limits.
+- **Homepage.** `src/components/home/*`: palette and type tokens in `home.css` (scoped to `.ih-home`), motion in
+  `motion.ts` (transform/opacity only; off under reduced motion), the labelled tutor demonstration in `demo.ts`.
+- **Real-provider evaluation.** `src/lib/ai/eval-cases.ts` (cases, configurations, automatic checks, thresholds) and
+  `src/lib/api/provider-eval.functions.ts` (admin only). Each configuration runs with the other providers' keys blanked
+  and the strategy forced through `AI_ROUTING` for that call only; the cache is off and spending caps still apply. Runs
+  against local doubles are stored and shown as "not real-model results". Migration 0014 adds `ai_eval_runs` and
+  `ai_eval_results` (additive). Tests: `tests/provider-eval.unit.test.ts`, `tests/e2e.eval.mjs` (local doubles).

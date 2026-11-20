@@ -51,10 +51,10 @@ const V = await browser.newContext({ viewport: { width: 1280, height: 900 } });
 const pv = await V.newPage();
 await pv.goto(`${BASE}/`);
 check("public home renders for visitors", (await pv.getByRole("heading", { level: 1 }).textContent()).includes("Learning should understand you."));
-check("public home has Sign in and Start learning", (await pv.getByRole("link", { name: "Sign in" }).count()) > 0 && (await pv.getByRole("link", { name: "Start learning" }).count()) > 0);
-check("public home shows all eight subjects", (await pv.locator("#curriculum li").count()) === 8);
+check("public home has Sign In and Get Started", (await pv.getByRole("link", { name: "Sign In" }).count()) > 0 && (await pv.getByRole("link", { name: "Get Started" }).count()) > 0);
+check("public home shows all five classes and both textbook versions", (await pv.locator("#curriculum [role=tab]").count()) === 5 && (await pv.locator("#grade-panel [data-medium]").count()) === 2);
 check("public home is branded IntelliHorizon, with no old brand left", (await pv.title()).startsWith("IntelliHorizon") && !(await pv.content()).includes("Educerro"));
-check("public home has a privacy and responsible AI section", (await pv.getByRole("heading", { name: "Privacy and responsible AI" }).count()) === 1);
+check("public home has a responsible AI section", (await pv.locator("#trust h2").count()) === 1 && (await pv.getByRole("heading", { name: "Your textbook is the authority. The AI is not." }).count()) === 1);
 for (const path of ["/dashboard", "/progress", "/revision", "/mistakes", "/mastery", "/knowledge-map", "/missions", "/achievements", "/history", "/settings", "/more", "/plan", "/practice", "/path"]) {
   await pv.goto(`${BASE}${path}`).catch(() => undefined);
   await pv.waitForURL(/\/signin/, { timeout: 10000 }).catch(() => undefined);
@@ -64,12 +64,11 @@ check("all student modules redirect visitors to sign in", true);
 await pv.goto(`${BASE}/login?next=/progress`).catch(() => undefined);
 await pv.waitForURL(/\/signin/, { timeout: 10000 }).catch(() => undefined);
 check("/login goes to sign in and keeps the destination", pv.url().includes("/signin") && pv.url().includes("progress"));
-// Landing loop demo works without an account
-await pv.goto(`${BASE}/#product`);
-await pv.getByRole("tab", { name: /Practise/ }).click();
-await pv.getByRole("radio", { name: /১৫ : ৬ : ১০/ }).click();
-await pv.getByRole("button", { name: "Check my answer" }).click();
-check("landing practice demo explains the wrong choice", await pv.getByText("That reverses the order of the terms.").isVisible());
+// Landing demo works without an account. (Phase 5 replaced the old practice-question demo with the tutor preview;
+// its "Check my working" flow is the equivalent: it explains a student's mistake.)
+await pv.goto(`${BASE}/#tutor`);
+await pv.locator('[data-demo-flow="working"]').click();
+check("landing demo explains the mistake (first wrong step)", /first wrong step is line 3/.test(await pv.locator("#tutor").innerText()));
 
 // 2. Student A: signup, dashboard, session
 const A = await browser.newContext({ viewport: { width: 1280, height: 900 } });

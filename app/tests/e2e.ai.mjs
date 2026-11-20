@@ -53,6 +53,8 @@ await register(pa, { name: "Mitu Akter", username: "mitu_ai", email: "mitu.ai@ex
 await mode("ok");
 
 const ask = async (q, waitFor) => {
+  // Validated answers are cached per student and question (Phase 5); each check here needs a fresh provider call.
+  sql("DELETE FROM ai_cache");
   await pa.goto(`${BASE}/tutor`);
   await pa.getByPlaceholder(/Ask a question/).fill(q);
   await pa.getByRole("button", { name: "Send" }).click();

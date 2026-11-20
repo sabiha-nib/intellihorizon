@@ -262,8 +262,68 @@ export const reviewPassage = createServerFn({ method: "POST" })
 export const aiAdminStatus = createServerFn({ method: "GET" }).handler(async () => {
   const g = await guard();
   if (g.error) return g.error;
-  const { aiStatus } = await import("../ai/provider");
+  const { providerStatus } = await import("../ai/providers");
+  const env = bindings() as unknown as Record<string, string | undefined>;
+  const providers = providerStatus(env);
+  const first = providers.find((p) => p.configured) ?? null;
   const day = new Date().toISOString().slice(0, 10);
   const r = await g.DB.prepare("SELECT status, COUNT(*) AS n FROM ai_requests WHERE created_at >= ? GROUP BY status").bind(`${day}T00:00:00`).all<{ status: string; n: number }>();
-  return { ok: true as const, ai: aiStatus(bindings() as unknown as Record<string, string | undefined>), today: r.results ?? [], email: { configured: !!bindings().RESEND_API_KEY && !!bindings().EMAIL_FROM } };
+  return {
+    ok: true as const,
+    ai: first ? { configured: true as const, provider: first.id, model: first.model, vision: providers.some((p) => p.configured && p.vision) } : { configured: false as const, provider: null, model: null, vision: false },
+    providers,
+    today: r.results ?? [],
+    email: { configured: !!bindings().RESEND_API_KEY && !!bindings().EMAIL_FROM },
+  };
 });
+
+/* ─────────── AI usage by provider (no prompts, no answers, no keys) ─────────── */
+
+const ERROR_STATUSES = ["timeout", "rate_limited", "provider_error", "bad_response", "auth_failed", "truncated"];
+
+export const aiUsage = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ days: z.number().int().min(1).max(90).default(30) }))
+  .handler(async ({ data }) => {
+    const g = await guard();
+    if (g.error) return g.error;
+    const since = new Date(Date.now() - data.days * 86400_000).toISOString();
+    const errs = ERROR_STATUSES.map(() => "?").join(",");
+    const rows = await g.DB.prepare(
+      `SELECT provider,
+              COUNT(*) AS calls,
+              SUM(CASE WHEN COALESCE(role, 'primary') IN ('primary', 'fallback') THEN 1 ELSE 0 END) AS authored,
+              SUM(CASE WHEN role = 'verifier' THEN 1 ELSE 0 END) AS verifications,
+              SUM(CASE WHEN role = 'independent' THEN 1 ELSE 0 END) AS independent,
+              SUM(CASE WHEN role = 'fallback' THEN 1 ELSE 0 END) AS fallbacks,
+              SUM(CASE WHEN status IN (${errs}) THEN 1 ELSE 0 END) AS errors,
+              AVG(CASE WHEN status NOT IN (${errs}) THEN latency_ms END) AS avg_ms,
+              COALESCE(SUM(input_tokens), 0) AS input_tokens,
+              COALESCE(SUM(output_tokens), 0) AS output_tokens,
+              SUM(cost_usd) AS cost_usd,
+              SUM(CASE WHEN role = 'verifier' AND COALESCE(disagreements, 0) > 0 THEN 1 ELSE 0 END) AS disagreeing
+         FROM ai_requests WHERE created_at >= ? AND provider IS NOT NULL GROUP BY provider`,
+    ).bind(...ERROR_STATUSES, ...ERROR_STATUSES, since).all<Record<string, number | string | null>>();
+    const strategies = await g.DB.prepare("SELECT COALESCE(strategy, 'primary') AS strategy, COUNT(DISTINCT COALESCE(request_group, CAST(id AS TEXT))) AS n FROM ai_requests WHERE created_at >= ? GROUP BY 1").bind(since).all<{ strategy: string; n: number }>();
+    const disputes = await g.DB.prepare("SELECT id, task, question, issues, status, created_at FROM ai_disputes ORDER BY created_at DESC LIMIT 20").all<{ id: string; task: string; question: string; issues: string; status: string; created_at: string }>();
+    const env = bindings() as unknown as Record<string, string | undefined>;
+    const { providerStatus } = await import("../ai/providers");
+    const { spend } = await import("../ai/orchestrator.server");
+    return {
+      ok: true as const, days: data.days,
+      providers: providerStatus(env),
+      usage: rows.results ?? [],
+      strategies: strategies.results ?? [],
+      disputes: (disputes.results ?? []).map((d) => ({ ...d, issues: JSON.parse(d.issues || "[]") as string[] })),
+      spend: await spend(g.DB),
+      caps: { daily: Number(env.AI_DAILY_BUDGET_USD) || null, monthly: Number(env.AI_MONTHLY_BUDGET_USD) || null },
+    };
+  });
+
+export const resolveDispute = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string().uuid(), status: z.enum(["resolved", "dismissed"]) }))
+  .handler(async ({ data }) => {
+    const g = await guard();
+    if (g.error) return g.error;
+    await g.DB.prepare("UPDATE ai_disputes SET status = ?, resolved_by = ?, resolved_at = ? WHERE id = ?").bind(data.status, g.admin.id, new Date().toISOString(), data.id).run();
+    return { ok: true as const };
+  });

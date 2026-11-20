@@ -12,7 +12,6 @@ import type { ThreadSummary, TutorMessage, TutorPayload } from "../tutor/types";
 import { PERSONA_IDS, STYLE_IDS, STYLE_PROMPT, guideQuestions, styleTerms, teachingMode } from "../tutor/teach";
 import { LESSONS as CHAPTER_LESSONS } from "../learning/lessons";
 import { learnerContext } from "../learning/context.server";
-import { aiConfig } from "../ai/provider";
 import { explain } from "../ai/explain.server";
 import { embedConfig, rrf } from "../ai/provider";
 import { semanticSearch } from "../curriculum/semantic.server";
@@ -307,9 +306,9 @@ export const ask = createServerFn({ method: "POST" })
         const learner = await learnerContext(g.DB, g.me.id, { chapterId, grade: student.grade, medium: student.medium, lang: explainLang === "en" ? "en" : "bn" });
         const pa = prev?.payload?.ai;
         const previous = prev ? { question: prev.question, tutorSaid: pa?.blocks.find((b) => b.role === "direct")?.text ?? null, tutorAsked: pa?.blocks.find((b) => b.role === "check")?.text ?? null } : null;
-        ai = await explain(g.DB, aiConfig(bindings() as unknown as Record<string, string | undefined>), {
+        ai = await explain(g.DB, bindings() as unknown as Record<string, string | undefined>, {
           userId: g.me.id, question, persona: data.persona, lang: explainLang, excerpts: r.excerpts, learner, evidence: status === "partial" ? "partial" : "sufficient",
-          style: data.style ? STYLE_PROMPT[data.style] : null, socratic: (data.persona === "socratic" && data.style !== "direct") || data.style === "questions", previous,
+          style: data.style ? STYLE_PROMPT[data.style] : null, socratic: (data.persona === "socratic" && data.style !== "direct") || data.style === "questions", previous, subjectKey: ctx.subjectId,
         });
       }
       payload = {

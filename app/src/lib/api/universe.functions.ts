@@ -2,7 +2,6 @@
 // mastery, knowledge map and missions. Every function reads or writes only the signed-in student's own rows.
 import { createServerFn } from "@tanstack/react-start";
 import { BOX_DAYS } from "../curriculum/text";
-import { aiConfig } from "../ai/provider";
 import { evaluateExplanation } from "../ai/explain.server";
 import type { D1Database } from "@cloudflare/workers-types";
 import { z } from "zod";
@@ -1000,7 +999,7 @@ export const submitExplanation = createServerFn({ method: "POST" })
     // Second opinion from the AI, when configured: ideas explained in the student's own words also count.
     const lang: "en" | "bn" = /[\u0980-\u09FF]/.test(text) ? "bn" : "en";
     const chRow = await g.DB.prepare("SELECT title FROM chapters WHERE id = ?").bind(data.chapterId).first<{ title: string }>();
-    const ai = await evaluateExplanation(g.DB, aiConfig(bindings() as unknown as Record<string, string | undefined>), { userId: g.me.id, chapter: chRow?.title ?? "", lang, ideas: lesson.keyIdeas.map((k) => ({ id: k.id, label: `${k.label.en} / ${k.label.bn}` })), text });
+    const ai = await evaluateExplanation(g.DB, bindings() as unknown as Record<string, string | undefined>, { userId: g.me.id, chapter: chRow?.title ?? "", lang, ideas: lesson.keyIdeas.map((k) => ({ id: k.id, label: `${k.label.en} / ${k.label.bn}` })), text });
     const coveredIds = [...new Set([...keyword.covered, ...ai.recognised])];
     const cov = { ...keyword, covered: lesson.keyIdeas.map((k) => k.id).filter((x) => coveredIds.includes(x)), missing: lesson.keyIdeas.map((k) => k.id).filter((x) => !coveredIds.includes(x)), counts: coveredIds.length >= Math.min(2, lesson.keyIdeas.length) && keyword.words >= 12 };
     const id = crypto.randomUUID();

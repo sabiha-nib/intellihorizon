@@ -10,6 +10,7 @@ import { PaperPage } from "../components/edu/ui";
 import { ask, deleteThread, getThread, renameThread } from "../lib/api/tutor.functions";
 import type { TutorMessage } from "../lib/tutor/types";
 import { useLearner } from "../lib/store";
+import { gradeLabel } from "../lib/curriculum/scope";
 
 export const Route = createFileRoute("/tutor/$threadId")({
   loader: ({ params }) => getThread({ data: { id: params.threadId } }),
@@ -46,6 +47,8 @@ function Thread() {
   const th = data.thread;
   const changed = ctx.subject !== initial.subject || ctx.book !== initial.book || ctx.chapter !== initial.chapter;
   const subj = ctx.subject ? subjectById(ctx.subject) : null;
+  // The learner's own class and textbook edition, so it is always visible which books the tutor may use.
+  const learnerScope = [account.grade ? t(gradeLabel(account.grade)) : null, account.curriculum === "nctb-bangla" ? tx("Bangla Version", "বাংলা ভার্সন") : account.curriculum === "nctb-english" ? tx("English Version", "ইংলিশ ভার্সন") : null].filter(Boolean).join(" · ");
   const ctxLabel = changed ? (subj ? t(subj.label) : tx("All subjects", "সব বিষয়")) : [subj ? t(subj.label) : tx("All subjects", "সব বিষয়"), th.book_title, th.chapter_title ? `${tx("Chapter", "অধ্যায়")} ${th.chapter_position}: ${th.chapter_title}` : null].filter(Boolean).join(" · ");
 
   const send = async (text: string, style: StyleId | null = null, subjectOverride: SubjectId | null = null) => {
@@ -84,10 +87,12 @@ function Thread() {
           )}
         </div>
         <div className="mt-2 text-sm text-ink-mid">
-          {tx("Searching in: ", "খোঁজা হচ্ছে: ")}<span className="font-semibold text-ink">{ctxLabel}</span>{" · "}{t(PERSONAS[persona].name)}{" "}
+          {tx("Searching in: ", "খোঁজা হচ্ছে: ")}<span className="font-semibold text-ink" data-testid="tutor-scope">{learnerScope ? `${learnerScope} · ` : ""}{ctxLabel}</span>{" · "}{t(PERSONAS[persona].name)}{" "}
           <button type="button" onClick={() => setShowCtx((v) => !v)} className="font-semibold underline decoration-dashed underline-offset-4">{showCtx ? tx("Done", "ঠিক আছে") : tx("Change", "বদলাও")}</button>
         </div>
-        {showCtx && <div className="edu-rise mt-3 space-y-4"><ContextPicker value={ctx} onChange={setCtx} /><PersonaPicker value={persona} onChange={setPersona} /><LangPicker value={tutorLang} onChange={setTutorLang} /></div>}
+        {showCtx && <div className="edu-rise mt-3 space-y-4"><ContextPicker value={ctx} onChange={setCtx} /><PersonaPicker value={persona} onChange={setPersona} /></div>}
+        {/* Explanation language stays one tap away during a conversation. */}
+        <div className="mt-3"><LangPicker value={tutorLang} onChange={setTutorLang} /></div>
         <div className="mt-6 flex-1 pb-40">
           <MessageList messages={messages} pending={pending} onAppend={(ms) => setMessages((m) => [...m, ...ms])} onAskDifferently={(q, style) => void send(q, style)} onAskInSubject={(q, sid) => { if (isSubjectId(sid)) void send(q, null, sid); }} />
         </div>

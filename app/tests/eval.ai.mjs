@@ -35,6 +35,8 @@ const passageText = (id) => sql(`SELECT text FROM passages WHERE id = ${Number(i
 const results = [];
 for (const c of data.cases) {
   await fetch(`${MOCK}/__mode`, { method: "POST", body: JSON.stringify({ mode: c.mock }) });
+  // Validated answers are cached per student and question (Phase 5); every case needs a fresh provider call.
+  sql("DELETE FROM ai_cache");
   const aiBefore = sql("SELECT COUNT(*) AS n FROM ai_requests")[0].n;
   await p.goto(`${BASE}/tutor${c.subject ? `?subject=${c.subject}` : ""}`);
   await p.getByPlaceholder(/Ask a question/).fill(c.question);

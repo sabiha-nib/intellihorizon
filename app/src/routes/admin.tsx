@@ -14,6 +14,9 @@ import { Coverage } from "../components/admin/Coverage";
 import { PassageReview } from "../components/admin/PassageReview";
 import { TopicAdmin } from "../components/admin/TopicAdmin";
 import { StudioAdmin } from "../components/admin/StudioAdmin";
+import { AiUsage } from "../components/admin/AiUsage";
+import { JudgeAdmin } from "../components/admin/JudgeAdmin";
+import { ProviderEval } from "../components/admin/ProviderEval";
 import { aiAdminStatus } from "../lib/api/review.functions";
 import { adminStatus, claimAdmin, importHistory, listBooks, previewPage, saveBook, setBookStatus, type AdminBook, type Row } from "../lib/api/admin.functions";
 import { SUBJECT_KEYS } from "../lib/curriculum/config";
@@ -29,9 +32,9 @@ const empty: Form = { grade: 7, medium: "bangla", subjectKey: "mathematics", sub
 
 function Admin() {
   const [status, setStatus] = useState<{ signedIn: boolean; admin: boolean; configured: boolean; codeAvailable: boolean } | null>(null);
-  const [tab, setTab] = useState<"coverage" | "passages" | "topics" | "studio" | "books" | "review" | "ocr" | "audit">("books");
+  const [tab, setTab] = useState<"coverage" | "passages" | "topics" | "studio" | "books" | "review" | "ocr" | "audit" | "ai" | "judge">("books");
   const [reviewBook, setReviewBook] = useState<string | null>(null);
-  const [ai, setAi] = useState<{ ai: { configured: boolean; provider: string | null; model: string | null; vision: boolean }; today: { status: string; n: number }[]; email: { configured: boolean } } | null>(null);
+  const [ai, setAi] = useState<{ ai: { configured: boolean; provider: string | null; model: string | null; vision: boolean }; providers: { id: string; label: string; configured: boolean; model: string | null }[]; today: { status: string; n: number }[]; email: { configured: boolean } } | null>(null);
   const [token, setToken] = useState("");
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const [books, setBooks] = useState<AdminBook[]>([]);
@@ -75,7 +78,7 @@ function Admin() {
             <p>Every attempt, successful or not, is recorded in the audit log.</p>
           </div>
           {(status.codeAvailable || status.configured) && (
-            <form className={`${card} space-y-3 p-5`} onSubmit={async (e) => { e.preventDefault(); const r = await call(claimAdmin({ data: { token } })); setToken(""); if (r.ok) { setClaimMsg(null); setStatus({ ...status, admin: true }); void load(); void call(aiAdminStatus()).then((x) => x.ok && setAi(x as never)); } else setClaimMsg(r.code === "wrong_token" ? "That code isn't valid, or it has already been used." : r.code === "rate_limited" ? "Too many attempts. Try again in an hour." : r.code); }}>
+            <form className={`${card} space-y-3 p-5`} onSubmit={async (e) => { e.preventDefault(); const r = await call(claimAdmin({ data: { token } })); setToken(""); if (r.ok) { setClaimMsg(null); setStatus({ ...status, admin: true }); void load(); void call(aiAdminStatus()).then((x) => x.ok && setAi(x as never)); } else setClaimMsg(r.code === "wrong_token" ? "That code isn't valid, or it has already been used." : r.code === "rate_limited" ? "Too many attempts. Try again in an hour." : r.code === "demo_account" ? "This is a judge demo workspace, so it can't become an administrator." : r.code); }}>
               <label className="block text-sm font-semibold" htmlFor="tok">Owner code or admin token</label>
               <input id="tok" type="password" autoComplete="off" className={f} value={token} onChange={(e) => setToken(e.target.value)} />
               <button type="submit" className="h-10 rounded-[10px] bg-brand px-4 font-semibold text-sheet">Unlock admin for this account</button>
@@ -105,7 +108,7 @@ function Admin() {
       <main className="mx-auto w-full max-w-6xl space-y-6 px-4 pt-6 md:px-6">
         <PageHeader title="Content Studio" subtitle="Import and check textbook text, review practice questions, and see every administrative action. Students only ever see text and questions that have been approved here." />
         <div role="tablist" aria-label="Content Studio" className="flex flex-wrap gap-2">
-          {([["books", "Books and import"], ["coverage", "Coverage"], ["passages", "Passage review"], ["topics", "Topics"], ["studio", "Formulas, links and AI drafts"], ["review", "Question review"], ["ocr", "OCR quality"], ["audit", "Audit log"]] as const).map(([k, l]) => (
+          {([["books", "Books and import"], ["coverage", "Coverage"], ["passages", "Passage review"], ["topics", "Topics"], ["studio", "Formulas, links and AI drafts"], ["review", "Question review"], ["ocr", "OCR quality"], ["ai", "AI providers"], ["judge", "Judge demo"], ["audit", "Audit log"]] as const).map(([k, l]) => (
             <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`h-11 rounded-[12px] border-2 px-4 font-semibold ${tab === k ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-sheet"}`}>{l}</button>
           ))}
         </div>
@@ -113,7 +116,7 @@ function Admin() {
           <section className={`${card} space-y-4 p-5`}>
             {ai && (
               <div className="rounded-[14px] bg-paper p-3 text-sm">
-                <p><b>AI explanations:</b> {ai.ai.configured ? `on (${ai.ai.provider}, model ${ai.ai.model}${ai.ai.vision ? ", photo reading on" : ", photo reading off"})` : "off. Set AI_PROVIDER, AI_API_KEY and AI_MODEL in the website settings and redeploy. Until then the tutor shows checked textbook text only."}{ai.today.length ? ` · today: ${ai.today.map((x) => `${x.n} ${x.status}`).join(", ")}` : ""}</p>
+                <p><b>AI explanations:</b> {ai.ai.configured ? `on: ${ai.providers.filter((p) => p.configured).map((p) => `${p.label} (${p.model})`).join(", ")}${ai.ai.vision ? "; photo reading on" : "; photo reading off"}` : "off. Set ANTHROPIC_API_KEY + ANTHROPIC_MODEL, GEMINI_API_KEY + GEMINI_MODEL and/or OPENAI_API_KEY + OPENAI_MODEL in the website secrets and redeploy. Until then the tutor shows checked textbook text only."}{ai.today.length ? ` · today: ${ai.today.map((x) => `${x.n} ${x.status}`).join(", ")}` : ""}</p>
                 <p><b>Account email:</b> {ai.email.configured ? "configured (RESEND_API_KEY and EMAIL_FROM are set)" : "not configured: RESEND_API_KEY and EMAIL_FROM are missing, so verification and password-reset emails cannot be sent."}</p>
               </div>
             )}
@@ -125,6 +128,8 @@ function Admin() {
         {tab === "studio" && <section className={`${card} p-5`}><StudioAdmin /></section>}
         {tab === "review" && <section className={`${card} p-5`}><Review /></section>}
         {tab === "audit" && <section className={`${card} p-5`}><Audit /></section>}
+        {tab === "ai" && <><section className={`${card} p-5`}><AiUsage /></section><section className={`${card} mt-4 p-5`}><ProviderEval /></section></>}
+        {tab === "judge" && <section className={`${card} p-5`}><JudgeAdmin /></section>}
         {tab === "ocr" && (
           <section className={`${card} space-y-4 p-5`}>
             <label className="block text-sm font-semibold">Book

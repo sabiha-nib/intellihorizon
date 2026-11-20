@@ -427,8 +427,8 @@ export function PublicFooter() {
           </div>
           <p className="mt-3 text-[14px] leading-relaxed text-ink-mid">
             {tx(
-              "A learning companion for the Class 7 NCTB curriculum. IntelliHorizon is independent and is not affiliated with or endorsed by NCTB. Textbook excerpts are short and cited; NCTB's written permission is still pending.",
-              "৭ম শ্রেণির এনসিটিবি পাঠ্যক্রমের জন্য শেখার সঙ্গী। ইন্টেলিহরাইজন স্বাধীন, এনসিটিবির সঙ্গে যুক্ত বা অনুমোদিত নয়। পাঠ্যবইয়ের অংশ ছোট ও উৎসসহ; এনসিটিবির লিখিত অনুমতি এখনো প্রক্রিয়াধীন।",
+              "A personalised learning ecosystem for Classes 6–10 of Bangladesh's NCTB curriculum, Bangla Version and English Version. Textbook content is available today for Class 7, Bangla Version; the other classes and versions are being added. IntelliHorizon is independent and is not affiliated with or endorsed by NCTB. Textbook excerpts are short and cited; NCTB's written permission is still pending.",
+              "বাংলাদেশের এনসিটিবি পাঠ্যক্রমের ৬ষ্ঠ–১০ম শ্রেণির জন্য ব্যক্তিগত শিক্ষার ইকোসিস্টেম, বাংলা ভার্সন ও ইংলিশ ভার্সন। পাঠ্যবইয়ের বিষয়বস্তু আজ পাওয়া যাচ্ছে ৭ম শ্রেণি, বাংলা ভার্সনের জন্য; অন্য শ্রেণি ও ভার্সন যোগ হচ্ছে। ইন্টেলিহরাইজন স্বাধীন, এনসিটিবির সঙ্গে যুক্ত বা অনুমোদিত নয়। পাঠ্যবইয়ের অংশ ছোট ও উৎসসহ; এনসিটিবির লিখিত অনুমতি এখনো প্রক্রিয়াধীন।",
             )}
           </p>
         </div>
