@@ -11,7 +11,7 @@ const BASE = "http://127.0.0.1:8787";
 const PW = "monsoon river kite 7";
 const results = [];
 const check = (n, ok, x = "") => { results.push(!!ok); console.log(ok ? "PASS" : "FAIL", n, ok ? "" : x); };
-const sql = (q) => JSON.parse(execSync(`/home/user/tools/node_modules/.bin/wrangler d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
+const sql = (q) => JSON.parse(execSync(`/home/user/website-17609620527ef5f4f428f302/app/tests/support/d1-cli.sh d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
 
 const ID = { soptoborna: "dc63304a-e153-5105-af5a-6a2ffff229a5", anandapath: "bfbd8358-41b3-5dda-b2c5-af3e9c96813d", science: "41f978e8-eeda-5506-b1ea-dc96ca7fec47" };
 const T = "পরীক্ষার লেখা, ইন্টেলিহরাইজনের লেখা, এনসিটিবির নয়। ";

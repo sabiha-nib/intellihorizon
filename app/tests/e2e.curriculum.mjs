@@ -6,7 +6,7 @@ const BASE = "http://127.0.0.1:8787";
 const PW = "monsoon river kite 7";
 const results = [];
 const check = (n, ok, x = "") => { results.push(ok); console.log(ok ? "PASS" : "FAIL", n, x); };
-const sql = (q) => JSON.parse(execSync(`/home/user/tools/node_modules/.bin/wrangler d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
+const sql = (q) => JSON.parse(execSync(`/home/user/website-17609620527ef5f4f428f302/app/tests/support/d1-cli.sh d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
 
 async function register(page, { name, username, email, grade = 7, curriculum = /NCTB, English Version/ }) {
   await page.goto(`${BASE}/signup`);

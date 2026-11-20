@@ -67,7 +67,7 @@ export const quizHome = createServerFn({ method: "GET" }).handler(async () => {
   const g = await guard(false);
   if (g.error) return g.error;
   const [chapters, topics, recent] = await Promise.all([
-    g.DB.prepare(`SELECT c.id, c.position, c.title, t.subject_key, t.title AS book, COUNT(q.id) AS n FROM questions q JOIN chapters c ON c.id = q.chapter_id JOIN textbooks t ON t.id = c.textbook_id WHERE q.status = 'published' GROUP BY c.id ORDER BY t.subject_key, c.position`).all<{ id: string; position: number; title: string; subject_key: string; book: string; n: number }>(),
+    g.DB.prepare(`SELECT c.id, c.position, c.title, t.subject_key, t.title AS book, COUNT(q.id) AS n FROM questions q JOIN chapters c ON c.id = q.chapter_id JOIN textbooks t ON t.id = c.textbook_id WHERE q.status = 'published' GROUP BY c.id, t.subject_key, t.title ORDER BY t.subject_key, c.position`).all<{ id: string; position: number; title: string; subject_key: string; book: string; n: number }>(),
     g.DB.prepare(`SELECT tp.id, tp.title, tp.title_en, tp.skill, tp.chapter_id, (SELECT COUNT(*) FROM questions q WHERE q.status = 'published' AND q.chapter_id = tp.chapter_id AND q.skill = tp.skill) AS n FROM topics tp WHERE tp.review_status IN ('checked', 'teacher_reviewed') ORDER BY tp.chapter_id, tp.position`).all<{ id: string; title: string; title_en: string | null; skill: string | null; chapter_id: string; n: number }>(),
     g.DB.prepare("SELECT id, mode, status, started_at, submitted_at, result FROM quiz_sets WHERE user_id = ? ORDER BY started_at DESC LIMIT 10").bind(g.me.id).all<{ id: string; mode: string; status: string; started_at: string; submitted_at: string | null; result: string | null }>(),
   ]);

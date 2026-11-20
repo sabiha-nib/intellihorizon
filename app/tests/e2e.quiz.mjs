@@ -10,7 +10,7 @@ const MOCK = "http://127.0.0.1:8790";
 const PW = "monsoon river kite 7";
 const results = [];
 const check = (n, ok, x = "") => { results.push(!!ok); console.log(ok ? "PASS" : "FAIL", n, ok ? "" : x); };
-const WR = "/home/user/tools/node_modules/.bin/wrangler";
+const WR = "/home/user/website-17609620527ef5f4f428f302/app/tests/support/d1-cli.sh";
 const sql = (q) => JSON.parse(execSync(`${WR} d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
 const CH2 = "f9c3f216-a09e-5c02-979e-497b60f8333a";
 const T_CONT = "a1d7c7a0-0b1e-4c2e-9d41-2a1f00000002";
@@ -41,6 +41,7 @@ const answerOf = (q, wrong = false) => {
   if (!wrong) return { text: q.answer_kind === "ratio" ? q.answer.split(":").join(" : ") : q.answer };
   // A wrong answer the grader can still read, in the question's own answer format.
   if (q.answer_kind === "ratio") { const n = q.answer.split(":").length; return { text: Array.from({ length: n }, (_, i) => String(97 + i)).join(" : ") }; }
+  if (q.answer_kind === "list") { const n = q.answer.split(",").length; return { text: Array.from({ length: n }, (_, i) => String(997 + i)).join(", ") }; }
   return { text: q.type === "numeric" ? "999999" : "একটি ভুল উত্তর" };
 };
 async function answer(page, q, wrong = false) {

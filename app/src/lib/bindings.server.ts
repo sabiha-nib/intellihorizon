@@ -1,27 +1,14 @@
-// Server-only access to this app's Cloudflare bindings. Each is present ONLY if
-// opted into via app.manifest.json (D1 `DB`, R2 `STORAGE`, KV `KV`, and the
-// container `CONTAINER`) — so the accessors are optional; guard before use.
-// `cloudflare:workers` is the Workers-runtime module that exposes the Worker
-// env (bindings) — usable inside any server-side code (server functions,
-// server routes). It is NOT bundled; the runtime provides it.
-import { env } from "cloudflare:workers";
-// Import the binding types directly — NOT via the global tsconfig `types` list,
-// which would clobber the DOM globals the client/SSR React code relies on.
-import type {
-  D1Database,
-  DurableObjectNamespace,
-  KVNamespace,
-  R2Bucket,
-} from "@cloudflare/workers-types";
+// Server-only configuration and services. On Vercel (Node) everything comes from environment variables:
+// DATABASE_URL (Supabase Postgres, server role) and optionally SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY for Storage.
+// The DB and STORAGE objects keep the D1/R2-shaped API the rest of the server code was written against.
+import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
+
+import { pgDatabase } from "./db/pg-d1.server";
+import { postgresStore, supabaseStore } from "./db/storage.server";
 
 type AppEnv = {
   DB?: D1Database;
   STORAGE?: R2Bucket;
-  KV?: KVNamespace;
-  // The container's Durable Object — present only when "container" is set in
-  // the manifest. Reach an instance with env.CONTAINER.getByName(id), then
-  // .fetch(). See skills/containers.md.
-  CONTAINER?: DurableObjectNamespace;
   HF_ENV?: string;
   APP_SLUG?: string;
   // Optional secrets for account email (set in Higgsfield website settings).
@@ -44,6 +31,19 @@ type AppEnv = {
   EMBED_MIN_SIM?: string;
 };
 
+let cached: AppEnv | null = null;
+
 export function bindings(): AppEnv {
-  return env as unknown as AppEnv;
+  if (cached) return cached;
+  const env = process.env as Record<string, string | undefined>;
+  const db = env.DATABASE_URL ? pgDatabase(env.DATABASE_URL) : null;
+  const store = env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY
+    ? supabaseStore(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, env.SUPABASE_STORAGE_BUCKET || "intellihorizon-files")
+    : db ? postgresStore(db) : null;
+  cached = {
+    ...(env as AppEnv),
+    DB: (db ?? undefined) as unknown as D1Database | undefined,
+    STORAGE: (store ?? undefined) as unknown as R2Bucket | undefined,
+  };
+  return cached;
 }

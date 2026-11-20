@@ -287,7 +287,7 @@ export const getInsights = createServerFn({ method: "GET" }).handler(async () =>
     g.DB.prepare(`SELECT strftime('%Y-%W', m.created_at) AS week, COUNT(*) AS asked FROM tutor_messages m JOIN tutor_threads th ON th.id = m.thread_id
                   WHERE th.user_id = ? AND m.role = 'student' AND m.created_at >= ? GROUP BY week`).bind(g.me.id, since).all<{ week: string; asked: number }>(),
     g.DB.prepare(`SELECT a.chapter_id, c.title, t.title AS book_title, COUNT(*) AS attempts, SUM(a.correct) AS correct FROM attempts a JOIN chapters c ON c.id = a.chapter_id JOIN textbooks t ON t.id = c.textbook_id
-                  WHERE a.user_id = ? GROUP BY a.chapter_id HAVING attempts >= 3 AND (1.0 * correct / attempts) < 0.6 ORDER BY attempts DESC LIMIT 5`).bind(g.me.id).all<{ chapter_id: string; title: string; book_title: string; attempts: number; correct: number }>(),
+                  WHERE a.user_id = ? GROUP BY a.chapter_id, c.title, t.title HAVING COUNT(*) >= 3 AND (1.0 * SUM(a.correct) / COUNT(*)) < 0.6 ORDER BY COUNT(*) DESC LIMIT 5`).bind(g.me.id).all<{ chapter_id: string; title: string; book_title: string; attempts: number; correct: number }>(),
     g.DB.prepare("SELECT SUM(CASE WHEN due_at <= ? THEN 1 ELSE 0 END) AS due, COUNT(*) AS scheduled, SUM(CASE WHEN box >= 4 THEN 1 ELSE 0 END) AS long_term FROM review_state WHERE user_id = ?").bind(now(), g.me.id).first<{ due: number; scheduled: number; long_term: number }>(),
     g.DB.prepare("SELECT SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END) AS done, COUNT(*) AS total FROM plan_tasks WHERE user_id = ? AND due_date >= ?").bind(g.me.id, since.slice(0, 10)).first<{ done: number; total: number }>(),
     // Mistake radar: questions this student has got wrong more than once (real lapses in the review schedule).
@@ -300,7 +300,7 @@ export const getInsights = createServerFn({ method: "GET" }).handler(async () =>
                          (SELECT COUNT(*) FROM review_state rs JOIN questions q ON q.id = rs.question_id WHERE rs.user_id = ?1 AND q.chapter_id = c.id AND rs.box >= 4) AS retained,
                          (SELECT COUNT(*) FROM questions q WHERE q.chapter_id = c.id AND q.status = 'published') AS questions
                     FROM attempts a JOIN chapters c ON c.id = a.chapter_id JOIN textbooks t ON t.id = c.textbook_id
-                   WHERE a.user_id = ?1 GROUP BY c.id ORDER BY last DESC LIMIT 30`).bind(g.me.id)
+                   WHERE a.user_id = ?1 GROUP BY c.id, t.subject_key, t.title ORDER BY last DESC LIMIT 30`).bind(g.me.id)
       .all<{ chapter_id: string; title: string; book_title: string; subject_key: string; attempts: number; correct: number; last: string; retained: number; questions: number }>(),
   ]);
   const got = new Map((bySubject.results ?? []).map((r) => [r.subject_key, r]));

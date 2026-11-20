@@ -10,7 +10,7 @@ const BASE = "http://127.0.0.1:8787";
 const PW = "monsoon river kite 7";
 const results = [];
 const check = (n, ok, x = "") => { results.push(!!ok); console.log(ok ? "PASS" : "FAIL", n, ok ? "" : x); };
-const WR = "/home/user/tools/node_modules/.bin/wrangler";
+const WR = "/home/user/website-17609620527ef5f4f428f302/app/tests/support/d1-cli.sh";
 const sql = (q) => JSON.parse(execSync(`${WR} d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
 const MATH_CH2 = "f9c3f216-a09e-5c02-979e-497b60f8333a";
 const TEST_CODE = "EDU-TSTAA-TSTBB-TSTCC-TSTDD-TSTEE";
@@ -281,12 +281,12 @@ check("service worker registers and activates", swState === "activated" || swSta
 await pp.reload(); await pp.waitForTimeout(1500);
 check("the page is controlled by the service worker after reload", await pp.evaluate(() => !!navigator.serviceWorker.controller));
 const cacheKeys = await pp.evaluate(async () => { const out = []; for (const k of await caches.keys()) { const c = await caches.open(k); for (const r of await c.keys()) out.push(new URL(r.url).pathname); } return out; });
-check("public pages and the offline page are precached", ["/", "/help", "/offline"].every((p) => cacheKeys.includes(p)), cacheKeys.join(","));
+check("public pages and the offline page are precached", ["/", "/help", "/offline.html"].every((p) => cacheKeys.includes(p)), cacheKeys.join(","));
 check("no student page is in the offline cache (only code bundles, public pages and the offline page)", !cacheKeys.filter((p) => !p.startsWith("/assets/") && !p.startsWith("/s/")).some((p) => /dashboard|progress|practice|account|admin|session|revision|mastery/.test(p)), cacheKeys.join(","));
 const signedInHtml = (await fetch(`${BASE}/`, { headers: { cookie: "edu_sid=" + "x".repeat(43) } })).headers.get("cache-control");
 check("pages requested with a session cookie are marked private, no-store", /no-store/.test(signedInHtml ?? ""), signedInHtml);
 // Take the server down to test real offline behaviour through the service worker.
-try { execSync("pkill -f '[w]orkerd'; pkill -f '[w]rangler dev'; true"); } catch { /* already stopped */ }
+try { execSync("pkill -f '[w]orkerd'; pkill -f '[w]rangler dev'; pkill -f '[.]output/server/index.mjs'; true"); } catch { /* already stopped */ }
 await new Promise((r) => setTimeout(r, 1500));
 await pp.goto(`${BASE}/help`).catch(() => undefined);
 check("offline: a precached public page still opens", await pp.getByRole("heading", { name: "Help and accessibility" }).isVisible().catch(() => false));

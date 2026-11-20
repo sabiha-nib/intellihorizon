@@ -13,7 +13,7 @@ export const Route = createFileRoute("/api/health")({
         let db = false;
         let migrations: number | null = null;
         try {
-          const r = await b.DB?.prepare("SELECT COUNT(*) AS n FROM d1_migrations").first<{ n: number }>();
+          const r = await b.DB?.prepare("SELECT COUNT(*) AS n FROM ih_migrations").first<{ n: number }>();
           db = !!b.DB;
           migrations = r?.n ?? null;
         } catch {

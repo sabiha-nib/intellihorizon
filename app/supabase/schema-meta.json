@@ -1,0 +1,262 @@
+{
+ "order": [
+  "learners",
+  "evidence",
+  "users",
+  "profiles",
+  "sessions",
+  "email_tokens",
+  "rate_events",
+  "curricula",
+  "curriculum_versions",
+  "subjects",
+  "subject_offerings",
+  "textbooks",
+  "chapters",
+  "objectives",
+  "source_pages",
+  "passages",
+  "import_jobs",
+  "tutor_threads",
+  "tutor_messages",
+  "saved_items",
+  "questions",
+  "attempts",
+  "review_state",
+  "plan_tasks",
+  "chapter_activity",
+  "app_settings",
+  "admin_bootstrap",
+  "audit_log",
+  "xp_events",
+  "user_achievements",
+  "learning_sessions",
+  "explanations",
+  "passage_reviews",
+  "ai_requests",
+  "uploads",
+  "quiz_sets",
+  "quiz_responses",
+  "topics",
+  "passage_embeddings",
+  "cards",
+  "card_reviews",
+  "notes",
+  "formulas",
+  "concept_links",
+  "reflections",
+  "share_grants",
+  "twin_feedback",
+  "ai_cache",
+  "ai_disputes",
+  "demo_access",
+  "ai_eval_runs",
+  "ai_eval_results"
+ ],
+ "identity": [
+  [
+   "evidence",
+   "id"
+  ],
+  [
+   "passages",
+   "id"
+  ],
+  [
+   "tutor_messages",
+   "id"
+  ],
+  [
+   "attempts",
+   "id"
+  ],
+  [
+   "audit_log",
+   "id"
+  ],
+  [
+   "xp_events",
+   "id"
+  ],
+  [
+   "passage_reviews",
+   "id"
+  ],
+  [
+   "ai_requests",
+   "id"
+  ],
+  [
+   "card_reviews",
+   "id"
+  ],
+  [
+   "twin_feedback",
+   "id"
+  ]
+ ],
+ "pk": {
+  "learners": [
+   "id"
+  ],
+  "evidence": [
+   "id"
+  ],
+  "users": [
+   "id"
+  ],
+  "profiles": [
+   "user_id"
+  ],
+  "sessions": [
+   "id_hash"
+  ],
+  "email_tokens": [
+   "token_hash"
+  ],
+  "rate_events": [],
+  "curricula": [
+   "id"
+  ],
+  "curriculum_versions": [
+   "id"
+  ],
+  "subjects": [
+   "id"
+  ],
+  "subject_offerings": [
+   "grade",
+   "medium",
+   "subject_id"
+  ],
+  "textbooks": [
+   "id"
+  ],
+  "chapters": [
+   "id"
+  ],
+  "objectives": [
+   "id"
+  ],
+  "source_pages": [
+   "textbook_id",
+   "page"
+  ],
+  "passages": [
+   "id"
+  ],
+  "import_jobs": [
+   "id"
+  ],
+  "tutor_threads": [
+   "id"
+  ],
+  "tutor_messages": [
+   "id"
+  ],
+  "saved_items": [
+   "id"
+  ],
+  "questions": [
+   "id"
+  ],
+  "attempts": [
+   "id"
+  ],
+  "review_state": [
+   "user_id",
+   "question_id"
+  ],
+  "plan_tasks": [
+   "id"
+  ],
+  "chapter_activity": [
+   "user_id",
+   "chapter_id"
+  ],
+  "app_settings": [
+   "key"
+  ],
+  "admin_bootstrap": [
+   "code_hash"
+  ],
+  "audit_log": [
+   "id"
+  ],
+  "xp_events": [
+   "id"
+  ],
+  "user_achievements": [
+   "user_id",
+   "achievement_id"
+  ],
+  "learning_sessions": [
+   "id"
+  ],
+  "explanations": [
+   "id"
+  ],
+  "passage_reviews": [
+   "id"
+  ],
+  "ai_requests": [
+   "id"
+  ],
+  "uploads": [
+   "id"
+  ],
+  "quiz_sets": [
+   "id"
+  ],
+  "quiz_responses": [
+   "set_id",
+   "question_id"
+  ],
+  "topics": [
+   "id"
+  ],
+  "passage_embeddings": [
+   "passage_id",
+   "model"
+  ],
+  "cards": [
+   "id"
+  ],
+  "card_reviews": [
+   "id"
+  ],
+  "notes": [
+   "id"
+  ],
+  "formulas": [
+   "id"
+  ],
+  "concept_links": [
+   "id"
+  ],
+  "reflections": [
+   "id"
+  ],
+  "share_grants": [
+   "id"
+  ],
+  "twin_feedback": [
+   "id"
+  ],
+  "ai_cache": [
+   "key"
+  ],
+  "ai_disputes": [
+   "id"
+  ],
+  "demo_access": [
+   "id"
+  ],
+  "ai_eval_runs": [
+   "id"
+  ],
+  "ai_eval_results": [
+   "id"
+  ]
+ }
+}

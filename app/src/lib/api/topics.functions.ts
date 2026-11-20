@@ -27,7 +27,7 @@ export const listTopics = createServerFn({ method: "GET" }).handler(async () => 
   // Chapters that have published questions but no reviewed topic: shown honestly as "topics not yet defined".
   const gaps = (await DB.prepare(`SELECT c.id, c.title, c.position, t.subject_key, COUNT(q.id) AS n,
       SUM(CASE WHEN q.skill IS NULL OR q.skill NOT IN (SELECT skill FROM topics WHERE chapter_id = c.id AND skill IS NOT NULL AND review_status IN ('checked', 'teacher_reviewed')) THEN 1 ELSE 0 END) AS unlinked
-    FROM questions q JOIN chapters c ON c.id = q.chapter_id JOIN textbooks t ON t.id = c.textbook_id WHERE q.status = 'published' GROUP BY c.id`).all<{ id: string; title: string; position: number; subject_key: string; n: number; unlinked: number }>()).results ?? [];
+    FROM questions q JOIN chapters c ON c.id = q.chapter_id JOIN textbooks t ON t.id = c.textbook_id WHERE q.status = 'published' GROUP BY c.id, t.subject_key, t.title`).all<{ id: string; title: string; position: number; subject_key: string; n: number; unlinked: number }>()).results ?? [];
   const chapters = (await DB.prepare("SELECT COUNT(*) AS n FROM chapters").first<{ n: number }>())?.n ?? 0;
   const withTopics = new Set(rows.map((r) => r.chapter_id)).size;
   return { ok: true as const, topics: await evidence(DB, me.id, rows), unlinked: gaps.filter((g) => g.unlinked > 0), chapters, chaptersWithTopics: withTopics };

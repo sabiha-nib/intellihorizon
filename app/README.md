@@ -7,14 +7,18 @@ Bangla Version and English Version students. **Product scope** is Classes 6–10
 today is Class 7, Bangla Version (16 checked passages, 22 published questions). Every other class/version is shown with
 an honest availability label computed from the database (Available / Partially available / Content under review /
 Coming soon), and the tutor never answers from another class's or another edition's books.
-**Hosting:** Cloudflare (one Worker for pages, assets and API; D1 database `intellihorizon`; R2 bucket
-`intellihorizon-files`), deployed from GitHub by `.github/workflows/deploy.yml`. Step-by-step owner guide: `../DEPLOY.md`.
-The earlier Higgsfield deployment (educerro.higgsfield.app) is no longer the production target.
+**Hosting:** Vercel (pages, assets and server functions, region bom1/Mumbai) with Supabase Postgres (project
+"IntelliHorizon", ap-south-1) as the database. Code on GitHub; Vercel deploys `main` to production and pull requests to
+private previews; GitHub Actions runs the CI gate. Owner guide: `../DEPLOY.md`. The old Higgsfield deployment is no longer
+the production target.
 
 ## Stack
 
-- React 19 + TanStack Start, server-rendered on a Cloudflare Worker (your own Cloudflare account; see DEPLOY.md).
-- D1 (SQLite, FTS5 trigram search) for all data; R2 for profile pictures.
+- React 19 + TanStack Start (Nitro), server-rendered on Vercel Functions (Node 22).
+- Supabase Postgres 17 for all data, through `src/lib/db/pg-d1.server.ts`: a small D1-shaped adapter that translates the
+  app's SQLite-dialect SQL (`src/lib/db/translate.ts`, unit-tested) so the server code didn't need rewriting. Full-text
+  search uses Postgres (see the baseline migration). Files: Supabase Storage when `SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY` are set, otherwise a private `app_files` table.
 - AI: the IntelliCore multi-model orchestrator (`src/lib/ai/orchestrator.server.ts`) over three server-side adapters
   (`src/lib/ai/providers.ts`): Anthropic Messages, Google Gemini generateContent, OpenAI Responses. The textbook evidence
   and validation rules (`grounding.ts`, `crosscheck.ts`) are the final authority; without any key configured, the tutor
@@ -50,8 +54,8 @@ Changing these would break existing records or deployed resources: the site addr
 
 ## Production configuration
 
-Secrets are set on the Cloudflare Worker (dashboard → Workers → intellihorizon → Settings → Variables and Secrets, or
-`npx wrangler secret put NAME`); non-secret values live in `wrangler.jsonc` → `vars`. All optional:
+Secrets are Vercel environment variables of type Sensitive (Vercel → intellihorizon → Settings → Environment Variables);
+non-secret values are plain variables there too. `DATABASE_URL` is required; the rest are optional:
 
 - `EDU_ADMIN_TOKEN` (32+ characters): a second way to unlock admin.
 - `RESEND_API_KEY`, `EMAIL_FROM`: enables verification and password-reset email. Without them the app says email isn't set up.
@@ -80,7 +84,7 @@ Secrets are set on the Cloudflare Worker (dashboard → Workers → intellihoriz
 ### Owner setup checklist
 
 1. Sign in, open /admin and unlock it with the owner code (shown only to the owner; never logged).
-2. In Cloudflare (Worker → Settings → Variables and Secrets), add `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL`, `GEMINI_API_KEY` +
+2. In Vercel (Settings → Environment Variables, type Sensitive), add `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL`, `GEMINI_API_KEY` +
    `GEMINI_MODEL`, `OPENAI_API_KEY` + `OPENAI_MODEL` (get keys at console.anthropic.com, aistudio.google.com and
    platform.openai.com). Optionally set `AI_DAILY_BUDGET_USD` / `AI_MONTHLY_BUDGET_USD`. Then redeploy (secrets apply
    on the next deploy). Admin -> "AI providers" shows which are configured, without showing keys.
@@ -128,7 +132,7 @@ reviewed, approved, published or withdrawn passages. Every review action is in `
 
 ```
 bun scripts/content/import-pack.ts <pack.json[.gz]> <out-dir> [book-key,...]
-wrangler d1 execute DB --local --file <out-dir>/<key>.sql     # or import the pack in Content Studio
+# then import the pack in Content Studio (Admin); the app writes it to Postgres through the adapter
 ```
 Validates each book against the registry (id, key, page count), classifies pages, segments passages with the same code
 as the app, flags quality problems, skips repeated text, and writes idempotent SQL (running it twice changes nothing;
@@ -205,7 +209,7 @@ bun install
 bun test tests/                 # unit tests
 bunx tsc --noEmit               # types
 bunx vite build                 # production build
-# end-to-end (needs wrangler dev on :8787 with a fresh local D1, see tests/*.mjs headers)
+# end-to-end: tests/support/run-e2e.sh (fresh local Postgres with all supabase/migrations, mock AI providers, Node server on :8787)
 node tests/e2e.universe.mjs && node tests/e2e.grade7.mjs && node tests/e2e.curriculum.mjs && node tests/e2e.accounts.mjs
 node tests/e2e.ai.mjs && node tests/e2e.content.mjs && node tests/e2e.inputs.mjs && node tests/e2e.security.mjs
 node tests/e2e.quiz.mjs && node tests/e2e.studio.mjs && node tests/eval.ai.mjs   # eval writes tests/eval-report.json

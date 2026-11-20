@@ -282,7 +282,7 @@ export const summaryChapters = createServerFn({ method: "GET" }).handler(async (
   const { DB } = bindings();
   if (!DB) return fail("unavailable_now");
   const rows = (await DB.prepare(`SELECT c.id, c.title, c.position, t.title AS book_title, t.subject_key, COUNT(p.id) AS n FROM chapters c JOIN textbooks t ON t.id = c.textbook_id
-      JOIN passages p ON p.textbook_id = t.id AND p.page BETWEEN c.start_page AND c.end_page WHERE ${STUDENT_VISIBLE} GROUP BY c.id ORDER BY t.subject_key, c.position`).all()).results ?? [];
+      JOIN passages p ON p.textbook_id = t.id AND p.page BETWEEN c.start_page AND c.end_page WHERE ${STUDENT_VISIBLE} GROUP BY c.id, t.subject_key, t.title ORDER BY t.subject_key, c.position`).all()).results ?? [];
   return { ok: true as const, chapters: rows as { id: string; title: string; position: number; book_title: string; subject_key: string; n: number }[] };
 });
 
@@ -310,7 +310,7 @@ export const listReflections = createServerFn({ method: "GET" }).handler(async (
 async function progressSummary(DB: D1, userId: string) {
   const topicRows = (await DB.prepare(`${TOPIC_SELECT} WHERE tp.review_status IN ('checked', 'teacher_reviewed') ORDER BY t.subject_key, c.position, tp.position`).all<TopicRow>()).results ?? [];
   const topics = await evidence(DB, userId, topicRows);
-  const chapters = (await DB.prepare(`SELECT c.id, c.title, c.position, t.subject_key, t.title AS book_title, COUNT(q.id) AS published FROM chapters c JOIN textbooks t ON t.id = c.textbook_id JOIN questions q ON q.chapter_id = c.id AND q.status = 'published' GROUP BY c.id ORDER BY t.subject_key, c.position`).all<{ id: string; title: string; position: number; subject_key: string; book_title: string; published: number }>()).results ?? [];
+  const chapters = (await DB.prepare(`SELECT c.id, c.title, c.position, t.subject_key, t.title AS book_title, COUNT(q.id) AS published FROM chapters c JOIN textbooks t ON t.id = c.textbook_id JOIN questions q ON q.chapter_id = c.id AND q.status = 'published' GROUP BY c.id, t.subject_key, t.title ORDER BY t.subject_key, c.position`).all<{ id: string; title: string; position: number; subject_key: string; book_title: string; published: number }>()).results ?? [];
   const att = (await DB.prepare("SELECT a.question_id, a.chapter_id, a.correct, a.created_at, a.mode, q.difficulty FROM attempts a JOIN questions q ON q.id = a.question_id WHERE a.user_id = ? ORDER BY a.created_at").bind(userId).all<{ question_id: string; chapter_id: string; correct: number; created_at: string; mode: string; difficulty: number | null }>()).results ?? [];
   const due = (await DB.prepare("SELECT q.chapter_id, COUNT(*) AS n FROM review_state r JOIN questions q ON q.id = r.question_id WHERE r.user_id = ? AND r.due_at <= ? GROUP BY q.chapter_id").bind(userId, now()).all<{ chapter_id: string; n: number }>()).results ?? [];
   const dueBy = new Map(due.map((d) => [d.chapter_id, d.n]));

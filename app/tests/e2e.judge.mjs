@@ -7,7 +7,7 @@ import { pbkdf2Sync, randomBytes } from "node:crypto";
 
 const BASE = "http://127.0.0.1:8787";
 const CFG = process.env.WR_CONFIG ?? "/tmp/wr/wrangler.multi.jsonc";
-const WR = "/home/user/tools/node_modules/.bin/wrangler";
+const WR = "/home/user/website-17609620527ef5f4f428f302/app/tests/support/d1-cli.sh";
 // No shell: the password hash contains "$".
 const sql = (q) => JSON.parse(execFileSync(WR, ["d1", "execute", "DB", "--local", "--config", CFG, "--json", "--command", q], { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
 const results = [];
@@ -119,10 +119,10 @@ check("judge AI use is limited per workspace (5th request refused, textbook stil
 // returns to the same workspace with its history.
 check("judge workspaces have no expiry date", sql("SELECT COUNT(*) AS n FROM users WHERE is_demo = 1 AND demo_expires_at IS NOT NULL")[0].n === 0);
 check("only a hash of the browser's resume token is stored", sql(`SELECT demo_resume_hash AS h FROM users WHERE id = '${u1.id}'`)[0].h?.length === 64 && !(await J1.cookies()).some((c) => c.name === "ih_judge_ws" && c.value === sql(`SELECT demo_resume_hash AS h FROM users WHERE id = '${u1.id}'`)[0].h));
-sql(`UPDATE sessions SET expires_at = CAST(strftime('%s','now') AS INTEGER) + 86400 WHERE user_id = '${u2.id}'`);
+sql(`UPDATE sessions SET expires_at = ${Math.floor(Date.now() / 1000)} + 86400 WHERE user_id = '${u2.id}'`);
 await p2.goto(`${BASE}/dashboard`);
 await p2.waitForLoadState("networkidle");
-check("a judge session in use renews instead of running out", sql(`SELECT MAX(expires_at) - CAST(strftime('%s','now') AS INTEGER) AS left FROM sessions WHERE user_id = '${u2.id}'`)[0].left > 20 * 86400);
+check("a judge session in use renews instead of running out", sql(`SELECT MAX(expires_at) - ${Math.floor(Date.now() / 1000)} AS left FROM sessions WHERE user_id = '${u2.id}'`)[0].left > 20 * 86400);
 // The browser session ends (or months pass): the judge signs in again with the same credentials.
 sql(`DELETE FROM sessions WHERE user_id = '${u1.id}'`);
 await p.goto(`${BASE}/dashboard`);

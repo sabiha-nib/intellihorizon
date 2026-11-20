@@ -7,6 +7,7 @@ import {
 } from "./src/module/design-inspector/vite";
 import svgr from "vite-plugin-svgr";
 import { defineConfig, type Plugin } from "vite";
+import { nitro } from "nitro/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
@@ -49,23 +50,9 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: [{ find: /^@higgsfield-ai\/icons(\/.*)?$/, replacement: QUANTA_ICONS_SHIM }],
     },
-    // The server bundle runs as a Cloudflare Worker — there is no node_modules
-    // at runtime. Vite's default SSR build leaves npm deps as bare external
-    // imports (h3, react, @tanstack/*, seroval, …), which resolve on a Node
-    // server but throw "No such module" in a Worker. Bundle them all in.
-    // (node: builtins stay external — nodejs_compat provides them.)
-    ssr: {
-      noExternal: true,
-      // `cloudflare:workers` is a workerd runtime built-in that exposes the Worker
-      // env / bindings (D1 `DB`, R2 `STORAGE`). Like node: builtins it must NOT be
-      // bundled; the runtime provides it. (`ssr.external` is typed string[].)
-      external: ["cloudflare:workers"],
-    },
-    build: {
-      // Keep `cloudflare:*` external in the SSR rollup pass too — `noExternal`
-      // above would otherwise try to resolve+bundle it and fail.
-      rollupOptions: { external: [/^cloudflare:/] },
-    },
+    // Server output is built by Nitro (below): the "vercel" preset on Vercel (detected automatically), "node-server"
+    // for local runs and tests (NITRO_PRESET=node-server). Node resolves npm dependencies at runtime, so nothing
+    // Workers-specific is configured here any more.
     plugins: [
       // Material Symbols SVGs (the app icon set) import as React components via
       // `?react`. `icon: true` sizes them 1em; fill is forced to currentColor so
@@ -95,6 +82,7 @@ export default defineConfig(({ mode }) => {
       tanstackStart({
         server: { entry: "server" },
       }),
+      nitro({ preset: process.env.NITRO_PRESET || (process.env.VERCEL ? "vercel" : "node-server"), vercel: { functions: { maxDuration: 60 } } }),
       higgsfieldDesignInspectorVitePlugin(designInspectorEnabled),
       swAssetList(),
       react({

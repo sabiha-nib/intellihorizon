@@ -1,73 +1,82 @@
-# Deploying IntelliHorizon (GitHub → Cloudflare)
-
-IntelliHorizon is one Cloudflare Worker (pages, assets and API) with a D1 database and an R2 bucket. GitHub holds
-the code; GitHub Actions builds, tests and deploys it to your Cloudflare account. No other host is involved.
+# Deploying IntelliHorizon (GitHub → Vercel, database on Supabase)
 
 ```
-GitHub repo (private) ──push to main──▶ GitHub Actions: typecheck · unit tests · build · secret scan
-                                              │
-                                              ▼
-                     Cloudflare: D1 migrations ─▶ wrangler deploy ─▶ smoke test of the live URL
-                                              │
-            Worker "intellihorizon"  ──  D1 "intellihorizon" (APAC)  ──  R2 "intellihorizon-files"
-                     │
-                     └── server-side only: Anthropic · Gemini · OpenAI (keys are Worker secrets)
+GitHub (private repo) ──push──▶ Vercel builds app/ (TanStack Start, Nitro "vercel" output)
+        │                               │
+        └── GitHub Actions CI           ├── static assets on Vercel's CDN
+            (typecheck, unit tests,     └── server functions in bom1 (Mumbai) ─┐
+             build, secret scan)                                               │ pooled Postgres (TLS)
+                                                                               ▼
+                                    Supabase project "IntelliHorizon" (ap-south-1): Postgres 17
+                                    role ih_app (least privilege, RLS on every table; the public
+                                    anon/authenticated API roles have no access to any table)
+        AI providers (server-side only): Anthropic · Google Gemini · OpenAI
 ```
 
-Steps marked **(you)** need your own accounts; nothing else does.
+The browser never talks to Supabase directly: every query runs on the server as `ih_app`, and the app's own
+authentication (salted PBKDF2 passwords, hashed session tokens) decides what each user may see. That is why existing
+accounts kept their passwords through the migration.
 
-## 1. One-time setup
+Steps marked **(you)** need your own accounts.
 
-1. **(you) Turn on R2.** Cloudflare dashboard → R2 Object Storage → Get started. (Free tier; Cloudflare asks for a
-   payment method before enabling R2.)
-2. **(you) Create a private GitHub repository** named `intellihorizon`, empty (no README). Keep it private: it
-   contains NCTB textbook passages, and NCTB's permission to publish them has not been received.
-3. **(you) Create the deploy token.** Cloudflare → My Profile → API Tokens → Create Token → template
-   "Edit Cloudflare Workers". Add permissions: Account · D1 · Edit, Account · Workers R2 Storage · Edit.
-   Limit it to your account.
-4. **(you) Add two GitHub secrets** (repo → Settings → Secrets and variables → Actions → New repository secret):
-   `CLOUDFLARE_API_TOKEN` (the token) and `CLOUDFLARE_ACCOUNT_ID` (Cloudflare dashboard, right-hand sidebar).
-5. Push the code to the repository (`git push -u origin main`). The workflow in `.github/workflows/deploy.yml` runs,
-   applies the database migrations, deploys and smoke-tests the site. The production URL is printed in the run log
-   (`https://intellihorizon.<your-subdomain>.workers.dev`).
-6. Restore the private production rows (your account, the owner-code hash, the judge credential) from the backup
-   file you were given, after the first deploy: Cloudflare dashboard → D1 → intellihorizon → Console → paste and run.
-   (Claude can also do this through the Cloudflare connector.)
+## Already done
 
-## 2. Secrets (Worker → Settings → Variables and Secrets → Add → type "Secret")
+- Supabase project **IntelliHorizon**: schema (`app/supabase/migrations/*`, tracked in `ih_migrations`), curriculum
+  content and all production records copied from the old database, row counts verified.
+- Vercel project **intellihorizon**: root directory `app`, Bun install, `bun run build`, functions in `bom1`,
+  production public, preview deployments private (Vercel Authentication). Environment variables set:
+  `DATABASE_URL` (sensitive), model names, AI budgets and limits.
 
-| Name | What it is | Needed for |
-|---|---|---|
-| `ANTHROPIC_API_KEY` | console.anthropic.com → API keys | Claude |
-| `GEMINI_API_KEY` | aistudio.google.com → Get API key | Gemini |
-| `OPENAI_API_KEY` | platform.openai.com → API keys | OpenAI |
-| `EDU_ADMIN_TOKEN` | any random string of 32+ characters | optional second way to unlock admin |
-| `RESEND_API_KEY`, `EMAIL_FROM` | resend.com | optional: verification and password-reset email |
-| `EMBED_API_KEY` | an OpenAI-compatible embeddings key | optional: meaning-based search |
+## 1. Put the code on GitHub (you)
 
-Or from a terminal with the repo checked out: `cd app && npx wrangler secret put ANTHROPIC_API_KEY`.
-Never put keys in the repository, in `wrangler.jsonc`, or in a chat.
+1. github.com → New repository → name `intellihorizon`, **Private**, no README. Keep it private: it contains NCTB
+   textbook passages, and NCTB's permission has not been received.
+2. Push this code to it (from the `intellihorizon.bundle` file you were given, or from any clone):
+   ```
+   git clone intellihorizon.bundle intellihorizon && cd intellihorizon
+   git remote set-url origin https://github.com/<you>/intellihorizon.git
+   git push -u origin main
+   ```
 
-Non-secret settings are in `app/wrangler.jsonc` → `vars`: the three model names, `AI_MONTHLY_BUDGET_USD` (25),
-`AI_DAILY_BUDGET_USD` (3), per-student and judge daily limits. Change them there (or override in the dashboard).
-A provider counts as configured only when both its key and its model are set; Admin → AI providers shows the status
-and has a "Test connection" check that makes one real request per provider.
+## 2. Connect Vercel to the repo (you)
 
-## 3. After the keys are in
+Vercel → intellihorizon → Settings → Git → Connect Git Repository → pick `intellihorizon`. Every push to `main` then
+deploys to production; every pull request gets a private preview. (Claude can do this step through the Vercel connector
+once the Vercel GitHub app can see the repository.)
 
-1. Admin → AI providers → test each provider (real request, no student data).
-2. Admin → AI providers → Provider evaluation → Run. Score the answers.
-3. Sign in at `/judge` in a private window and walk the judge journey.
+## 3. AI keys (you): Vercel → intellihorizon → Settings → Environment Variables → Add (type **Sensitive**)
 
-## 4. Rolling back
+| Name | Where to get it |
+|---|---|
+| `ANTHROPIC_API_KEY` | console.anthropic.com → API keys |
+| `GEMINI_API_KEY` | aistudio.google.com → Get API key |
+| `OPENAI_API_KEY` | platform.openai.com → API keys |
 
-- Code: Cloudflare dashboard → Workers → intellihorizon → Deployments → pick the previous version → Rollback
-  (or `npx wrangler rollback`). Every deploy keeps its version.
-- Data: migrations are additive and never delete data. D1 Time Travel restores the database to any minute in the
-  last 30 days: `npx wrangler d1 time-travel restore intellihorizon --timestamp <ISO time>`.
-- Take a manual export any time: `npx wrangler d1 export intellihorizon --remote --output backup.sql` (keep it private).
+Optional: `EDU_ADMIN_TOKEN` (32+ random characters), `RESEND_API_KEY` + `EMAIL_FROM` (email),
+`SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (store uploads in Supabase Storage instead of the private `app_files`
+table). Then Deployments → … → Redeploy. Never put keys in the repo or in a chat.
 
-## 5. Custom domain (optional)
+Model names and spending limits are ordinary variables already set: `ANTHROPIC_MODEL`, `GEMINI_MODEL`, `OPENAI_MODEL`,
+`AI_MONTHLY_BUDGET_USD` (25), `AI_DAILY_BUDGET_USD` (3), `AI_DAILY_LIMIT` (60 per student), `JUDGE_AI_DAILY_LIMIT`
+(40), `JUDGE_AI_TOTAL_DAILY` (400). A provider counts as configured only when its key and model are both set; Admin →
+AI providers → "Test connection" makes one real request per provider and reports the result.
 
-Workers → intellihorizon → Settings → Domains & Routes → Add → Custom domain (the domain must be on your Cloudflare
-account). Then set the GitHub variable `PRODUCTION_URL` and the Worker variable `APP_ORIGIN` to the new address.
+## 4. After deploying
+
+- `node app/scripts/smoke.mjs https://<production-url>` checks pages, deep links, assets, the API and the database
+  from a clean client.
+- Admin → AI providers → test each provider, then run the Provider evaluation and score the answers.
+- Sign in at `/judge` in a private window and walk the judge journey.
+
+## Database changes
+
+Add a new file to `app/supabase/migrations/` (additive changes only) and apply it with
+`DATABASE_URL=<owner connection string> node app/scripts/pg-migrate.mjs app/supabase/migrations` (or in the Supabase SQL
+editor, then insert the file name into `ih_migrations`). The app role `ih_app` cannot change the schema.
+
+## Rolling back
+
+- Code: Vercel → Deployments → pick the previous production deployment → "Promote to Production" (instant).
+- Data: Supabase → Database → Backups (daily backups; point-in-time recovery on paid plans). Migrations never delete
+  data.
+- The old Higgsfield deployment still exists unchanged and can be used as a fallback until you retire it.

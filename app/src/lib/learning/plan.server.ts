@@ -26,7 +26,7 @@ export async function buildPlan(DB: D1Database, userId: string, date: string) {
     });
   const weak = await DB.prepare(
     `SELECT a.chapter_id, c.title, COUNT(*) AS n, SUM(a.correct) AS ok FROM attempts a JOIN chapters c ON c.id = a.chapter_id
-      WHERE a.user_id = ? AND a.created_at >= ? GROUP BY a.chapter_id HAVING n >= 2 AND (1.0 * ok / n) < 0.6 ORDER BY MAX(a.created_at) DESC LIMIT 1`,
+      WHERE a.user_id = ? AND a.created_at >= ? GROUP BY a.chapter_id, c.title HAVING COUNT(*) >= 2 AND (1.0 * SUM(a.correct) / COUNT(*)) < 0.6 ORDER BY MAX(a.created_at) DESC LIMIT 1`,
   )
     .bind(userId, new Date(Date.now() - 14 * 86400000).toISOString())
     .first<{ chapter_id: string; title: string; n: number; ok: number }>();

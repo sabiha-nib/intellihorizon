@@ -8,7 +8,7 @@ const PW = "monsoon river kite 7";
 const results = [];
 const check = (name, ok, extra = "") => { results.push([ok ? "PASS" : "FAIL", name, extra]); console.log(ok ? "PASS" : "FAIL", name, extra); };
 const sql = (q) => {
-  const out = execSync(`/home/user/tools/node_modules/.bin/wrangler d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  const out = execSync(`/home/user/website-17609620527ef5f4f428f302/app/tests/support/d1-cli.sh d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
   return JSON.parse(out)[0].results;
 };
 const sha = (s) => createHash("sha256").update(s).digest("hex");
@@ -176,6 +176,9 @@ await Promise.all([p1.getByRole("button", { name: "Create account" }).click(), p
 await Promise.race([p1.getByText("Welcome, Racer.").waitFor({ timeout: 15000 }), p2.getByText("Welcome, Racer.").waitFor({ timeout: 15000 })]);
 await new Promise((r) => setTimeout(r, 2500));
 const racers = sql("SELECT COUNT(*) AS n FROM profiles WHERE username='racer_1'")[0].n;
+// On Postgres the losing transaction waits for the winner to commit before it fails, so its message arrives a moment
+// later than on D1; wait for it (same assertion, no extra tolerance in what counts).
+await Promise.race([p1.getByText("That username is taken.").waitFor({ timeout: 10000 }), p2.getByText("That username is taken.").waitFor({ timeout: 10000 })]).catch(() => undefined);
 const loser = (await p1.getByText("That username is taken.").count()) + (await p2.getByText("That username is taken.").count());
 check("simultaneous same-username registrations: exactly one wins", racers === 1 && loser === 1, `profiles=${racers} loserMsgs=${loser}`);
 check("no orphan user created for the losing request", sql("SELECT COUNT(*) AS n FROM users WHERE email IN ('race1@example.com','race2@example.com')")[0].n === 1);

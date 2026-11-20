@@ -53,10 +53,10 @@ export const contentCoverage = createServerFn({ method: "POST" })
         (SELECT COUNT(*) FROM source_pages s WHERE s.textbook_id = t.id AND s.confidence IS NOT NULL AND s.confidence < 75) AS pages_low_conf,
         (SELECT COUNT(DISTINCT p.page) FROM passages p WHERE p.textbook_id = t.id AND p.review_status IS NULL AND COALESCE(p.publish_status, 'draft') = 'draft') AS pages_awaiting,
         COUNT(p.id) AS passages,
-        SUM(p.review_status IS NULL) AS extracted, SUM(p.review_status = 'ocr_corrected') AS corrected, SUM(p.review_status = 'checked') AS checked,
-        SUM(p.review_status = 'teacher_reviewed') AS teacher, SUM(p.review_status = 'rejected') AS rejected,
-        SUM(COALESCE(p.publish_status, 'draft') = 'draft') AS draft, SUM(p.publish_status = 'approved') AS approved, SUM(p.publish_status = 'published') AS published,
-        SUM(p.publish_status = 'withdrawn') AS withdrawn, SUM(p.blocked = 1) AS blocked, SUM(p.flags LIKE '%math_unverified%') AS math_unverified,
+        SUM(CASE WHEN p.review_status IS NULL THEN 1 ELSE 0 END) AS extracted, SUM(CASE WHEN p.review_status = 'ocr_corrected' THEN 1 ELSE 0 END) AS corrected, SUM(CASE WHEN p.review_status = 'checked' THEN 1 ELSE 0 END) AS checked,
+        SUM(CASE WHEN p.review_status = 'teacher_reviewed' THEN 1 ELSE 0 END) AS teacher, SUM(CASE WHEN p.review_status = 'rejected' THEN 1 ELSE 0 END) AS rejected,
+        SUM(CASE WHEN COALESCE(p.publish_status, 'draft') = 'draft' THEN 1 ELSE 0 END) AS draft, SUM(CASE WHEN p.publish_status = 'approved' THEN 1 ELSE 0 END) AS approved, SUM(CASE WHEN p.publish_status = 'published' THEN 1 ELSE 0 END) AS published,
+        SUM(CASE WHEN p.publish_status = 'withdrawn' THEN 1 ELSE 0 END) AS withdrawn, SUM(CASE WHEN p.blocked = 1 THEN 1 ELSE 0 END) AS blocked, SUM(CASE WHEN p.flags LIKE '%math_unverified%' THEN 1 ELSE 0 END) AS math_unverified,
         SUM(CASE WHEN p.id IS NULL THEN 0 WHEN (p.publish_status = 'published' OR (t.status = 'indexed' AND COALESCE(p.publish_status, 'draft') = 'draft' AND p.blocked = 0)) AND COALESCE(p.review_status, '') != 'rejected' THEN 1 ELSE 0 END) AS student_visible,
         (SELECT COUNT(*) FROM import_jobs j WHERE j.textbook_id = t.id AND j.status = 'failed') AS failed_imports
        FROM textbooks t LEFT JOIN passages p ON p.textbook_id = t.id
@@ -244,8 +244,9 @@ export const reviewPassage = createServerFn({ method: "POST" })
                     provenance = CASE WHEN ? != text THEN 'review_edit' ELSE provenance END, reviewed_by = ?, reviewed_at = ?, review_note = COALESCE(?, review_note)
                     WHERE id = ? AND content_hash = ?`)
         .bind(text, hash, review, publish, newFlags.length ? JSON.stringify(newFlags) : null, blocked, text, text, g.admin.id, ts, histNote, p.id, data.expectedHash),
-      g.DB.prepare("INSERT INTO passage_reviews (passage_id, actor_id, action, from_review, to_review, from_publish, to_publish, old_hash, new_hash, note, created_at) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE changes() = 1")
-        .bind(p.id, g.admin.id, action, p.review_status, review, p.publish_status, publish, p.content_hash, hash, histNote, ts),
+      g.DB.prepare("INSERT INTO passage_reviews (passage_id, actor_id, action, from_review, to_review, from_publish, to_publish, old_hash, new_hash, note, created_at) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM passages WHERE id = ? AND reviewed_at = ? AND reviewed_by = ? AND content_hash = ?)")
+        // Only when the guarded UPDATE above applied (same check as the audit row; portable, unlike SQLite's changes()).
+        .bind(p.id, g.admin.id, action, p.review_status, review, p.publish_status, publish, p.content_hash, hash, histNote, ts, p.id, ts, g.admin.id, hash),
       g.DB.prepare("INSERT INTO audit_log (actor_id, action, target, detail, created_at) SELECT ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM passages WHERE id = ? AND reviewed_at = ? AND reviewed_by = ? AND content_hash = ?)")
         .bind(g.admin.id, `passage_${action}`, `passage:${p.id}`, JSON.stringify({ from: [p.review_status, p.publish_status], to: [review, publish] }), ts, p.id, ts, g.admin.id, hash),
     ]);

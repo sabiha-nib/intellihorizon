@@ -9,7 +9,7 @@ const MOCK = "http://127.0.0.1:8790";
 const PW = "monsoon river kite 7";
 const results = [];
 const check = (n, ok, x = "") => { results.push(!!ok); console.log(ok ? "PASS" : "FAIL", n, ok ? "" : x); };
-const WR = "/home/user/tools/node_modules/.bin/wrangler";
+const WR = "/home/user/website-17609620527ef5f4f428f302/app/tests/support/d1-cli.sh";
 const sql = (q) => JSON.parse(execSync(`${WR} d1 execute DB --local --config /tmp/wr/wrangler.jsonc --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
 const mode = (m) => fetch(`${MOCK}/__mode`, { method: "POST", body: JSON.stringify({ mode: m }) });
 const lastReq = async () => (await fetch(`${MOCK}/__last`)).json();

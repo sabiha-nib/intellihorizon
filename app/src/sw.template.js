@@ -10,7 +10,7 @@
 const VERSION = "__IH_BUILD__";
 const PAGES = `pages-${VERSION}`;
 const STATIC = `static-${VERSION}`;
-const PRECACHE = ["/offline", "/manifest.webmanifest", "/favicon.svg", "/icon-192.png", "/icon-512.png"];
+const PRECACHE = ["/offline.html", "/manifest.webmanifest", "/favicon.svg", "/icon-192.png", "/icon-512.png"];
 const PUBLIC_PAGES = ["/", "/help", "/privacy"];
 
 self.addEventListener("install", (e) => {
@@ -68,7 +68,7 @@ self.addEventListener("fetch", (e) => {
         }
         return res;
       } catch {
-        const hit = (await caches.match(url.pathname, { cacheName: PAGES })) || (await caches.match("/offline"));
+        const hit = (await caches.match(url.pathname, { cacheName: PAGES })) || (await caches.match("/offline.html"));
         if (!hit) return Response.error();
         // Rebuild the response so a cached redirect can never be replayed for a navigation.
         return new Response(await hit.blob(), { status: 200, headers: { "content-type": hit.headers.get("content-type") || "text/html; charset=utf-8" } });

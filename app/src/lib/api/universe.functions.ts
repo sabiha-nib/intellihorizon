@@ -133,7 +133,7 @@ async function starterChapter(
   if (grade === null || medium === null) return null;
   return DB.prepare(
     `SELECT c.id, c.title, t.subject_key, t.title AS book_title, COUNT(q.id) AS questions FROM chapters c JOIN textbooks t ON t.id = c.textbook_id JOIN questions q ON q.chapter_id = c.id AND q.status = 'published'
-      WHERE t.version_id = ? AND t.grade = ? AND t.medium = ? AND t.status != 'retired' GROUP BY c.id ORDER BY questions DESC, c.position LIMIT 1`,
+      WHERE t.version_id = ? AND t.grade = ? AND t.medium = ? AND t.status != 'retired' GROUP BY c.id, t.subject_key, t.title ORDER BY questions DESC, c.position LIMIT 1`,
   )
     .bind(ACTIVE_VERSION, grade, medium)
     .first<{
@@ -328,7 +328,7 @@ export const getDashboard = createServerFn({ method: "GET" }).handler(async () =
     });
   const weak = await DB.prepare(
     `SELECT a.chapter_id, c.title, t.subject_key, COUNT(*) AS n, SUM(a.correct) AS ok FROM (SELECT * FROM attempts WHERE user_id = ? ORDER BY id DESC LIMIT 60) a
-       JOIN chapters c ON c.id = a.chapter_id JOIN textbooks t ON t.id = c.textbook_id GROUP BY a.chapter_id HAVING n >= 3 AND (1.0 * ok / n) < 0.6 ORDER BY n DESC LIMIT 1`,
+       JOIN chapters c ON c.id = a.chapter_id JOIN textbooks t ON t.id = c.textbook_id GROUP BY a.chapter_id, c.title, t.subject_key HAVING COUNT(*) >= 3 AND (1.0 * SUM(a.correct) / COUNT(*)) < 0.6 ORDER BY COUNT(*) DESC LIMIT 1`,
   )
     .bind(me.id)
     .first<{ chapter_id: string; title: string; subject_key: string; n: number; ok: number }>();
@@ -343,7 +343,7 @@ export const getDashboard = createServerFn({ method: "GET" }).handler(async () =
       m: weak.n,
     });
   const tags = await DB.prepare(
-    "SELECT misconception, COUNT(DISTINCT question_id) AS qs FROM attempts WHERE user_id = ? AND correct = 0 AND misconception IS NOT NULL GROUP BY misconception HAVING qs >= 2 ORDER BY qs DESC LIMIT 1",
+    "SELECT misconception, COUNT(DISTINCT question_id) AS qs FROM attempts WHERE user_id = ? AND correct = 0 AND misconception IS NOT NULL GROUP BY misconception HAVING COUNT(DISTINCT question_id) >= 2 ORDER BY qs DESC LIMIT 1",
   )
     .bind(me.id)
     .first<{ misconception: string; qs: number }>();

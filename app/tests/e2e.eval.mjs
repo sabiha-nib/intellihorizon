@@ -9,7 +9,7 @@ const BASE = "http://127.0.0.1:8787";
 const MOCK = "http://127.0.0.1:8791";
 const PW = "monsoon river kite 7";
 const CFG = process.env.WR_CONFIG ?? "/tmp/wr/wrangler.multi.jsonc";
-const WR = "/home/user/tools/node_modules/.bin/wrangler";
+const WR = "/home/user/website-17609620527ef5f4f428f302/app/tests/support/d1-cli.sh";
 const sql = (q) => JSON.parse(execSync(`${WR} d1 execute DB --local --config ${CFG} --json --command ${JSON.stringify(q)}`, { cwd: "/tmp/wr", encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }))[0].results;
 const results = [];
 const check = (name, ok, detail = "") => { results.push(!!ok); console.log(`${ok ? "PASS" : "FAIL"} ${name}${ok ? "" : ` [${String(detail).slice(0, 300)}]`}`); };
@@ -55,7 +55,7 @@ await fetch(`${MOCK}/__pmode`, { method: "POST", body: JSON.stringify({ anthropi
 await pa.getByRole("button", { name: /Test connections/ }).click();
 await pa.waitForFunction(() => document.querySelectorAll('[data-provider-state$=":tested"], [data-provider-state$=":unavailable"]').length === 3, null, { timeout: 30000 });
 check("a provider whose real request succeeds is 'Tested OK'; one that fails is 'Unavailable' with the reason", (await states()) === "anthropic:tested gemini:unavailable openai:tested" && /Last real request failed: provider_error/.test(await pa.getByTestId("provider-connections").innerText()), await states());
-check("the connection test shows no key", !/test-(anthropic|gemini|openai)-key|sk-/.test(await pa.content()));
+check("the connection test shows no key", !/test-(anthropic|gemini|openai)-key|(^|[^a-z0-9])sk-[a-z0-9]/i.test(await pa.content()));
 await fetch(`${MOCK}/__pmode`, { method: "POST", body: JSON.stringify({ anthropic: "ok", gemini: "ok", openai: "ok" }) });
 const labels = await pa.getByTestId("provider-eval").locator("fieldset label").allTextContents();
 check("eight configurations offered with three providers configured", labels.length === 8, labels.join(" | "));

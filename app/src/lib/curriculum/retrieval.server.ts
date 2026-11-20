@@ -1,7 +1,7 @@
 import type { D1Database } from "@cloudflare/workers-types";
 
 import { ACTIVE_VERSION, MAX_EXCERPTS } from "./config";
-import { excerpt, ftsQuery, termCoverage } from "./text";
+import { excerpt, termCoverage } from "./text";
 import type { Excerpt, SourceRef } from "../tutor/types";
 
 /** Retrieval scope. Every field narrows; subjectKey is always one of the eight registry subjects (validated by callers). */
@@ -59,17 +59,26 @@ export async function countBooksInScope(DB: D1Database, scope: Scope): Promise<n
   return r?.n ?? 0;
 }
 
-/** Lexical retrieval (FTS5 trigram BM25 with a LIKE fallback for very short Bangla words), filtered by the student's curriculum scope. */
+/** to_tsquery text: each term reduced to letters/digits (any script) and OR-ed as a prefix match. */
+export function tsQuery(terms: string[]): string | null {
+  const parts = [...new Set(terms.map((t) => t.normalize("NFC").toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu, "")).filter((t) => [...t].length >= 2))];
+  return parts.length ? parts.slice(0, 16).map((t) => `${t}:*`).join(" | ") : null;
+}
+
+/** Lexical retrieval (Postgres full-text search with prefix matching, plus a substring fallback for very short Bangla words), filtered by the student's curriculum scope. */
 export async function retrieve(DB: D1Database, scope: Scope, terms: string[]): Promise<Retrieval> {
   const booksInScope = await countBooksInScope(DB, scope);
   const empty: Retrieval = { excerpts: [], bestCoverage: 0, booksInScope, topChapter: null };
   if (!terms.length || !booksInScope) return empty;
   const { sql, args } = scopeSql(scope);
   let rows: HitRow[] = [];
-  const match = ftsQuery(terms);
+  // Postgres full-text search on the generated passages.search column. Prefix matching (term:*) keeps Bangla
+  // inflections matching their stem ("অনুপাত" finds "অনুপাতের"), as the old trigram index did. The score is the
+  // negated rank so that, like BM25 before, lower is better and the ranking below is unchanged.
+  const match = tsQuery(terms);
   if (match) {
-    const r = await DB.prepare(`${SELECT}, bm25(passages_fts) AS score FROM passages_fts JOIN passages p ON p.id = passages_fts.rowid JOIN textbooks t ON t.id = p.textbook_id
-      WHERE passages_fts MATCH ? AND ${sql} ORDER BY score LIMIT 40`).bind(match, ...args).all<HitRow>();
+    const r = await DB.prepare(`${SELECT}, -ts_rank(p.search, to_tsquery('simple', ?)) AS score FROM passages p JOIN textbooks t ON t.id = p.textbook_id
+      WHERE p.search @@ to_tsquery('simple', ?) AND ${sql} ORDER BY score LIMIT 40`).bind(match, match, ...args).all<HitRow>();
     rows = r.results ?? [];
   }
   const short = terms.filter((t) => [...t].length < 3);

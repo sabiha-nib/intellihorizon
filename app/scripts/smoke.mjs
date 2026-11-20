@@ -25,7 +25,7 @@ check("deep link to a signed-in page redirects to sign-in instead of failing", [
 const health = await get("/api/health");
 const h = await health.json().catch(() => ({}));
 check("API reaches the database", health.status === 200 && h.db === true, JSON.stringify(h));
-check("all migrations applied", typeof h.migrations === "number" && h.migrations >= 15, h.migrations);
+check("all migrations applied", typeof h.migrations === "number" && h.migrations >= 6, h.migrations);
 console.log(`INFO storage bound: ${h.storage}; AI providers: ${JSON.stringify(h.providers)}`);
 const sw = await get("/sw.js");
 check("service worker is served and versioned per build", sw.status === 200 && /ih-[0-9a-f]{12}/.test(await sw.text()));
