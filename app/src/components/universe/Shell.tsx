@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import type { Lang } from "../../content/types";
 import { levelInfo } from "../../lib/learning/rules";
+import { gradeLabel } from "../../lib/curriculum/scope";
 import { useLearner } from "../../lib/store";
 import { AccountAvatar } from "../auth/Avatar";
 import { Icon, Mark } from "./icons";
@@ -59,175 +60,137 @@ function useActive(match: string[]) {
   return match.some((m) => path === m || path.startsWith(m + "/"));
 }
 
-function NavLink({
-  to,
-  icon,
-  label,
-  match,
-}: {
-  to: string;
-  icon: string;
-  label: string;
-  match: string[];
-}) {
+/* ─────────── App shell: a calm grouped sidebar on wide screens, a slim bar plus bottom tabs on phones ─────────── */
+
+// Order inside each group: the core of the learning journey first.
+const ORDER = ["tutor", "path", "topics", "map", "concepts", "formulas", "summary", "lab", "quiz", "plan", "practice", "exam", "mastery", "progress", "mistakes", "twin", "horizon", "revision", "achievements", "missions", "history", "cards", "notes", "reflect", "saved", "share", "search", "settings", "account", "help", "admin"];
+const rank = (id: string) => { const i = ORDER.indexOf(id); return i < 0 ? 99 : i; };
+const COLLAPSE_KEY = "ih_nav_collapsed_v1";
+
+function SideLink({ to, icon, label, match }: { to: string; icon: string; label: string; match: string[] }) {
   const on = useActive(match);
   return (
     <Link
       to={to as "/"}
       aria-current={on ? "page" : undefined}
-      className={`flex h-10 items-center gap-2 whitespace-nowrap rounded-[12px] px-3 text-[15px] font-semibold transition-colors ${on ? "bg-brand-soft text-brand-deep" : "text-ink-mid hover:bg-lilac hover:text-ink"}`}
+      className={`ih-side-link group relative flex min-h-[36px] items-center gap-2.5 rounded-[10px] px-2.5 text-[14px] font-semibold transition-colors ${on ? "bg-[rgba(249,168,212,0.14)] text-white" : "text-[#dedcdc] hover:bg-[rgba(222,220,220,0.08)] hover:text-white"}`}
     >
-      <Icon name={icon} size={20} />
+      {on && <span aria-hidden className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full bg-[#f9a8d4]" />}
+      <Icon name={icon} size={18} className={on ? "text-[#f9a8d4]" : "text-[#989daa] group-hover:text-[#dedcdc]"} />
+      <span className="truncate">{label}</span>
+    </Link>
+  );
+}
+
+function ScopeChip() {
+  const { account, tx, t } = useLearner();
+  if (!account) return null;
+  const version = account.curriculum === "nctb-bangla" ? tx("Bangla Version", "বাংলা ভার্সন") : account.curriculum === "nctb-english" ? tx("English Version", "ইংলিশ ভার্সন") : null;
+  const label = [account.grade ? t(gradeLabel(account.grade)) : null, "NCTB", version].filter(Boolean).join(" · ");
+  return (
+    <Link to="/start" className="block rounded-[12px] border border-[rgba(222,220,220,0.16)] px-3 py-2 text-[13px] font-semibold text-[#dedcdc] hover:border-[rgba(222,220,220,0.35)]" data-testid="scope-chip"
+      aria-label={tx(`Your curriculum: ${label}. Change class or version`, `তোমার পাঠ্যক্রম: ${label}। শ্রেণি বা ভার্সন বদলাও`)}>
+      <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#989daa]">{tx("Studying", "পড়ছ")}</span>
       {label}
     </Link>
   );
 }
 
-function MoreMenu() {
-  const { t, tx, account } = useLearner();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+function Sidebar() {
+  const { t, tx, account, lang, xp } = useLearner();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  useEffect(() => setOpen(false), [path]);
+  const [collapsed, setCollapsed] = useState<string[]>(["you"]);
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onClick);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onClick);
-    };
-  }, [open]);
+    try { const v = window.localStorage.getItem(COLLAPSE_KEY); if (v) setCollapsed(JSON.parse(v) as string[]); } catch { /* storage unavailable */ }
+  }, []);
+  const toggle = (id: string) => setCollapsed((c) => {
+    const next = c.includes(id) ? c.filter((x) => x !== id) : [...c, id];
+    try { window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+    return next;
+  });
   const mods = MODULES.filter((m) => !m.admin || account?.role === "admin");
+  const lv = xp === null ? null : levelInfo(xp);
   return (
-    <div className="relative" ref={ref}>
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls="more-menu"
-        onClick={() => setOpen((v) => !v)}
-        className={`flex h-10 items-center gap-2 whitespace-nowrap rounded-[12px] px-3 text-[15px] font-semibold transition-colors ${open ? "bg-brand-soft text-brand-deep" : "text-ink-mid hover:bg-lilac hover:text-ink"}`}
-      >
-        <Icon name="more" size={20} />
-        {tx("More", "আরও")}
-      </button>
-      {open && (
-        <div
-          id="more-menu"
-          className="edu-pop absolute right-0 top-12 z-50 w-[min(92vw,720px)] rounded-[24px] border border-line bg-sheet p-5 shadow-[var(--shadow-lift)]"
-        >
-          <div className="grid gap-5 sm:grid-cols-4">
-            {GROUPS.map((g) => (
-              <div key={g.id}>
-                <p className="mb-2 text-[13px] font-semibold text-ink-low">{t(g.label)}</p>
-                <ul className="space-y-0.5">
-                  {mods
-                    .filter((m) => m.group === g.id)
-                    .map((m) => (
-                      <li key={m.id}>
-                        <Link
-                          to={m.to as "/"}
-                          className="flex items-center gap-2 rounded-[10px] px-2 py-1.5 text-[15px] font-medium text-ink hover:bg-lilac"
-                        >
-                          <Icon name={m.icon} size={18} className="text-brand" />
-                          {t(m.label)}
-                        </Link>
-                      </li>
-                    ))}
+    <aside className="ih-sidebar ih-appbar fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-[rgba(222,220,220,0.12)] bg-[#191d23] lg:flex" lang={lang} aria-label={tx("App", "অ্যাপ")}>
+      <div className="flex items-center gap-2 px-5 pb-3 pt-5">
+        <Link to="/dashboard" className="flex items-center gap-2" aria-label={tx("IntelliHorizon, go to your dashboard", "ইন্টেলিহরাইজন, ড্যাশবোর্ডে যাও")}>
+          <Mark />
+          <span className="font-display text-[19px] font-extrabold tracking-tight text-white" lang="en">IntelliHorizon</span>
+        </Link>
+      </div>
+      <div className="space-y-2 px-4 pb-3">
+        <Link to="/tutor" className="flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[#f9a8d4] px-4 text-[15px] font-bold text-[#191d23] transition-colors hover:bg-[#fce7f3]" data-testid="ask-tutor">
+          <Icon name="spark" size={18} />
+          {tx("Ask IntelliTutor", "ইন্টেলিটিউটরকে জিজ্ঞেস করো")}
+        </Link>
+        <Link to="/search" className="flex min-h-[38px] items-center gap-2 rounded-[10px] border border-[rgba(222,220,220,0.16)] px-3 text-[14px] font-medium text-[#989daa] hover:text-white">
+          <Icon name="search" size={17} />
+          {tx("Search", "খোঁজো")}
+        </Link>
+      </div>
+      <nav aria-label={tx("Main", "প্রধান")} className="ih-side-scroll min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+        <SideLink to="/dashboard" icon="home" label={tx("Home", "হোম")} match={["/dashboard"]} />
+        {GROUPS.map((g) => {
+          const items = mods.filter((m) => m.group === g.id).sort((a, b) => rank(a.id) - rank(b.id));
+          const here = items.some((m) => path === m.to || path.startsWith(m.to + "/"));
+          const open = here || !collapsed.includes(g.id);
+          return (
+            <div key={g.id} className="mt-4">
+              <button type="button" aria-expanded={open} aria-controls={`nav-${g.id}`} onClick={() => toggle(g.id)}
+                className="flex w-full items-center justify-between rounded-[8px] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[#989daa] hover:text-[#dedcdc]">
+                {t(g.label)}
+                <Icon name="arrow" size={14} className={`transition-transform ${open ? "rotate-90" : ""}`} />
+              </button>
+              {open && (
+                <ul id={`nav-${g.id}`} className="mt-1 space-y-0.5">
+                  {items.map((m) => <li key={m.id}><SideLink to={m.to} icon={m.icon} label={t(m.label)} match={[m.to]} /></li>)}
                 </ul>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
-            <span className="text-[14px] font-semibold text-ink-mid">
-              {tx("Interface language", "ইন্টারফেসের ভাষা")}
-            </span>
-            <LangSwitch compact />
-          </div>
+              )}
+            </div>
+          );
+        })}
+      </nav>
+      <div className="space-y-2 border-t border-[rgba(222,220,220,0.12)] px-4 py-3">
+        <ScopeChip />
+        <div className="flex items-center justify-between gap-2">
+          <LangSwitch compact />
+          <SyncPill />
         </div>
-      )}
-    </div>
-  );
-}
-
-function LevelChip() {
-  const { xp, tx, t } = useLearner();
-  if (xp === null) return null;
-  const lv = levelInfo(xp);
-  return (
-    <Link
-      to="/progress"
-      className="hidden items-center gap-2 whitespace-nowrap rounded-full bg-lilac px-3 py-1.5 text-[14px] font-semibold text-ink xl:inline-flex"
-      aria-label={tx(
-        `Level ${lv.level}, ${t(lv.name)}, ${xp} XP`,
-        `লেভেল ${lv.level}, ${t(lv.name)}, ${xp} এক্সপি`,
-      )}
-    >
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-[12px] font-bold text-white">
-        {lv.level}
-      </span>
-      <span className="tnum">{xp} XP</span>
-    </Link>
+        {account && (
+          <Link to="/account" className="flex items-center gap-2.5 rounded-[12px] px-1 py-1 hover:bg-[rgba(222,220,220,0.08)]" aria-label={tx("Your account", "তোমার অ্যাকাউন্ট")}>
+            <AccountAvatar avatar={account.avatar} name={account.fullName} size={34} />
+            <span className="min-w-0">
+              <span className="block truncate text-[14px] font-semibold text-white">{account.fullName}</span>
+              {lv && <span className="block text-[12px] text-[#989daa] tnum">{tx(`Level ${lv.level} · ${xp} XP`, `লেভেল ${lv.level} · ${xp} এক্সপি`)}</span>}
+            </span>
+          </Link>
+        )}
+      </div>
+    </aside>
   );
 }
 
 export function AppHeader() {
-  const { t, tx, account, lang } = useLearner();
+  const { tx, account, lang } = useLearner();
   return (
     <>
-      <header
-        className="ih-appbar sticky top-0 z-40 border-b border-line bg-canvas"
-        lang={lang}
-      >
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 md:px-6">
-          <Link
-            to="/dashboard"
-            className="flex shrink-0 items-center gap-2"
-            aria-label={tx("IntelliHorizon, go to your dashboard", "ইন্টেলিহরাইজন, ড্যাশবোর্ডে যাও")}
-          >
+      <Sidebar />
+      {/* Phones and tablets: a slim bar; the sidebar takes over from 1024px. */}
+      <header className="ih-appbar sticky top-0 z-40 border-b border-line bg-canvas lg:hidden" lang={lang}>
+        <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 md:px-6">
+          <Link to="/dashboard" className="flex shrink-0 items-center gap-2" aria-label={tx("IntelliHorizon, go to your dashboard", "ইন্টেলিহরাইজন, ড্যাশবোর্ডে যাও")}>
             <Mark />
-            <span
-              className="font-display text-[21px] font-extrabold tracking-tight text-ink"
-              lang="en"
-            >
-              IntelliHorizon
-            </span>
+            <span className="font-display text-[19px] font-extrabold tracking-tight text-ink" lang="en">IntelliHorizon</span>
           </Link>
-          <nav
-            aria-label={tx("Main", "প্রধান")}
-            className="ml-2 hidden items-center gap-0.5 lg:flex xl:ml-4 xl:gap-1"
-          >
-            {PRIMARY.map((n) => (
-              <NavLink key={n.to} to={n.to} icon={n.icon} label={t(n.label)} match={n.match} />
-            ))}
-            <MoreMenu />
-          </nav>
-          <div className="ml-auto flex items-center gap-1.5">
+          <div className="ml-auto flex items-center gap-1">
             <SyncPill />
-            <Link
-              to="/search"
-              className="flex h-10 items-center gap-2 rounded-[12px] px-2.5 text-[15px] font-semibold text-ink-mid hover:bg-lilac hover:text-ink"
-            >
+            <Link to="/search" aria-label={tx("Search", "খোঁজো")} className="flex h-11 w-11 items-center justify-center rounded-[12px] text-ink-mid hover:bg-lilac hover:text-ink">
               <Icon name="search" size={20} />
-              <span className="hidden sm:inline lg:hidden xl:inline">{tx("Search", "খোঁজো")}</span>
             </Link>
-            <LevelChip />
-            <span className="hidden sm:block lg:hidden xl:block">
-              <LangSwitch compact />
-            </span>
+            <span className="hidden sm:block"><LangSwitch compact /></span>
             {account && (
-              <Link
-                to="/account"
-                aria-label={tx("Your account", "তোমার অ্যাকাউন্ট")}
-                className="rounded-full"
-              >
-                <AccountAvatar avatar={account.avatar} name={account.fullName} size={36} />
+              <Link to="/account" aria-label={tx("Your account", "তোমার অ্যাকাউন্ট")} className="rounded-full">
+                <AccountAvatar avatar={account.avatar} name={account.fullName} size={34} />
               </Link>
             )}
           </div>

@@ -274,3 +274,11 @@ html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-mo
 }
 .ih-appbar :focus-visible { outline-color: #f9a8d4; }
 
+
+/* App shell (Phase 6): on wide screens the grouped sidebar is fixed at the left, so every page's content and its
+ * full-width fixed bars (bottom composers, toasts) start after it. The sidebar exists only for signed-in students. */
+@media (min-width: 1024px) {
+  body:has(.ih-sidebar) { padding-left: 16rem; }
+  body:has(.ih-sidebar) .fixed.inset-x-0 { left: 16rem; }
+}
+.ih-side-scroll { scrollbar-width: thin; scrollbar-color: rgba(222, 220, 220, 0.2) transparent; }

@@ -28,8 +28,8 @@ export function AuthLayout({ title, subtitle, children, aside }: { title: string
           <polyline points="210,120 260,70 300,160" fill="none" stroke="#F9A8D4" strokeOpacity=".7" strokeWidth="1.4" strokeDasharray="5 5" />
           {STARS.map(([x, y, r, g], i) => (
             <g key={i} transform={`translate(${x} ${y})`}>
-              {g !== "unexplored" && g !== "glimpsed" && <circle r={r * 1.9} fill="#F9A8D4" opacity={0.14} />}
-              <path d={`M0 ${-r} L${r * 0.28} ${-r * 0.28} L${r} 0 L${r * 0.28} ${r * 0.28} L0 ${r} L${-r * 0.28} ${r * 0.28} L${-r} 0 L${-r * 0.28} ${-r * 0.28} Z`} fill={g === "unexplored" || g === "glimpsed" ? "#989DAA" : "#F9A8D4"} />
+              {g !== "glimpsed" && <circle r={r * 1.9} fill="#F9A8D4" opacity={0.14} />}
+              <path d={`M0 ${-r} L${r * 0.28} ${-r * 0.28} L${r} 0 L${r * 0.28} ${r * 0.28} L0 ${r} L${-r * 0.28} ${r * 0.28} L${-r} 0 L${-r * 0.28} ${-r * 0.28} Z`} fill={g === "glimpsed" ? "#989DAA" : "#F9A8D4"} />
             </g>
           ))}
         </svg>

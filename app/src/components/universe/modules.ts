@@ -9,7 +9,7 @@ export type Module = {
   icon: IconName;
   label: L;
   blurb: L;
-  group: "learn" | "practise" | "progress" | "you";
+  group: "learn" | "practise" | "assess" | "progress" | "you";
   admin?: boolean;
 };
 
@@ -38,13 +38,13 @@ export const PRIMARY: { to: string; icon: IconName; label: L; match: string[] }[
 
 export const MODULES: Module[] = [
   { id: "twin", to: "/twin", icon: "radar", group: "progress", label: { en: "Learning Twin", bn: "লার্নিং টুইন" }, blurb: { en: "What your evidence says about each topic, and how to correct it", bn: "প্রতিটি টপিক নিয়ে তোমার প্রমাণ কী বলে, আর কীভাবে সংশোধন করবে" } },
-  { id: "exam", to: "/exam-arena", icon: "shield", group: "practise", label: { en: "ExamArena", bn: "পরীক্ষা অঙ্গন" }, blurb: { en: "Chapter readiness from four visible factors, then a timed exam", bn: "চারটি দৃশ্যমান কারণে অধ্যায়ের প্রস্তুতি, তারপর সময় বাঁধা পরীক্ষা" } },
-  { id: "cards", to: "/cards", icon: "revision", group: "practise", label: { en: "MemoryCards", bn: "মেমরি কার্ড" }, blurb: { en: "Flashcards from your book's definitions, spaced for recall", bn: "বইয়ের সংজ্ঞা থেকে ফ্ল্যাশকার্ড, মনে রাখার মতো বিরতিতে" } },
-  { id: "notes", to: "/notes", icon: "pen", group: "learn", label: { en: "SmartNotes", bn: "স্মার্ট নোট" }, blurb: { en: "Your own private notes, searchable, tied to chapters", bn: "তোমার নিজের ব্যক্তিগত নোট, খোঁজা যায়, অধ্যায়ের সঙ্গে যুক্ত" } },
+  { id: "exam", to: "/exam-arena", icon: "shield", group: "assess", label: { en: "ExamArena", bn: "পরীক্ষা অঙ্গন" }, blurb: { en: "Chapter readiness from four visible factors, then a timed exam", bn: "চারটি দৃশ্যমান কারণে অধ্যায়ের প্রস্তুতি, তারপর সময় বাঁধা পরীক্ষা" } },
+  { id: "cards", to: "/cards", icon: "revision", group: "you", label: { en: "MemoryCards", bn: "মেমরি কার্ড" }, blurb: { en: "Flashcards from your book's definitions, spaced for recall", bn: "বইয়ের সংজ্ঞা থেকে ফ্ল্যাশকার্ড, মনে রাখার মতো বিরতিতে" } },
+  { id: "notes", to: "/notes", icon: "pen", group: "you", label: { en: "SmartNotes", bn: "স্মার্ট নোট" }, blurb: { en: "Your own private notes, searchable, tied to chapters", bn: "তোমার নিজের ব্যক্তিগত নোট, খোঁজা যায়, অধ্যায়ের সঙ্গে যুক্ত" } },
   { id: "formulas", to: "/formulas", icon: "book", group: "learn", label: { en: "FormulaVault", bn: "সূত্র ভান্ডার" }, blurb: { en: "Checked formulas, each with its textbook page", bn: "যাচাই করা সূত্র, প্রতিটির পাঠ্যবইয়ের পৃষ্ঠাসহ" } },
   { id: "concepts", to: "/concepts", icon: "map", group: "learn", label: { en: "ConceptConnect", bn: "ধারণা সংযোগ" }, blurb: { en: "Reviewed links between topics, with the reason for each", bn: "টপিকের মধ্যে যাচাই করা সংযোগ, প্রতিটির কারণসহ" } },
   { id: "summary", to: "/summary", icon: "layers", group: "learn", label: { en: "IntelliSummary", bn: "ইন্টেলিসারাংশ" }, blurb: { en: "Chapter summaries copied from the book's own sentences", bn: "বইয়ের নিজের বাক্য থেকে অধ্যায়ের সারাংশ" } },
-  { id: "reflect", to: "/reflect", icon: "sun", group: "progress", label: { en: "Reflection", bn: "প্রতিফলন" }, blurb: { en: "Write what you learned and what to revisit", bn: "কী শিখলে আর কী আবার দেখবে লেখো" } },
+  { id: "reflect", to: "/reflect", icon: "sun", group: "you", label: { en: "Reflection", bn: "প্রতিফলন" }, blurb: { en: "Write what you learned and what to revisit", bn: "কী শিখলে আর কী আবার দেখবে লেখো" } },
   { id: "share", to: "/share", icon: "user", group: "you", label: { en: "Teacher and parent access", bn: "শিক্ষক ও অভিভাবকের প্রবেশ" }, blurb: { en: "Share a progress summary with an expiring code", bn: "মেয়াদি কোড দিয়ে অগ্রগতির সারাংশ দেখাও" } },
   {
     id: "quiz",
@@ -66,7 +66,7 @@ export const MODULES: Module[] = [
     id: "horizon",
     to: "/path",
     icon: "missions",
-    group: "learn",
+    group: "progress",
     label: { en: "Horizon Path", bn: "হরাইজন পথ" },
     blurb: { en: "Where you've been, where you are, what's next", bn: "কোথায় ছিলে, কোথায় আছ, এরপর কী" },
   },
@@ -104,7 +104,7 @@ export const MODULES: Module[] = [
     id: "search",
     to: "/search",
     icon: "search",
-    group: "learn",
+    group: "you",
     label: { en: "Search", bn: "খোঁজো" },
     blurb: {
       en: "Subjects, chapters, passages and your notes",
@@ -115,7 +115,7 @@ export const MODULES: Module[] = [
     id: "saved",
     to: "/saved",
     icon: "saved",
-    group: "learn",
+    group: "you",
     label: { en: "Saved notes", bn: "সংরক্ষিত নোট" },
     blurb: { en: "Passages and questions you kept", bn: "তোমার রাখা অংশ ও প্রশ্ন" },
   },
@@ -156,7 +156,7 @@ export const MODULES: Module[] = [
     id: "revision",
     to: "/revision",
     icon: "revision",
-    group: "practise",
+    group: "progress",
     label: { en: "Revision queue", bn: "পুনরালোচনা" },
     blurb: { en: "Questions due back today", bn: "আজ যে প্রশ্নগুলো ফিরে এসেছে" },
   },
@@ -164,7 +164,7 @@ export const MODULES: Module[] = [
     id: "mistakes",
     to: "/mistakes",
     icon: "radar",
-    group: "practise",
+    group: "assess",
     label: { en: "Misconception Radar", bn: "ভুল ধারণার রাডার" },
     blurb: {
       en: "Mistakes you repeat, and the ones you fixed",
@@ -175,7 +175,7 @@ export const MODULES: Module[] = [
     id: "progress",
     to: "/progress",
     icon: "progress",
-    group: "progress",
+    group: "assess",
     label: { en: "Progress", bn: "অগ্রগতি" },
     blurb: { en: "Activity, accuracy and your level", bn: "কাজ, সঠিকতা আর তোমার লেভেল" },
   },
@@ -183,7 +183,7 @@ export const MODULES: Module[] = [
     id: "mastery",
     to: "/mastery",
     icon: "evidence",
-    group: "progress",
+    group: "assess",
     label: { en: "Mastery evidence", bn: "দক্ষতার প্রমাণ" },
     blurb: { en: "What your answers actually show", bn: "তোমার উত্তর আসলে কী দেখায়" },
   },
@@ -255,9 +255,10 @@ export const MODULES: Module[] = [
   },
 ];
 
-export const GROUPS: { id: Module["group"]; label: L }[] = [
-  { id: "learn", label: { en: "Learn", bn: "শেখো" } },
-  { id: "practise", label: { en: "Practise", bn: "অনুশীলন" } },
-  { id: "progress", label: { en: "Progress", bn: "অগ্রগতি" } },
-  { id: "you", label: { en: "You", bn: "তুমি" } },
+export const GROUPS: { id: Module["group"]; label: L; hint: L }[] = [
+  { id: "learn", label: { en: "Learn", bn: "শেখো" }, hint: { en: "Understand from your own textbooks", bn: "নিজের পাঠ্যবই থেকে বোঝো" } },
+  { id: "practise", label: { en: "Practice", bn: "অনুশীলন" }, hint: { en: "Checked questions and daily practice", bn: "যাচাই করা প্রশ্ন ও প্রতিদিনের অনুশীলন" } },
+  { id: "assess", label: { en: "Assess", bn: "মূল্যায়ন" }, hint: { en: "Exams, mastery and what your answers show", bn: "পরীক্ষা, দক্ষতা ও তোমার উত্তর কী দেখায়" } },
+  { id: "progress", label: { en: "My Progress", bn: "আমার অগ্রগতি" }, hint: { en: "Your path, revision and achievements", bn: "তোমার পথ, পুনরালোচনা ও অর্জন" } },
+  { id: "you", label: { en: "More", bn: "আরও" }, hint: { en: "Notes, cards, reflection and settings", bn: "নোট, কার্ড, প্রতিফলন ও সেটিংস" } },
 ];
