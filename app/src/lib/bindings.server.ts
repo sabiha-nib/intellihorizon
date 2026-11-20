@@ -11,7 +11,7 @@ type AppEnv = {
   STORAGE?: R2Bucket;
   HF_ENV?: string;
   APP_SLUG?: string;
-  // Optional secrets for account email (set in Higgsfield website settings).
+  // Optional secrets for account email (Vercel project environment variables).
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
   APP_ORIGIN?: string;

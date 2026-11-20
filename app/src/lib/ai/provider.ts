@@ -2,7 +2,7 @@
 // server code (`aiConfig(bindings())`); this module holds no secrets itself and is imported only by server modules. The tutor never calls a vendor SDK directly: it calls
 // `complete()`, so the provider or model can change without touching the tutor.
 //
-// Secrets (set in the Higgsfield website settings, then redeploy):
+// Secrets (Vercel project environment variables, marked Sensitive; then redeploy):
 //   AI_PROVIDER   "openai" (any OpenAI-compatible Chat Completions API) or "anthropic"
 //   AI_API_KEY    the provider key
 //   AI_MODEL      the model id to use (required; there is no built-in default model)

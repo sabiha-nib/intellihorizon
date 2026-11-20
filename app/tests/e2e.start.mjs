@@ -32,6 +32,8 @@ check("an unavailable choice says plainly that no textbooks are imported", /have
 await pv.getByRole("button", { name: "Enter IntelliHorizon" }).click();
 await pv.waitForURL(/\/learn/, { timeout: 15000 });
 await pv.goto(`${BASE}/start`);
+// The saved choice is read from this device after the page hydrates, so allow it a moment to apply.
+await pv.waitForFunction(() => document.querySelector('[data-grade="9"]')?.getAttribute("aria-checked") === "true", null, { timeout: 8000 }).catch(() => {});
 check("a visitor's choice is remembered on this device", (await pv.locator('[data-grade="9"]').getAttribute("aria-checked")) === "true" && (await pv.locator('[data-medium="english"]').getAttribute("aria-checked")) === "true");
 
 // 2. Signed-in student: saving changes the profile; the interface language stays as chosen.

@@ -128,8 +128,7 @@ check("an unfinished session has paid no completion reward", sessionXp() === 0);
 // 4. Headers and bundle
 const res = await pn.request.get(`${BASE}/`);
 const h = res.headers();
-// frame-ancestors is injected by the Higgsfield hosting platform on deployed responses, so it isn't checked locally.
-check("security headers are set (CSP, HSTS, referrer, permissions with camera off)", !!h["content-security-policy"] && !!h["strict-transport-security"] && !!h["referrer-policy"] && /camera=\(\)/.test(h["permissions-policy"] ?? ""), JSON.stringify(h).slice(0, 400));
+check("security headers are set (CSP, HSTS, referrer, permissions with camera off, no framing by other sites)", /frame-ancestors 'none'/.test(h["content-security-policy"] ?? "") && h["x-frame-options"] === "DENY" && !!h["strict-transport-security"] && !!h["referrer-policy"] && /camera=\(\)/.test(h["permissions-policy"] ?? ""), JSON.stringify(h).slice(0, 400));
 const files = [];
 const walk = (d) => { for (const f of readdirSync(d)) { const x = join(d, f); if (statSync(x).isDirectory()) walk(x); else if (/\.(js|html|json)$/.test(f)) files.push(x); } };
 walk("/home/user/website-17609620527ef5f4f428f302/app/dist/client");
