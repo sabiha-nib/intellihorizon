@@ -34,7 +34,7 @@ function SkyLayer({ selected, onSelect, only, mode }: Props & { mode: "desk" | "
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full select-none" role="group" aria-label={t({ en: "Understanding Sky", bn: "বোঝাপড়ার আকাশ" })}>
       {dust.map(([x, y, s], i) => (
-        <circle key={i} cx={x} cy={y} r={s > 0.92 ? 1.3 : 0.7} fill="#4A4664" opacity={0.18 + s * 0.25} />
+        <circle key={i} cx={x} cy={y} r={s > 0.92 ? 1.3 : 0.7} fill="#465C65" opacity={0.18 + s * 0.25} />
       ))}
       {subjects.map((s) => {
         const [cx, cy] = centre(s.id);
@@ -48,7 +48,7 @@ function SkyLayer({ selected, onSelect, only, mode }: Props & { mode: "desk" | "
                   const [x1, y1] = pos(p);
                   const [x2, y2] = pos(c.id);
                   const lit = glowLevel(concept(p).glow) >= 3 && glowLevel(concept(c.id).glow) >= 3;
-                  return <line key={`${p}-${c.id}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={lit ? "#5B3FD6" : s.thread} strokeOpacity={lit ? 0.9 : 0.45} strokeWidth={1.4} strokeDasharray="5 5" />;
+                  return <line key={`${p}-${c.id}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={lit ? "#57707A" : s.thread} strokeOpacity={lit ? 0.9 : 0.45} strokeWidth={1.4} strokeDasharray="5 5" />;
                 }),
             )}
             {!only && (
@@ -79,11 +79,11 @@ function SkyLayer({ selected, onSelect, only, mode }: Props & { mode: "desk" | "
                   className="cursor-pointer outline-none"
                 >
                   <circle r={22} fill="transparent" />
-                  {isSel && <circle r={r * 2.3} fill="none" stroke="#1D1B2C" strokeWidth={1.2} strokeDasharray="2 4" />}
+                  {isSel && <circle r={r * 2.3} fill="none" stroke="#191D23" strokeWidth={1.2} strokeDasharray="2 4" />}
                   {c.route && g === "unexplored" && <circle r={r * 1.7} fill="none" stroke={s.thread} strokeWidth={1.2} strokeDasharray="3 3" opacity={0.9} />}
                   <StarGlyph glow={g} r={r} thread={s.thread} />
                   {(c.route || only) && (
-                    <text y={r + 18} textAnchor="middle" fill="#1D1B2C" fontSize={only ? 12.5 : 12} fontWeight={600} opacity={0.92}>
+                    <text y={r + 18} textAnchor="middle" fill="#191D23" fontSize={only ? 12.5 : 12} fontWeight={600} opacity={0.92}>
                       {t(c.title).length > 30 && !only ? t(c.title).slice(0, 28) + "…" : t(c.title)}
                     </text>
                   )}
@@ -101,7 +101,7 @@ function SkyLayer({ selected, onSelect, only, mode }: Props & { mode: "desk" | "
           const mx = (x1 + x2) / 2;
           const my = Math.min(y1, y2) - 60;
           const len = Math.hypot(x2 - x1, y2 - y1) * 1.3;
-          return <path key={b.to} d={`M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`} fill="none" stroke="#5B3FD6" strokeWidth={1.6} className="edu-stitch-draw" style={{ ["--edu-len" as string]: len }} />;
+          return <path key={b.to} d={`M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`} fill="none" stroke="#57707A" strokeWidth={1.6} className="edu-stitch-draw" style={{ ["--edu-len" as string]: len }} />;
         })}
     </svg>
   );

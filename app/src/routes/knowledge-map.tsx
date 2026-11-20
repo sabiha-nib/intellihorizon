@@ -23,12 +23,12 @@ type Data = Extract<Awaited<ReturnType<typeof getKnowledgeMap>>, { ok: true }>;
 type Ch = Data["subjects"][number]["books"][number]["chapters"][number];
 type NodeState = Ch["status"];
 const NODE: Record<NodeState, { fill: string; stroke: string; label: L; means: L }> = {
-  none: { fill: "#FFFFFF", stroke: "#D3CCE3", label: { en: "Not explored", bn: "দেখা হয়নি" }, means: { en: "You haven't opened this chapter in IntelliHorizon.", bn: "ইন্টেলিহরাইজনে এই অধ্যায় এখনো খোলোনি।" } },
-  introduced: { fill: "#F4F1FC", stroke: "#6C6886", label: { en: "Introduced", bn: "পরিচিত" }, means: { en: "You've opened it, but haven't answered a question yet. Opening is not understanding.", bn: "খুলেছ, তবে এখনো কোনো প্রশ্নের উত্তর দাওনি। খোলা মানে বোঝা নয়।" } },
-  practising: { fill: "#EEE9FE", stroke: "#5B3FD6", label: { en: "Practising", bn: "অনুশীলন চলছে" }, means: { en: "You've answered at least one question here.", bn: "এখানে অন্তত একটি প্রশ্নের উত্তর দিয়েছ।" } },
+  none: { fill: "#FFFFFF", stroke: "#C5BAC4", label: { en: "Not explored", bn: "দেখা হয়নি" }, means: { en: "You haven't opened this chapter in IntelliHorizon.", bn: "ইন্টেলিহরাইজনে এই অধ্যায় এখনো খোলোনি।" } },
+  introduced: { fill: "#EDF1F2", stroke: "#5A6670", label: { en: "Introduced", bn: "পরিচিত" }, means: { en: "You've opened it, but haven't answered a question yet. Opening is not understanding.", bn: "খুলেছ, তবে এখনো কোনো প্রশ্নের উত্তর দাওনি। খোলা মানে বোঝা নয়।" } },
+  practising: { fill: "#EDF1F2", stroke: "#57707A", label: { en: "Practising", bn: "অনুশীলন চলছে" }, means: { en: "You've answered at least one question here.", bn: "এখানে অন্তত একটি প্রশ্নের উত্তর দিয়েছ।" } },
   developing: { fill: "#F3B23E", stroke: "#9A6410", label: { en: "Developing", bn: "এগোচ্ছে" }, means: { en: "3 or more different questions, and 60% or more of your recent answers right.", bn: "৩ বা বেশি ভিন্ন প্রশ্ন, আর সাম্প্রতিক উত্তরের ৬০% বা বেশি সঠিক।" } },
-  demonstrated: { fill: "#0D8A6E", stroke: "#0D8A6E", label: { en: "Demonstrated", bn: "প্রমাণিত" }, means: { en: "5 different questions right, a due revision right, and 70% or more recently.", bn: "৫টি ভিন্ন প্রশ্ন সঠিক, একটি পুনরালোচনা সঠিক, আর সাম্প্রতিক ৭০% বা বেশি।" } },
-  needs_revision: { fill: "#FCE9F2", stroke: "#C4407F", label: { en: "Needs revision", bn: "পুনরালোচনা দরকার" }, means: { en: "Questions from this chapter are due back in your revision queue.", bn: "এই অধ্যায়ের প্রশ্ন তোমার পুনরালোচনায় ফিরে এসেছে।" } },
+  demonstrated: { fill: "#0D7A62", stroke: "#0D7A62", label: { en: "Demonstrated", bn: "প্রমাণিত" }, means: { en: "5 different questions right, a due revision right, and 70% or more recently.", bn: "৫টি ভিন্ন প্রশ্ন সঠিক, একটি পুনরালোচনা সঠিক, আর সাম্প্রতিক ৭০% বা বেশি।" } },
+  needs_revision: { fill: "#FCE7F3", stroke: "#B0386F", label: { en: "Needs revision", bn: "পুনরালোচনা দরকার" }, means: { en: "Questions from this chapter are due back in your revision queue.", bn: "এই অধ্যায়ের প্রশ্ন তোমার পুনরালোচনায় ফিরে এসেছে।" } },
 };
 
 function KnowledgeMap() {
@@ -213,7 +213,7 @@ function ChapterPath({
       <path
         d={pos.map((p, i) => `${i ? "L" : "M"}${p.x} ${p.y}`).join(" ")}
         fill="none"
-        stroke="#D3CCE3"
+        stroke="#C5BAC4"
         strokeWidth="2.5"
         strokeDasharray="6 6"
       />
@@ -242,7 +242,7 @@ function ChapterPath({
               cy={y}
               r={on ? 24 : 21}
               fill={n.fill}
-              stroke={on ? "#1D1B2C" : n.stroke}
+              stroke={on ? "#191D23" : n.stroke}
               strokeWidth={on ? 3 : 2.5}
             />
             <text
@@ -251,13 +251,13 @@ function ChapterPath({
               textAnchor="middle"
               fontSize="17"
               fontWeight="700"
-              fill={c.status === "demonstrated" ? "#fff" : "#1D1B2C"}
+              fill={c.status === "demonstrated" ? "#fff" : "#191D23"}
               fontFamily="Figtree, system-ui"
             >
               {c.position}
             </text>
             {c.questions > 0 && (
-              <circle cx={x + 16} cy={y - 16} r="7" fill="#5B3FD6" stroke="#fff" strokeWidth="2" />
+              <circle cx={x + 16} cy={y - 16} r="7" fill="#57707A" stroke="#fff" strokeWidth="2" />
             )}
           </g>
         );

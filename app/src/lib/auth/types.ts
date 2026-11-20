@@ -20,6 +20,6 @@ export type AccountSummary = {
   explainLang: "en" | "bn" | null;
   goals: string[];
   role: "student" | "admin";
-  /** An isolated judge-demo workspace (expires; cannot change credentials or become admin). */
-  demo: { expiresAt: string } | null;
+  /** An isolated judge-demo workspace (never expires; cannot change credentials or become admin). */
+  demo: Record<string, never> | null;
 };

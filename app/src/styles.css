@@ -112,74 +112,88 @@
   }
 }
 
-/* ───────────── IntelliHorizon design system (website brand, no Quanta) ─────────────
- * Violet anchors the product. Warm white is the ground; lavender is the secondary surface.
- * Mint means progress, amber means achievement, soft pink is a rare highlight, coral-red means "try again".
- * Legacy names (night/cloth/thread/paper/sheet/ink) are kept as aliases so older screens follow the same system. */
+/* ───────────── IntelliHorizon design system (one theme for the homepage and the whole app) ─────────────
+ * Palette from the Phase 5 brief: night #191D23, slate #57707A, mist #7B919C, haze #989DAA, mauve #C5BAC4,
+ * fog #DEDCDC, blush #FCE7F3, rose #F9A8D4. Slate anchors actions; blush and rose are highlights; night is text.
+ * Text shades are darker steps of slate, chosen so every text colour is at least 4.5:1 on every light surface:
+ *   ink #191D23 (16.9:1 on white) · ink-mid #465C65 (7.1:1, 6.0:1 on blush) · ink-low #5A6670 (5.9:1, 5.0:1 on blush)
+ *   brand #57707A: white label 5.2:1; as text 5.2:1 on white, 4.6:1 on mist.
+ * Meaning colours stay: green = progress/right, amber = achievement, red = try again (all ≥ 4.5:1 on their tints).
+ * Legacy names (night/cloth/thread/paper/sheet/ink/lilac) are kept as aliases so every screen follows one system. */
 @theme {
-  --font-display: "Bricolage Grotesque", "Hind Siliguri", system-ui, sans-serif;
-  --font-body: "Figtree", "Hind Siliguri", system-ui, sans-serif;
+  --font-display: "Montserrat", "Hind Siliguri", system-ui, sans-serif;
+  --font-body: "Open Sans", "Hind Siliguri", system-ui, sans-serif;
+  --font-editorial: "Playfair Display", "Hind Siliguri", Georgia, serif;
 
-  --color-canvas: #fbfaf8;
+  --color-canvas: #f7f6f6;
   --color-sheet: #ffffff;
-  --color-lilac: #f4f1fc;
-  --color-lilac-2: #ebe5fb;
-  --color-line: #e7e3ef;
-  --color-line-strong: #d3cce3;
-  --color-ink: #1d1b2c;
-  --color-ink-mid: #4a4664;
-  --color-ink-low: #6c6886;
-  --color-brand: #5b3fd6;
-  --color-brand-deep: #4329b2;
-  --color-brand-soft: #eee9fe;
-  --color-mint: #0d8a6e;
-  --color-mint-soft: #e2f5ef;
-  --color-amber: #9a6410;
+  --color-lilac: #edf1f2;
+  --color-lilac-2: #e2e8ea;
+  --color-line: #dedcdc;
+  --color-line-strong: #c5bac4;
+  --color-ink: #191d23;
+  --color-ink-mid: #465c65;
+  --color-ink-low: #5a6670;
+  --color-brand: #57707a;
+  --color-brand-deep: #3f535b;
+  --color-brand-soft: #edf1f2;
+  --color-mint: #0d7a62;
+  --color-mint-soft: #e3f2ee;
+  --color-amber: #8a5a0e;
   --color-amber-fill: #f3b23e;
-  --color-amber-soft: #fdf2db;
-  --color-pink: #c4407f;
-  --color-pink-soft: #fce9f2;
-  --color-again: #bf3b2b;
+  --color-amber-soft: #fcf1dc;
+  --color-pink: #b0386f;
+  --color-pink-soft: #fce7f3;
+  --color-again: #b43a2e;
   --color-again-soft: #fbe9e6;
+  --color-blush: #fce7f3;
+  --color-rose: #f9a8d4;
+  --color-mist: #7b919c;
+  --color-haze: #989daa;
+  --color-mauve: #c5bac4;
+  --color-fog: #dedcdc;
+  --color-night: #191d23;
+  --color-night-soft: #20252d;
 
   /* Legacy aliases */
-  --color-night-0: #fbfaf8;
-  --color-night-1: #f4f1fc;
-  --color-night-2: #ebe5fb;
-  --color-stitch: #d3cce3;
-  --color-cloth: #1d1b2c;
-  --color-cloth-mid: #4a4664;
-  --color-cloth-low: #6c6886;
-  --color-paper: #f4f1fc;
-  --color-thread: #5b3fd6;
-  --color-thread-deep: #4329b2;
-  --color-right: #0d8a6e;
+  --color-night-0: #f7f6f6;
+  --color-night-1: #edf1f2;
+  --color-night-2: #e2e8ea;
+  --color-stitch: #c5bac4;
+  --color-cloth: #191d23;
+  --color-cloth-mid: #465c65;
+  --color-cloth-low: #5a6670;
+  --color-paper: #edf1f2;
+  --color-thread: #57707a;
+  --color-thread-deep: #3f535b;
+  --color-right: #0d7a62;
 
   --radius-panel: 24px;
   --radius-item: 14px;
   --radius-chip: 10px;
-  --shadow-lift: 0 1px 2px rgba(29, 27, 44, 0.05), 0 18px 40px -24px rgba(67, 41, 178, 0.35);
-  --shadow-quiet: 0 1px 2px rgba(29, 27, 44, 0.05);
+  --shadow-lift: 0 1px 2px rgba(25, 29, 35, 0.06), 0 18px 40px -24px rgba(25, 29, 35, 0.4);
+  --shadow-quiet: 0 1px 2px rgba(25, 29, 35, 0.06);
   --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @layer base {
   html {
-    background-color: #fbfaf8;
-    color: #1d1b2c;
+    background-color: #f7f6f6;
+    color: #191d23;
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
   }
   body {
     min-height: 100dvh;
-    background-color: #fbfaf8;
-    color: #1d1b2c;
+    background-color: #f7f6f6;
+    color: #191d23;
     font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  .font-display { letter-spacing: -0.02em; }
   [lang="bn"] { line-height: 1.75; }
   [lang="bn"] .font-display,
   .font-display:lang(bn) {
@@ -188,14 +202,14 @@
     font-weight: 700;
   }
   :focus-visible {
-    outline: 3px solid #5b3fd6;
+    outline: 3px solid #57707a;
     outline-offset: 2px;
     border-radius: 8px;
   }
   .theme-paper, .theme-night {
     color-scheme: light;
-    background-color: #fbfaf8;
-    color: #1d1b2c;
+    background-color: #f7f6f6;
+    color: #191d23;
   }
   .tnum { font-variant-numeric: tabular-nums; }
   /* Mathematical notation reads as its own voice. */
@@ -240,3 +254,23 @@ html[data-text="larger"] { font-size: 125%; }
   * { scroll-behavior: auto !important; transition-duration: 1ms !important; }
 }
 html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-motion="reduce"] *::after { animation: none !important; transition-duration: 1ms !important; }
+
+/* App bars share the homepage's dark navigation. The theme colours are remapped inside the bar only, so every link,
+ * chip, menu and switch in it follows without separate dark styles. Measured on night #191D23: white 16.9:1,
+ * fog #DEDCDC 12.4:1, haze #989DAA 6.2:1; selected items are night on rose #F9A8D4 (9.3:1); slate buttons keep a
+ * white label (5.2:1). Menus that open from the bar use the raised night surface #20252D. */
+.ih-appbar {
+  --color-canvas: #191d23;
+  --color-sheet: #20252d;
+  --color-ink: #ffffff;
+  --color-ink-mid: #dedcdc;
+  --color-ink-low: #989daa;
+  --color-lilac: rgba(222, 220, 220, 0.1);
+  --color-line: rgba(222, 220, 220, 0.16);
+  --color-brand-soft: #f9a8d4;
+  --color-brand-deep: #191d23;
+  color: #ffffff;
+  color-scheme: dark;
+}
+.ih-appbar :focus-visible { outline-color: #f9a8d4; }
+

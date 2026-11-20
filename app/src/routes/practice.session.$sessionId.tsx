@@ -482,7 +482,7 @@ function Celebrate({
   return (
     <section aria-labelledby="cel-h" className="edu-rise space-y-5">
       <Panel tone="lift" className="overflow-hidden">
-        <div className="bg-[linear-gradient(135deg,#5b3fd6_0%,#7a5cf0_55%,#c4407f_130%)] p-6 text-white md:p-8">
+        <div className="bg-[linear-gradient(135deg,#57707A_0%,#7a5cf0_55%,#B0386F_130%)] p-6 text-white md:p-8">
           <p className="text-[15px] font-semibold text-white/85" lang={language}>
             {chapterTitle}
           </p>

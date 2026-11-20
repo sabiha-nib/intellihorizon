@@ -47,6 +47,16 @@ await pa.getByLabel("Owner code or admin token").fill("local-test-admin-token-01
 await pa.getByRole("button", { name: "Unlock admin for this account" }).click();
 await pa.getByRole("tab", { name: "AI providers" }).click();
 await pa.getByTestId("provider-eval").waitFor({ timeout: 15000 });
+
+// Provider status: integrated -> configured -> tested OK / unavailable, from a real call to each (here: the doubles).
+const states = async () => (await pa.locator("[data-provider-state]").evaluateAll((els) => els.map((e) => e.getAttribute("data-provider-state")))).join(" ");
+check("before a test, configured providers are not called working", (await states()) === "anthropic:configured gemini:configured openai:configured", await states());
+await fetch(`${MOCK}/__pmode`, { method: "POST", body: JSON.stringify({ anthropic: "ok", gemini: "fail", openai: "ok" }) });
+await pa.getByRole("button", { name: /Test connections/ }).click();
+await pa.waitForFunction(() => document.querySelectorAll('[data-provider-state$=":tested"], [data-provider-state$=":unavailable"]').length === 3, null, { timeout: 30000 });
+check("a provider whose real request succeeds is 'Tested OK'; one that fails is 'Unavailable' with the reason", (await states()) === "anthropic:tested gemini:unavailable openai:tested" && /Last real request failed: provider_error/.test(await pa.getByTestId("provider-connections").innerText()), await states());
+check("the connection test shows no key", !/test-(anthropic|gemini|openai)-key|sk-/.test(await pa.content()));
+await fetch(`${MOCK}/__pmode`, { method: "POST", body: JSON.stringify({ anthropic: "ok", gemini: "ok", openai: "ok" }) });
 const labels = await pa.getByTestId("provider-eval").locator("fieldset label").allTextContents();
 check("eight configurations offered with three providers configured", labels.length === 8, labels.join(" | "));
 check("every configuration is labelled as a local test double", labels.every((l) => l.includes("local test double")), labels.join(" | "));

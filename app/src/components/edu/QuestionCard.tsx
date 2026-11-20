@@ -9,13 +9,13 @@ import { ConfidenceDial, IgniteButton, ReadAloud, SourceTag } from "./ui";
 export type Answer = { optionId: string; correct: boolean; misconception: string | null; confidence: 1 | 2 | 3 };
 
 function MiniGraph({ lines }: { lines: NonNullable<Option["graph"]> }) {
-  const colors = ["#E8644A", "#1D1B2C"];
+  const colors = ["#E8644A", "#191D23"];
   return (
     <svg viewBox="-14 -8 128 120" className="h-24 w-28 shrink-0" aria-hidden="true">
-      <line x1="0" y1="100" x2="104" y2="100" stroke="#6C6886" strokeWidth="1.5" />
-      <line x1="0" y1="100" x2="0" y2="-4" stroke="#6C6886" strokeWidth="1.5" />
-      <text x="104" y="112" fontSize="10" textAnchor="end" fill="#4A4664">t</text>
-      <text x="-10" y="4" fontSize="10" fill="#4A4664">v</text>
+      <line x1="0" y1="100" x2="104" y2="100" stroke="#5A6670" strokeWidth="1.5" />
+      <line x1="0" y1="100" x2="0" y2="-4" stroke="#5A6670" strokeWidth="1.5" />
+      <text x="104" y="112" fontSize="10" textAnchor="end" fill="#465C65">t</text>
+      <text x="-10" y="4" fontSize="10" fill="#465C65">v</text>
       {lines.map((l, i) => (
         <g key={i}>
           <polyline points={l.pts.map(([x, y]) => `${x},${100 - y}`).join(" ")} fill="none" stroke={colors[i % 2]} strokeWidth={i === 0 ? 4 : 2} strokeDasharray={i === 1 ? "5 3" : undefined} opacity={0.9} />
@@ -35,11 +35,11 @@ function NumberLine({ options, lang }: { options: Option[]; lang: Lang }) {
   const bn = ["ক", "খ", "গ", "ঘ"];
   return (
     <svg viewBox="0 0 400 70" className="mt-4 w-full max-w-md" role="img" aria-label="Number line from 0 to 2">
-      <line x1="10" y1="40" x2="390" y2="40" stroke="#1D1B2C" strokeWidth="2" />
+      <line x1="10" y1="40" x2="390" y2="40" stroke="#191D23" strokeWidth="2" />
       {[0, 0.5, 1, 1.5, 2].map((v) => (
         <g key={v}>
-          <line x1={x(v)} y1={34} x2={x(v)} y2={46} stroke="#1D1B2C" strokeWidth={v % 1 === 0 ? 2 : 1} />
-          <text x={x(v)} y={64} fontSize="12" textAnchor="middle" fill="#4A4664">
+          <line x1={x(v)} y1={34} x2={x(v)} y2={46} stroke="#191D23" strokeWidth={v % 1 === 0 ? 2 : 1} />
+          <text x={x(v)} y={64} fontSize="12" textAnchor="middle" fill="#465C65">
             {v === 0.5 ? "1/2" : v === 1.5 ? "3/2" : String(v)}
           </text>
         </g>
@@ -47,8 +47,8 @@ function NumberLine({ options, lang }: { options: Option[]; lang: Lang }) {
       {options.map((o, i) =>
         o.mark === undefined ? null : (
           <g key={o.id}>
-            <circle cx={x(o.mark)} cy={40} r={6} fill="#5B3FD6" stroke="#1D1B2C" strokeWidth={1.5} />
-            <text x={x(o.mark)} y={22} fontSize="13" fontWeight={700} textAnchor="middle" fill="#1D1B2C">
+            <circle cx={x(o.mark)} cy={40} r={6} fill="#57707A" stroke="#191D23" strokeWidth={1.5} />
+            <text x={x(o.mark)} y={22} fontSize="13" fontWeight={700} textAnchor="middle" fill="#191D23">
               {lang === "bn" ? bn[i] : String.fromCharCode(65 + i)}
             </text>
           </g>

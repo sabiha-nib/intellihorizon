@@ -375,7 +375,7 @@ export function MessageList({ messages, onAppend, pending, readOnly, onAskDiffer
         ) : (
           <li key={m.id} className="edu-rise flex gap-3">
             <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-night-0" aria-hidden="true">
-              <svg width="16" height="16" viewBox="-8 -8 16 16"><path d="M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z" fill="#5B3FD6" /></svg>
+              <svg width="16" height="16" viewBox="-8 -8 16 16"><path d="M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z" fill="#57707A" /></svg>
             </span>
             <div className="min-w-0 flex-1 rounded-[20px] rounded-tl-[6px] bg-paper/70 p-4">{m.payload ? <TutorBubble m={m} onAppend={onAppend} readOnly={readOnly} onAskDifferently={onAskDifferently && !pending && questionFor(i) ? (style) => onAskDifferently(questionFor(i)!, style) : undefined} onAskInSubject={onAskInSubject && !pending && questionFor(i) ? (sid) => onAskInSubject(questionFor(i)!, sid) : undefined} /> : null}</div>
           </li>

@@ -41,7 +41,7 @@ export async function accountSummary(userId: string): Promise<AccountSummary | n
     explainLang: r.explain_lang === "bn" || r.explain_lang === "en" ? r.explain_lang : null,
     goals: (() => { try { const g = JSON.parse(r.goals ?? "[]"); return Array.isArray(g) ? g.filter((x) => typeof x === "string") : []; } catch { return []; } })(),
     role: !r.is_demo && r.role === "admin" ? "admin" : "student",
-    demo: r.is_demo ? { expiresAt: r.demo_expires_at ?? "" } : null,
+    demo: r.is_demo ? {} : null,
   };
 }
 

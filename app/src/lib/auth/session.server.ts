@@ -30,12 +30,13 @@ async function userFromToken(token: string | null | undefined): Promise<SessionU
   if (!row) return null;
   const t = now();
   const demo = !!row.is_demo;
-  // A judge-demo workspace ends at its fixed expiry; its session is never extended.
-  if (row.expires_at <= t || (demo && (!row.demo_expires_at || Date.parse(row.demo_expires_at) <= t * 1000))) {
+  // Judge-demo workspaces don't expire (Phase 6); like every account, only the session itself has an end, and it renews
+  // while in use. The owner ends judge access by rotating the password, ending judge sessions or turning access off.
+  if (row.expires_at <= t) {
     await DB.prepare("DELETE FROM sessions WHERE id_hash = ?").bind(hash).run();
     return null;
   }
-  if (!demo && row.expires_at - t < TTL / 2) {
+  if (row.expires_at - t < TTL / 2) {
     await DB.prepare("UPDATE sessions SET expires_at = ?, last_seen_at = ? WHERE id_hash = ?").bind(t + TTL, t, hash).run();
   }
   return { id: row.user_id, email: row.email, emailVerified: !!row.email_verified_at, pendingEmail: row.pending_email, sessionHash: hash, role: !demo && row.role === "admin" ? "admin" : "student", isDemo: demo };
@@ -110,9 +111,10 @@ export async function rateLimit(bucket: string, limit: number, windowSec: number
 export function appOrigin(): string {
   const fixed = bindings().APP_ORIGIN;
   if (fixed && /^https:\/\/[a-z0-9.-]+$/.test(fixed)) return fixed;
+  // Links in emails use APP_ORIGIN when it is set (set it to the production URL on any host). Otherwise the request's
+  // own origin, which on Cloudflare is always a hostname routed to this Worker. No host is hard-coded.
   const url = new URL(getRequest().url);
-  if (url.hostname.endsWith(".higgsfield.app") || url.hostname === "localhost" || url.hostname === "127.0.0.1") return url.origin;
-  return "https://educerro.higgsfield.app";
+  return url.protocol === "https:" || url.hostname === "localhost" || url.hostname === "127.0.0.1" ? url.origin : `https://${url.host}`;
 }
 
 /** Count-only check (no consumption). Pair with rateHit to count failures only. */

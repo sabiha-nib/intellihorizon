@@ -72,6 +72,7 @@ import { Route as LearnShareRouteImport } from './routes/learn.share'
 import { Route as LearnFallRouteImport } from './routes/learn.fall'
 import { Route as ChaptersChapterIdRouteImport } from './routes/chapters.$chapterId'
 import { Route as BooksBookIdRouteImport } from './routes/books.$bookId'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiAvatarRouteImport } from './routes/api/avatar'
 import { Route as PracticeSessionSessionIdRouteImport } from './routes/practice.session.$sessionId'
 import { Route as SubjectsSubjectIdChaptersChapterIdRouteImport } from './routes/subjects.$subjectId.chapters.$chapterId'
@@ -391,6 +392,11 @@ const BooksBookIdRoute = BooksBookIdRouteImport.update({
   path: '/books/$bookId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAvatarRoute = ApiAvatarRouteImport.update({
   id: '/api/avatar',
   path: '/api/avatar',
@@ -457,6 +463,7 @@ export interface FileRoutesByFullPath {
   '/twin': typeof TwinRoute
   '/verify-email': typeof VerifyEmailRoute
   '/api/avatar': typeof ApiAvatarRoute
+  '/api/health': typeof ApiHealthRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/chapters/$chapterId': typeof ChaptersChapterIdRoute
   '/learn/fall': typeof LearnFallRoute
@@ -525,6 +532,7 @@ export interface FileRoutesByTo {
   '/twin': typeof TwinRoute
   '/verify-email': typeof VerifyEmailRoute
   '/api/avatar': typeof ApiAvatarRoute
+  '/api/health': typeof ApiHealthRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/chapters/$chapterId': typeof ChaptersChapterIdRoute
   '/learn/fall': typeof LearnFallRoute
@@ -594,6 +602,7 @@ export interface FileRoutesById {
   '/twin': typeof TwinRoute
   '/verify-email': typeof VerifyEmailRoute
   '/api/avatar': typeof ApiAvatarRoute
+  '/api/health': typeof ApiHealthRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/chapters/$chapterId': typeof ChaptersChapterIdRoute
   '/learn/fall': typeof LearnFallRoute
@@ -664,6 +673,7 @@ export interface FileRouteTypes {
     | '/twin'
     | '/verify-email'
     | '/api/avatar'
+    | '/api/health'
     | '/books/$bookId'
     | '/chapters/$chapterId'
     | '/learn/fall'
@@ -732,6 +742,7 @@ export interface FileRouteTypes {
     | '/twin'
     | '/verify-email'
     | '/api/avatar'
+    | '/api/health'
     | '/books/$bookId'
     | '/chapters/$chapterId'
     | '/learn/fall'
@@ -800,6 +811,7 @@ export interface FileRouteTypes {
     | '/twin'
     | '/verify-email'
     | '/api/avatar'
+    | '/api/health'
     | '/books/$bookId'
     | '/chapters/$chapterId'
     | '/learn/fall'
@@ -869,6 +881,7 @@ export interface RootRouteChildren {
   TwinRoute: typeof TwinRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiAvatarRoute: typeof ApiAvatarRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   BooksBookIdRoute: typeof BooksBookIdRoute
   ChaptersChapterIdRoute: typeof ChaptersChapterIdRoute
   LearnFallRoute: typeof LearnFallRoute
@@ -1332,6 +1345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BooksBookIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/avatar': {
       id: '/api/avatar'
       path: '/api/avatar'
@@ -1416,6 +1436,7 @@ const rootRouteChildren: RootRouteChildren = {
   TwinRoute: TwinRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   ApiAvatarRoute: ApiAvatarRoute,
+  ApiHealthRoute: ApiHealthRoute,
   BooksBookIdRoute: BooksBookIdRoute,
   ChaptersChapterIdRoute: ChaptersChapterIdRoute,
   LearnFallRoute: LearnFallRoute,

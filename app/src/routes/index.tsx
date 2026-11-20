@@ -15,10 +15,6 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "IntelliHorizon: learning should understand you" },
       { property: "og:description", content: "A curriculum-grounded, bilingual AI tutor and learning ecosystem for NCTB Classes 6–10, Bangla Version and English Version." },
     ],
-    links: [
-      // Homepage typefaces only (the app keeps its own). Three families, the weights actually used, swap to avoid invisible text.
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600&family=Playfair+Display:ital,wght@1,500&display=swap" },
-    ],
   }),
   component: Landing,
 });

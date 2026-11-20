@@ -17,6 +17,7 @@ import { StudioAdmin } from "../components/admin/StudioAdmin";
 import { AiUsage } from "../components/admin/AiUsage";
 import { JudgeAdmin } from "../components/admin/JudgeAdmin";
 import { ProviderEval } from "../components/admin/ProviderEval";
+import { ProviderConnections } from "../components/admin/ProviderConnections";
 import { aiAdminStatus } from "../lib/api/review.functions";
 import { adminStatus, claimAdmin, importHistory, listBooks, previewPage, saveBook, setBookStatus, type AdminBook, type Row } from "../lib/api/admin.functions";
 import { SUBJECT_KEYS } from "../lib/curriculum/config";
@@ -128,7 +129,7 @@ function Admin() {
         {tab === "studio" && <section className={`${card} p-5`}><StudioAdmin /></section>}
         {tab === "review" && <section className={`${card} p-5`}><Review /></section>}
         {tab === "audit" && <section className={`${card} p-5`}><Audit /></section>}
-        {tab === "ai" && <><section className={`${card} p-5`}><AiUsage /></section><section className={`${card} mt-4 p-5`}><ProviderEval /></section></>}
+        {tab === "ai" && <><section className={`${card} mb-4 p-5`}><ProviderConnections /></section><section className={`${card} p-5`}><AiUsage /></section><section className={`${card} mt-4 p-5`}><ProviderEval /></section></>}
         {tab === "judge" && <section className={`${card} p-5`}><JudgeAdmin /></section>}
         {tab === "ocr" && (
           <section className={`${card} space-y-4 p-5`}>

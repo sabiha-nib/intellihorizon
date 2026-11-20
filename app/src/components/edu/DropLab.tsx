@@ -28,11 +28,11 @@ type Lane = { y: number; v: number; landed: number | null; trace: [number, numbe
 const fresh = (): Lane => ({ y: 0, v: 0, landed: null, trace: [[0, 0]] });
 
 function Shape({ id, x, y, t }: { id: ObjId; x: number; y: number; t: number }) {
-  if (id === "stone5") return <circle cx={x} cy={y - 16} r={16} fill="#6C6886" stroke="#1D1B2C" strokeWidth={1.5} />;
-  if (id === "stone1") return <circle cx={x} cy={y - 10} r={10} fill="#8E95B8" stroke="#1D1B2C" strokeWidth={1.5} />;
-  if (id === "ball") return <polygon points={`${x - 8},${y - 6} ${x - 3},${y - 15} ${x + 6},${y - 13} ${x + 9},${y - 4} ${x + 2},${y} ${x - 6},${y - 1}`} fill="#fff" stroke="#1D1B2C" strokeWidth={1.4} />;
-  if (id === "sheet") return <rect x={x - 22} y={y - 4} width={44} height={3} fill="#fff" stroke="#1D1B2C" strokeWidth={1.2} transform={`rotate(${Math.sin(t * 5) * 12} ${x} ${y})`} />;
-  return <path d={`M${x - 16} ${y - 4} Q${x} ${y - 14} ${x + 16} ${y - 6} Q${x} ${y - 2} ${x - 16} ${y - 4} Z M${x - 18} ${y - 3} L${x + 18} ${y - 7}`} fill="#1D1B2C" stroke="#8a5a37" strokeWidth={1.1} transform={`rotate(${Math.sin(t * 3) * 18} ${x} ${y})`} />;
+  if (id === "stone5") return <circle cx={x} cy={y - 16} r={16} fill="#5A6670" stroke="#191D23" strokeWidth={1.5} />;
+  if (id === "stone1") return <circle cx={x} cy={y - 10} r={10} fill="#8E95B8" stroke="#191D23" strokeWidth={1.5} />;
+  if (id === "ball") return <polygon points={`${x - 8},${y - 6} ${x - 3},${y - 15} ${x + 6},${y - 13} ${x + 9},${y - 4} ${x + 2},${y} ${x - 6},${y - 1}`} fill="#fff" stroke="#191D23" strokeWidth={1.4} />;
+  if (id === "sheet") return <rect x={x - 22} y={y - 4} width={44} height={3} fill="#fff" stroke="#191D23" strokeWidth={1.2} transform={`rotate(${Math.sin(t * 5) * 12} ${x} ${y})`} />;
+  return <path d={`M${x - 16} ${y - 4} Q${x} ${y - 14} ${x + 16} ${y - 6} Q${x} ${y - 2} ${x - 16} ${y - 4} Z M${x - 18} ${y - 3} L${x + 18} ${y - 7}`} fill="#191D23" stroke="#8a5a37" strokeWidth={1.1} transform={`rotate(${Math.sin(t * 3) * 18} ${x} ${y})`} />;
 }
 
 export function DropLab() {
@@ -134,23 +134,23 @@ export function DropLab() {
       <div className="mt-5 grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
         <div>
           <svg viewBox="0 0 360 400" className="w-full rounded-[14px] bg-paper" role="img" aria-label={tx("Two objects falling side by side", "পাশাপাশি দুটি বস্তু পড়ছে")}>
-            {env !== "air" && <rect x="40" y="20" width="280" height="356" rx="14" fill="none" stroke="#4A4664" strokeDasharray="6 5" />}
-            <line x1="20" y1={GROUND + 1} x2="340" y2={GROUND + 1} stroke="#1D1B2C" strokeWidth="3" />
+            {env !== "air" && <rect x="40" y="20" width="280" height="356" rx="14" fill="none" stroke="#465C65" strokeDasharray="6 5" />}
+            <line x1="20" y1={GROUND + 1} x2="340" y2={GROUND + 1} stroke="#191D23" strokeWidth="3" />
             {[0, 1, 2, 3, 4, 5].map((m) => (
               <g key={m}>
-                <line x1="22" x2="30" y1={TOP + m * PPM} y2={TOP + m * PPM} stroke="#6C6886" />
-                <text x="34" y={TOP + m * PPM + 4} fontSize="10" fill="#6C6886">{m} m</text>
+                <line x1="22" x2="30" y1={TOP + m * PPM} y2={TOP + m * PPM} stroke="#5A6670" />
+                <text x="34" y={TOP + m * PPM + 4} fontSize="10" fill="#5A6670">{m} m</text>
               </g>
             ))}
             {lanes.map((L, k) => (
               <g key={k}>
                 <Shape id={ids[k]} x={k === 0 ? 130 : 250} y={TOP + L.y * PPM} t={time} />
-                <text x={k === 0 ? 130 : 250} y={392} fontSize="11" textAnchor="middle" fill="#1D1B2C" fontWeight={600}>
+                <text x={k === 0 ? 130 : 250} y={392} fontSize="11" textAnchor="middle" fill="#191D23" fontWeight={600}>
                   {t(OBJ[ids[k]].label)}
                 </text>
               </g>
             ))}
-            <text x="340" y="34" fontSize="12" textAnchor="end" fill="#4A4664">{t(ENV[env].label)}</text>
+            <text x="340" y="34" fontSize="12" textAnchor="end" fill="#465C65">{t(ENV[env].label)}</text>
           </svg>
         </div>
         <div className="space-y-4">
@@ -175,7 +175,7 @@ export function DropLab() {
             </label>
           ))}
           <label className="flex items-center gap-2 text-sm font-semibold text-ink-mid">
-            <input type="checkbox" checked={slow} onChange={(e) => setSlow(e.target.checked)} className="h-4 w-4 accent-[#1D1B2C]" />
+            <input type="checkbox" checked={slow} onChange={(e) => setSlow(e.target.checked)} className="h-4 w-4 accent-[#191D23]" />
             {tx("Slow motion (quarter speed)", "ধীর গতি (চার ভাগের এক)")}
           </label>
           <IgniteButton onClick={run} disabled={running} wide>
@@ -194,12 +194,12 @@ export function DropLab() {
       <div className="mt-5">
         <p className="text-sm font-semibold text-ink-mid">{tx("Speed over time", "সময়ের সাথে বেগ")}</p>
         <svg viewBox="0 0 360 150" className="mt-2 w-full max-w-xl" role="img" aria-label={tx("Live speed-time graph", "সরাসরি বেগ-সময় লেখচিত্র")}>
-          <line x1="30" y1="130" x2="350" y2="130" stroke="#6C6886" />
-          <line x1="30" y1="130" x2="30" y2="8" stroke="#6C6886" />
-          <text x="350" y="146" fontSize="10" textAnchor="end" fill="#4A4664">{tx("time (s)", "সময় (সে)")}</text>
-          <text x="2" y="14" fontSize="10" fill="#4A4664">{tx("m/s", "মি/সে")}</text>
+          <line x1="30" y1="130" x2="350" y2="130" stroke="#5A6670" />
+          <line x1="30" y1="130" x2="30" y2="8" stroke="#5A6670" />
+          <text x="350" y="146" fontSize="10" textAnchor="end" fill="#465C65">{tx("time (s)", "সময় (সে)")}</text>
+          <text x="2" y="14" fontSize="10" fill="#465C65">{tx("m/s", "মি/সে")}</text>
           {lanes.map((L, k) => (
-            <polyline key={k} points={L.trace.map(([tt, v]) => `${30 + (tt / tMax) * 320},${130 - (v / vMax) * 118}`).join(" ")} fill="none" stroke={k === 0 ? "#E8644A" : "#1D1B2C"} strokeWidth={k === 0 ? 4 : 2} strokeDasharray={k === 1 ? "6 4" : undefined} />
+            <polyline key={k} points={L.trace.map(([tt, v]) => `${30 + (tt / tMax) * 320},${130 - (v / vMax) * 118}`).join(" ")} fill="none" stroke={k === 0 ? "#E8644A" : "#191D23"} strokeWidth={k === 0 ? 4 : 2} strokeDasharray={k === 1 ? "6 4" : undefined} />
           ))}
         </svg>
       </div>

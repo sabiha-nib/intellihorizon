@@ -303,7 +303,7 @@ function SignUp() {
             />
             <div>
               <label className="flex items-start gap-3 rounded-[14px] border border-ink-low/30 bg-sheet p-4">
-                <input type="checkbox" checked={form.acceptPrivacy} onChange={(e) => set("acceptPrivacy", e.target.checked)} aria-invalid={!!show("acceptPrivacy")} className="mt-1 h-5 w-5 shrink-0 accent-[#1D1B2C]" />
+                <input type="checkbox" checked={form.acceptPrivacy} onChange={(e) => set("acceptPrivacy", e.target.checked)} aria-invalid={!!show("acceptPrivacy")} className="mt-1 h-5 w-5 shrink-0 accent-[#191D23]" />
                 <span className="text-[15px] leading-relaxed">
                   {tx("I've read ", "আমি পড়েছি ")}
                   <Link to="/privacy" target="_blank" className="font-semibold underline decoration-dashed underline-offset-4">{tx("how IntelliHorizon looks after my information", "ইন্টেলিহরাইজন কীভাবে আমার তথ্য রাখে")}</Link>

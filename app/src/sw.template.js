@@ -3,15 +3,21 @@
  * - Pages: network-first. Only pages the server marks cacheable are stored, and the server marks every page
  *   rendered for a signed-in student "private, no-store", so no student's data is ever kept here.
  * - Server functions and API calls are never cached.
- * - Updates: a new worker waits until the page asks it to take over (the app shows "Update ready").
+ * - Updates: every build has its own version; a new worker takes over at once and removes the old caches.
  */
-const VERSION = "ih-2026-11-14";
+// Replaced at build time with a hash of this build's assets (vite.config.ts), so every deploy installs a new worker
+// and its "activate" step deletes the previous version's caches. Never edit by hand.
+const VERSION = "__IH_BUILD__";
 const PAGES = `pages-${VERSION}`;
 const STATIC = `static-${VERSION}`;
 const PRECACHE = ["/offline", "/manifest.webmanifest", "/favicon.svg", "/icon-192.png", "/icon-512.png"];
 const PUBLIC_PAGES = ["/", "/help", "/privacy"];
 
 self.addEventListener("install", (e) => {
+  // Take over as soon as this build's caches are ready: pages are network-first and assets are content-hashed, so
+  // switching mid-session is safe, and "activate" then deletes the previous build's caches (including any old copy of
+  // a public page). The page is never reloaded by this; a reload happens only when the student asks for one.
+  self.skipWaiting();
   e.waitUntil((async () => {
     const s = await caches.open(STATIC);
     await s.addAll(PRECACHE);

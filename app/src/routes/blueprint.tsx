@@ -109,7 +109,7 @@ function Blueprint() {
             ))}
           </div>
           <label className="mt-4 flex items-center gap-2 text-sm text-cloth-mid">
-            <input type="checkbox" checked={liveOnly} onChange={(e) => setLiveOnly(e.target.checked)} className="h-4 w-4 accent-[#5B3FD6]" />
+            <input type="checkbox" checked={liveOnly} onChange={(e) => setLiveOnly(e.target.checked)} className="h-4 w-4 accent-[#57707A]" />
             Show only features running now
           </label>
           <ul className="mt-5 divide-y divide-dashed divide-stitch border-y border-dashed border-stitch">

@@ -9,6 +9,8 @@ import svgr from "vite-plugin-svgr";
 import { defineConfig, type Plugin } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 
 // The vendored @higgsfield/quanta components import their glyphs from the private
 // Nexus-only `@higgsfield-ai/icons`. Generated sites build on the PUBLIC npm
@@ -31,6 +33,11 @@ function swAssetList(): Plugin {
         .filter((f) => /\.(js|css)$/.test(f) && !/pdf|admin|worker|design-inspector/i.test(f))
         .sort();
       this.emitFile({ type: "asset", fileName: "sw-assets.json", source: JSON.stringify(files) });
+      // The service worker is generated per build: its version is a hash of this build's file names (content-hashed),
+      // so a deploy always changes sw.js, browsers install the new worker, and old page/asset caches are removed.
+      const build = createHash("sha256").update(Object.keys(bundle).sort().join("\n")).digest("hex").slice(0, 12);
+      const template = readFileSync(fileURLToPath(new URL("./src/sw.template.js", import.meta.url)), "utf8");
+      this.emitFile({ type: "asset", fileName: "sw.js", source: template.replace("__IH_BUILD__", `ih-${build}`) });
     },
   };
 }

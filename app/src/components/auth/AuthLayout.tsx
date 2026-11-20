@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 import { useLearner } from "../../lib/store";
-import { LangToggle, Monogram, StarGlyph } from "../edu/ui";
+import { LangToggle, Monogram } from "../edu/ui";
 
 const STARS: [number, number, number, "holding" | "shapeshifter" | "fragile" | "glimpsed"][] = [
   [70, 90, 9, "shapeshifter"], [150, 60, 6, "holding"], [210, 120, 7, "fragile"], [120, 170, 6, "holding"], [260, 70, 5, "glimpsed"], [300, 160, 8, "shapeshifter"], [40, 200, 5, "glimpsed"],
@@ -13,21 +13,29 @@ export function AuthLayout({ title, subtitle, children, aside }: { title: string
   const { lang, tx } = useLearner();
   return (
     <div className="theme-paper min-h-dvh lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]" lang={lang}>
-      <aside className="theme-night relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-12" aria-hidden="true">
+      <aside
+        className="ih-appbar relative hidden overflow-hidden text-ink lg:flex lg:flex-col lg:justify-between lg:p-12"
+        // The homepage hero's night sky: a rose horizon glow over night #191D23 (text on it is white / fog).
+        style={{ background: "radial-gradient(120% 70% at 50% 108%, rgba(249,168,212,0.42) 0%, rgba(197,186,196,0.16) 30%, rgba(87,112,122,0.1) 48%, rgba(25,29,35,0) 66%), #191D23" }}
+        aria-hidden="true"
+      >
         <Link to="/" className="flex items-center gap-2" tabIndex={-1}>
           <Monogram />
           <span className="font-display text-xl font-bold tracking-tight" lang="en">IntelliHorizon</span>
         </Link>
         <svg viewBox="0 0 340 240" className="w-full max-w-md">
-          <polyline points="70,90 150,60 210,120 120,170 70,90" fill="none" stroke="#5B3FD6" strokeOpacity=".55" strokeWidth="1.4" strokeDasharray="5 5" />
-          <polyline points="210,120 260,70 300,160" fill="none" stroke="#D3CCE3" strokeWidth="1.4" strokeDasharray="5 5" />
+          <polyline points="70,90 150,60 210,120 120,170 70,90" fill="none" stroke="#DEDCDC" strokeOpacity=".45" strokeWidth="1.4" strokeDasharray="5 5" />
+          <polyline points="210,120 260,70 300,160" fill="none" stroke="#F9A8D4" strokeOpacity=".7" strokeWidth="1.4" strokeDasharray="5 5" />
           {STARS.map(([x, y, r, g], i) => (
-            <g key={i} transform={`translate(${x} ${y})`}><StarGlyph glow={g} r={r} /></g>
+            <g key={i} transform={`translate(${x} ${y})`}>
+              {g !== "unexplored" && g !== "glimpsed" && <circle r={r * 1.9} fill="#F9A8D4" opacity={0.14} />}
+              <path d={`M0 ${-r} L${r * 0.28} ${-r * 0.28} L${r} 0 L${r * 0.28} ${r * 0.28} L0 ${r} L${-r * 0.28} ${r * 0.28} L${-r} 0 L${-r * 0.28} ${-r * 0.28} Z`} fill={g === "unexplored" || g === "glimpsed" ? "#989DAA" : "#F9A8D4"} />
+            </g>
           ))}
         </svg>
         <div>
           <p className="font-display max-w-sm text-3xl font-bold leading-tight tracking-tight">{aside?.title ?? tx("Your learning universe starts here.", "তোমার শেখার মহাবিশ্ব শুরু এখানেই।")}</p>
-          <p className="mt-3 max-w-sm leading-relaxed text-cloth-mid">{aside?.body ?? tx("One account keeps your sky with you on any phone or computer. Your details stay private by default.", "একটি অ্যাকাউন্টে যেকোনো ফোন বা কম্পিউটারে তোমার আকাশ তোমার সাথে থাকে। তোমার তথ্য শুরু থেকেই গোপন থাকে।")}</p>
+          <p className="mt-3 max-w-sm leading-relaxed text-ink-mid">{aside?.body ?? tx("One account keeps your sky with you on any phone or computer. Your details stay private by default.", "একটি অ্যাকাউন্টে যেকোনো ফোন বা কম্পিউটারে তোমার আকাশ তোমার সাথে থাকে। তোমার তথ্য শুরু থেকেই গোপন থাকে।")}</p>
         </div>
       </aside>
       <div className="flex min-h-dvh flex-col">

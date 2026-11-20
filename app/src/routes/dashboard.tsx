@@ -101,7 +101,7 @@ function Dashboard() {
   return (
     <Frame>
       <div className="space-y-10">
-        {account?.demo && <JudgeWelcome expiresAt={account.demo.expiresAt} />}
+        {account?.demo && <JudgeWelcome />}
         {/* A + B: welcome and continue learning */}
         <section
           aria-labelledby="hello-h"

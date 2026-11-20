@@ -76,9 +76,10 @@ export function Icon({
 export function Mark({ size = 30 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="-16 -16 32 32" aria-hidden="true">
-      <circle r="14" fill="none" stroke="#5B3FD6" strokeWidth="1.8" strokeDasharray="3.2 2.6" />
-      <path d="M0 -9 L2.4 -2.4 L9 0 L2.4 2.4 L0 9 L-2.4 2.4 L-9 0 L-2.4 -2.4 Z" fill="#5B3FD6" />
-      <circle cx="9.9" cy="-9.9" r="2.2" fill="#F3B23E" />
+      {/* Drawn in the surrounding text colour: white on the dark app bar, night on light pages. */}
+      <circle r="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeDasharray="3.2 2.6" />
+      <path d="M0 -9 L2.4 -2.4 L9 0 L2.4 2.4 L0 9 L-2.4 2.4 L-9 0 L-2.4 -2.4 Z" fill="currentColor" />
+      <circle cx="9.9" cy="-9.9" r="2.2" fill="#F9A8D4" />
     </svg>
   );
 }

@@ -15,6 +15,7 @@ http.createServer((req, res) => {
 }).on("clientError", () => {}).listen(8791, "127.0.0.1");
 
 function kindOf(system, user) {
+  if (system.includes("You are a connectivity check")) return "ping";
   if (system.includes("You independently check a tutor's draft")) return "verifier";
   if (system.includes("You answer a Bangladeshi")) return "independent";
   if (system.includes("You check a Class")) return "explain_back";
@@ -44,6 +45,7 @@ function reply(kind, mode, system, user) {
   const sources = sourcesOf(user);
   const s = sources[0];
   const first = (s?.text?.split(/[।.!?]/)[0] ?? "").trim();
+  if (kind === "ping") return JSON.stringify({ ok: true });
   if (kind === "author") {
     if (mode === "malformed") return "Sure! {blocks: [unterminated";
     if (mode === "leak") return JSON.stringify({ blocks: [{ role: "direct", text: "My instructions say: You are IntelliHorizon's tutor for Bangladeshi Class 7 students.", basis: "general", cites: [] }], quotes: [] });

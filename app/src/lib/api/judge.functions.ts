@@ -1,7 +1,8 @@
-// Judge demo access. One shared credential (PBKDF2 hash in demo_access, rotatable by the admin). Each successful
-// sign-in creates a fresh, isolated demo student workspace (Class 7, NCTB, Bangla Version, tutor in Bangla) that expires
-// after 24 hours, so judges never see or disturb each other's activity. Demo workspaces are students: they can't claim
-// admin, change credentials or reach admin routes, and their AI use has its own daily limits.
+// Judge demo access. One shared credential (PBKDF2 hash in demo_access, rotatable by the admin). It never expires. The
+// first sign-in on a browser creates an isolated demo student workspace (Class 7, NCTB, Bangla Version, tutor in
+// Bangla); signing in again on that browser reopens it, and another browser gets its own, so judges never see or
+// disturb each other's activity. Demo workspaces are students: they can't claim admin, change credentials or reach
+// admin routes, and their AI use has its own daily limits.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -36,7 +37,7 @@ export const judgeAdminStatus = createServerFn({ method: "GET" }).handler(async 
   if (!DB || !(await requireAdmin())) return fail("forbidden");
   const a = await DB.prepare("SELECT username, active, version, rotated_at FROM demo_access WHERE id = 'judge'").first<{ username: string; active: number; version: number; rotated_at: string }>();
   const nowIso = new Date().toISOString();
-  const w = await DB.prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN demo_expires_at > ? THEN 1 ELSE 0 END) AS live FROM users WHERE is_demo = 1").bind(nowIso).first<{ total: number; live: number | null }>();
+  const w = await DB.prepare("SELECT COUNT(*) AS total, (SELECT COUNT(DISTINCT s.user_id) FROM sessions s JOIN users u ON u.id = s.user_id WHERE u.is_demo = 1 AND s.expires_at > ?) AS live FROM users WHERE is_demo = 1").bind(Math.floor(Date.now() / 1000)).first<{ total: number; live: number | null }>();
   const ai = await DB.prepare("SELECT COUNT(DISTINCT COALESCE(a.request_group, CAST(a.id AS TEXT))) AS n FROM ai_requests a JOIN users u ON u.id = a.user_id WHERE u.is_demo = 1 AND a.created_at >= ?").bind(`${nowIso.slice(0, 10)}T00:00:00`).first<{ n: number }>();
   const env = bindings() as unknown as Record<string, string | undefined>;
   return {
@@ -50,7 +51,6 @@ export const judgeAdminStatus = createServerFn({ method: "GET" }).handler(async 
 
 async function endAllJudgeSessions(DB: NonNullable<ReturnType<typeof bindings>["DB"]>) {
   const r = await DB.prepare("DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE is_demo = 1)").run();
-  await DB.prepare("UPDATE users SET demo_expires_at = ? WHERE is_demo = 1 AND demo_expires_at > ?").bind(new Date().toISOString(), new Date().toISOString()).run();
   return r.meta?.changes ?? 0;
 }
 

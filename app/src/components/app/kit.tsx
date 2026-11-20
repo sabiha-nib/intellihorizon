@@ -45,11 +45,11 @@ export function EmptyState({
   return (
     <div className={`${card} flex flex-col items-start gap-3 p-6`}>
       <svg width="40" height="40" viewBox="-20 -20 40 40" aria-hidden="true">
-        <circle r="17" fill="none" stroke="#6C6886" strokeDasharray="3 3" />
+        <circle r="17" fill="none" stroke="#5A6670" strokeDasharray="3 3" />
         <path
           d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z"
           fill="none"
-          stroke="#6C6886"
+          stroke="#5A6670"
           strokeWidth="1.4"
         />
       </svg>

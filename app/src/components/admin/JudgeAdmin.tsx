@@ -16,12 +16,12 @@ export function JudgeAdmin() {
   return (
     <div className="space-y-4" data-testid="judge-admin">
       <h2 className="font-display text-xl font-bold">Judge demo access</h2>
-      <p className="max-w-prose text-sm text-ink-mid">Judges sign in at /judge (or on the normal sign-in page). Each sign-in opens a fresh, isolated Class 7 Bangla Version student workspace that ends after 24 hours. Demo workspaces are students: they can't open admin pages or change credentials. Only the password's hash is stored.</p>
+      <p className="max-w-prose text-sm text-ink-mid">Judges sign in at /judge (or on the normal sign-in page). The credential never expires. The first sign-in on a browser opens an isolated Class 7 Bangla Version student workspace; signing in again on that browser reopens it, and another browser gets its own. Workspaces are never deleted. Demo workspaces are students: they can't open admin pages or change credentials. Only the password's hash is stored. To revoke access, rotate the password, end judge sessions or turn judge access off.</p>
       {s.access ? (
         <dl className="grid gap-2 text-sm sm:grid-cols-2">
           <div><dt className="font-semibold">Username</dt><dd>{s.access.username}</dd></div>
           <div><dt className="font-semibold">Status</dt><dd>{s.access.active ? "On" : "Off"} · password version {s.access.version}, set {new Date(s.access.rotatedAt).toLocaleString()}</dd></div>
-          <div><dt className="font-semibold">Workspaces</dt><dd>{s.workspaces.live} active · {s.workspaces.total} opened in total</dd></div>
+          <div><dt className="font-semibold">Workspaces</dt><dd>{s.workspaces.live} signed in now · {s.workspaces.total} workspaces in total</dd></div>
           <div><dt className="font-semibold">AI requests by judges today</dt><dd>{s.aiToday} · limits {s.limits.perWorkspace} per workspace, {s.limits.allJudges} for all judges (JUDGE_AI_DAILY_LIMIT, JUDGE_AI_TOTAL_DAILY)</dd></div>
         </dl>
       ) : <p>Not provisioned.</p>}

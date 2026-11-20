@@ -39,7 +39,7 @@ function JudgeAccess() {
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>{tx("A private student workspace: Class 7 · NCTB Bangladesh · Bangla Version.", "একটি ব্যক্তিগত শিক্ষার্থী ওয়ার্কস্পেস: ৭ম শ্রেণি · এনসিটিবি বাংলাদেশ · বাংলা ভার্সন।")}</li>
           <li>{tx("The tutor answers in Bangla; you can switch it to English or mixed at any time.", "টিউটর বাংলায় উত্তর দেয়; যেকোনো সময় ইংরেজি বা মিশ্র ভাষায় বদলাতে পারেন।")}</li>
-          <li>{tx("Every sign-in starts fresh and is visible only to you. It ends after 24 hours.", "প্রতিবার সাইন ইন নতুন করে শুরু হয় এবং শুধু আপনিই দেখতে পান। ২৪ ঘণ্টা পর শেষ হয়।")}</li>
+          <li>{tx("Your workspace is private to you and doesn't expire. Sign in again on this browser any time to continue; another browser or device opens its own workspace.", "আপনার ওয়ার্কস্পেস শুধু আপনার এবং এর মেয়াদ শেষ হয় না। যেকোনো সময় এই ব্রাউজারে আবার সাইন ইন করে চালিয়ে যান; অন্য ব্রাউজার বা ডিভাইসে আলাদা ওয়ার্কস্পেস খোলে।")}</li>
         </ul>
       </div>
       <form onSubmit={submit} noValidate className="space-y-6">

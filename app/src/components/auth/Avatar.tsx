@@ -5,16 +5,16 @@ import type { AvatarRef } from "../../lib/auth/types";
 import { useLearner } from "../../lib/store";
 import { msg } from "./messages";
 
-const PRESET_BG: Record<string, string> = { comet: "#E2A93B", ringed: "#E8644A", moon: "#7FA7EA", star: "#1D1B2C", galaxy: "#E57AA0", leaf: "#8DBF5A", atom: "#4FB5A5", kite: "#C98B62" };
+const PRESET_BG: Record<string, string> = { comet: "#E2A93B", ringed: "#E8644A", moon: "#7FA7EA", star: "#191D23", galaxy: "#E57AA0", leaf: "#8DBF5A", atom: "#4FB5A5", kite: "#C98B62" };
 
 export function PresetArt({ id, size }: { id: string; size: number }) {
-  const ink = "#1D1B2C";
-  const cloth = "#1D1B2C";
+  const ink = "#191D23";
+  const cloth = "#191D23";
   const glyph: Record<string, ReactNode> = {
     comet: <><circle cx="38" cy="26" r="7" fill={cloth} /><path d="M33 31 L16 46 M30 27 L14 38 M35 34 L24 48" stroke={cloth} strokeWidth="3" strokeLinecap="round" opacity=".7" /></>,
     ringed: <><circle cx="32" cy="32" r="11" fill={cloth} /><ellipse cx="32" cy="32" rx="21" ry="6" fill="none" stroke={ink} strokeWidth="3" transform="rotate(-20 32 32)" /></>,
     moon: <path d="M38 16a17 17 0 1 0 8 30A14 14 0 0 1 38 16z" fill={cloth} />,
-    star: <path d="M32 12 L37 27 L52 32 L37 37 L32 52 L27 37 L12 32 L27 27 Z" fill="#5B3FD6" />,
+    star: <path d="M32 12 L37 27 L52 32 L37 37 L32 52 L27 37 L12 32 L27 27 Z" fill="#57707A" />,
     galaxy: <><path d="M32 32m-3 0a3 3 0 1 0 6 0a9 9 0 1 0-18 0a15 15 0 1 0 30 0" fill="none" stroke={cloth} strokeWidth="3.2" strokeLinecap="round" /></>,
     leaf: <><path d="M18 46C18 26 32 16 48 16c0 18-12 30-30 30z" fill={cloth} /><path d="M20 44 L40 24" stroke="#8DBF5A" strokeWidth="2.5" /></>,
     atom: <><circle cx="32" cy="32" r="4" fill={cloth} />{[0, 60, 120].map((r) => <ellipse key={r} cx="32" cy="32" rx="19" ry="7" fill="none" stroke={cloth} strokeWidth="2.4" transform={`rotate(${r} 32 32)`} />)}</>,
@@ -22,7 +22,7 @@ export function PresetArt({ id, size }: { id: string; size: number }) {
   };
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <circle cx="32" cy="32" r="32" fill={PRESET_BG[id] ?? "#EBE5FB"} />
+      <circle cx="32" cy="32" r="32" fill={PRESET_BG[id] ?? "#E2E8EA"} />
       {glyph[id] ?? glyph.star}
     </svg>
   );
@@ -130,7 +130,7 @@ function Cropper({ bitmap, onCancel, onDone }: { bitmap: ImageBitmap; onCancel: 
         </div>
         <label className="mt-5 flex items-center gap-3 text-sm font-semibold text-ink-mid">
           {tx("Zoom", "জুম")}
-          <input type="range" min={1} max={3} step={0.01} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} className="flex-1 accent-[#1D1B2C]" />
+          <input type="range" min={1} max={3} step={0.01} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} className="flex-1 accent-[#191D23]" />
         </label>
         <div className="mt-6 grid grid-cols-2 gap-3">
           <button type="button" onClick={onCancel} className="h-12 rounded-[14px] border border-ink-low/35 font-semibold hover:border-ink">{tx("Cancel", "বাতিল")}</button>

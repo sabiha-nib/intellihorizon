@@ -7,9 +7,8 @@ import { useLearner } from "../../lib/store";
  * Shown only in an isolated judge-demo workspace: what this account is, its curriculum, and a short guided journey
  * through the real product. Every step opens a real screen; nothing here is a recording or a mock-up.
  */
-export function JudgeWelcome({ expiresAt }: { expiresAt: string }) {
+export function JudgeWelcome() {
   const { tx, lang } = useLearner();
-  const until = expiresAt ? new Date(expiresAt).toLocaleString(lang === "bn" ? "bn-BD" : "en-GB", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short", timeZone: "Asia/Dhaka" }) : "";
   const steps: { to: string; search?: Record<string, string>; title: string; body: string }[] = [
     { to: "/tutor", search: { subject: "mathematics", q: "ধারাবাহিক অনুপাত কাকে বলে?" }, title: tx("Ask IntelliTutor in Bangla", "বাংলায় ইন্টেলিটিউটরকে জিজ্ঞেস করুন"), body: tx("The question is pre-filled. The answer quotes your checked Class 7 Mathematics text and labels every part.", "প্রশ্নটি আগে থেকে লেখা আছে। উত্তর ৭ম শ্রেণির যাচাই করা গণিতের লেখা থেকে উদ্ধৃতি দেয় এবং প্রতিটি অংশে লেবেল থাকে।") },
     { to: "/tutor", search: { subject: "mathematics", q: "Explain continued ratio in English" }, title: tx("Switch to English", "ইংরেজিতে বদলান"), body: tx("Same Bangla textbook, explained in English. The app shows how it searched, and never presents a translation as a quotation.", "একই বাংলা পাঠ্যবই, ব্যাখ্যা ইংরেজিতে। অ্যাপ দেখায় কীভাবে খুঁজেছে, আর অনুবাদকে কখনো উদ্ধৃতি হিসেবে দেখায় না।") },
@@ -28,7 +27,7 @@ export function JudgeWelcome({ expiresAt }: { expiresAt: string }) {
         ))}
       </p>
       <p className="mt-3 max-w-prose text-[15px] text-ink-mid">
-        {tx(`This private workspace started empty, so everything you see comes from what you do here. Other judges can't see it, and it ends ${until} (Dhaka time). Content today: Class 7, Bangla Version, starting with checked Mathematics passages; other classes and versions are shown honestly as coming soon.`, `এই ব্যক্তিগত ওয়ার্কস্পেস শূন্য থেকে শুরু হয়েছে, তাই এখানে যা দেখবেন সব আপনার কাজ থেকে। অন্য বিচারকেরা এটি দেখতে পান না, এবং এটি শেষ হবে ${until} (ঢাকা সময়)। আজকের বিষয়বস্তু: ৭ম শ্রেণি, বাংলা ভার্সন, শুরুতে গণিতের যাচাই করা পাঠ্যাংশ; অন্য শ্রেণি ও ভার্সন সঠিকভাবে "শীঘ্রই আসছে" দেখানো আছে।`)}
+        {tx("This private workspace started empty, so everything you see comes from what you do here. Other judges can't see it. It doesn't expire: sign in again on this browser with the same username and password to continue where you left off. Content today: Class 7, Bangla Version, starting with checked Mathematics passages; other classes and versions are shown honestly as coming soon.", "এই ব্যক্তিগত ওয়ার্কস্পেস শূন্য থেকে শুরু, তাই এখানে যা দেখবেন সবই আপনার নিজের কাজ থেকে। অন্য বিচারকেরা এটি দেখতে পান না। এর মেয়াদ শেষ হয় না: এই ব্রাউজারে একই ইউজারনেম ও পাসওয়ার্ড দিয়ে আবার সাইন ইন করলে যেখানে থেমেছিলেন সেখান থেকে চলবে। আজকের বিষয়বস্তু: ৭ম শ্রেণি, বাংলা ভার্সন, যাচাই করা গণিতের অংশ দিয়ে শুরু; অন্য শ্রেণি ও ভার্সন সৎভাবে 'শীঘ্রই আসছে' হিসেবে দেখানো হয়।")}
       </p>
       <Link to="/tutor" search={{ subject: "mathematics" }} className="mt-5 inline-flex items-center gap-2 rounded-[14px] bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-deep">
         <Icon name="tutor" size={20} /> {tx("Open IntelliTutor", "ইন্টেলিটিউটর খুলুন")}

@@ -115,11 +115,24 @@ for (let i = 0; i < 5; i++) {
 const last = JSON.parse(sql(`SELECT m.payload FROM tutor_messages m JOIN tutor_threads t ON t.id = m.thread_id WHERE t.user_id = '${u2.id}' AND m.role = 'tutor' ORDER BY m.id DESC LIMIT 1`)[0].payload);
 check("judge AI use is limited per workspace (5th request refused, textbook still shown)", last.ai?.status === "limit" && (last.excerpts ?? []).length > 0, last.ai?.status);
 
-// Expiry: the workspace ends at its fixed time.
-sql(`UPDATE users SET demo_expires_at = '2020-01-01T00:00:00Z' WHERE id = '${u1.id}'`);
+// Permanence (Phase 6): no expiry date, sessions renew while in use, and signing in again on the same browser
+// returns to the same workspace with its history.
+check("judge workspaces have no expiry date", sql("SELECT COUNT(*) AS n FROM users WHERE is_demo = 1 AND demo_expires_at IS NOT NULL")[0].n === 0);
+check("only a hash of the browser's resume token is stored", sql(`SELECT demo_resume_hash AS h FROM users WHERE id = '${u1.id}'`)[0].h?.length === 64 && !(await J1.cookies()).some((c) => c.name === "ih_judge_ws" && c.value === sql(`SELECT demo_resume_hash AS h FROM users WHERE id = '${u1.id}'`)[0].h));
+sql(`UPDATE sessions SET expires_at = CAST(strftime('%s','now') AS INTEGER) + 86400 WHERE user_id = '${u2.id}'`);
+await p2.goto(`${BASE}/dashboard`);
+await p2.waitForLoadState("networkidle");
+check("a judge session in use renews instead of running out", sql(`SELECT MAX(expires_at) - CAST(strftime('%s','now') AS INTEGER) AS left FROM sessions WHERE user_id = '${u2.id}'`)[0].left > 20 * 86400);
+// The browser session ends (or months pass): the judge signs in again with the same credentials.
+sql(`DELETE FROM sessions WHERE user_id = '${u1.id}'`);
 await p.goto(`${BASE}/dashboard`);
 await p.waitForURL(/\/signin/, { timeout: 15000 }).catch(() => undefined);
-check("an expired judge workspace is signed out", /\/signin/.test(p.url()), p.url());
+await p.close();
+const pAgain = await judgeLogin(J1);
+await pAgain.waitForURL(/\/dashboard/, { timeout: 20000 }).catch(() => undefined);
+const back = sql("SELECT s.user_id FROM sessions s JOIN users u ON u.id = s.user_id WHERE u.is_demo = 1 ORDER BY s.created_at DESC LIMIT 1")[0];
+check("signing in again later with the same credentials works", /\/dashboard/.test(pAgain.url()), pAgain.url());
+check("the same browser returns to the same workspace, history kept", back.user_id === u1.id && sql(`SELECT COUNT(*) AS n FROM tutor_threads WHERE user_id = '${u1.id}'`)[0].n > 0 && sql("SELECT COUNT(*) AS n FROM users WHERE is_demo = 1")[0].n === 2, JSON.stringify(back));
 
 // Wrong password and rotation by the admin.
 const J3 = await browser.newContext();

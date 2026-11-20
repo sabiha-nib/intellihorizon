@@ -261,7 +261,7 @@ export function CurriculumPicker({ value, other, otherText, onChange, errors }: 
             role="radio"
             aria-checked={value === c.id}
             onClick={() => onChange({ curriculum: c.id })}
-            className={`flex items-center gap-3 rounded-[14px] border px-4 py-3 text-left transition-colors ${value === c.id ? "border-ink bg-sheet shadow-[0_0_0_1px_#1D1B2C]" : "border-ink-low/35 bg-sheet hover:border-ink-low/70"}`}
+            className={`flex items-center gap-3 rounded-[14px] border px-4 py-3 text-left transition-colors ${value === c.id ? "border-ink bg-sheet shadow-[0_0_0_1px_#191D23]" : "border-ink-low/35 bg-sheet hover:border-ink-low/70"}`}
           >
             <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${value === c.id ? "border-ink" : "border-ink-low/50"}`} aria-hidden="true">
               {value === c.id && <span className="h-2.5 w-2.5 rounded-full bg-brand" />}

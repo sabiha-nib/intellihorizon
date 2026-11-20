@@ -25,15 +25,15 @@ export const GLOW_HINT: Record<Glow, L> = {
 };
 
 /** Star glyph used everywhere a concept appears. Brightness carries meaning. */
-export function StarGlyph({ glow, r = 9, thread = "#5B3FD6", ignite = false }: { glow: Glow; r?: number; thread?: string; ignite?: boolean }) {
+export function StarGlyph({ glow, r = 9, thread = "#57707A", ignite = false }: { glow: Glow; r?: number; thread?: string; ignite?: boolean }) {
   const lit = glow === "holding" || glow === "shapeshifter" || glow === "durable";
-  const fill = glow === "unexplored" ? "transparent" : glow === "glimpsed" ? "#8E95B8" : "#5B3FD6";
+  const fill = glow === "unexplored" ? "transparent" : glow === "glimpsed" ? "#8E95B8" : "#57707A";
   const op = glow === "glimpsed" ? 0.75 : glow === "fragile" ? 0.7 : 1;
   const d = `M0 ${-r} L${r * 0.28} ${-r * 0.28} L${r} 0 L${r * 0.28} ${r * 0.28} L0 ${r} L${-r * 0.28} ${r * 0.28} L${-r} 0 L${-r * 0.28} ${-r * 0.28} Z`;
   return (
     <g>
-      {(glow === "shapeshifter" || glow === "durable") && <circle r={r * 1.9} fill="#5B3FD6" opacity={0.16} />}
-      {glow === "durable" && <circle r={r * 1.55} fill="none" stroke="#5B3FD6" strokeWidth={1.4} strokeDasharray="3 3" />}
+      {(glow === "shapeshifter" || glow === "durable") && <circle r={r * 1.9} fill="#57707A" opacity={0.16} />}
+      {glow === "durable" && <circle r={r * 1.55} fill="none" stroke="#57707A" strokeWidth={1.4} strokeDasharray="3 3" />}
       {lit && <circle r={r * 1.25} fill="none" stroke={thread} strokeWidth={1.2} opacity={0.9} />}
       <path
         d={d}
@@ -50,8 +50,10 @@ export function StarGlyph({ glow, r = 9, thread = "#5B3FD6", ignite = false }: {
 export function Monogram({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="-16 -16 32 32" aria-hidden="true">
-      <circle r="14" fill="none" stroke="#5B3FD6" strokeWidth="1.6" strokeDasharray="3.2 2.6" />
-      <path d="M0 -9 L2.4 -2.4 L9 0 L2.4 2.4 L0 9 L-2.4 2.4 L-9 0 L-2.4 -2.4 Z" fill="#5B3FD6" />
+      {/* Same mark as the app bar: the surrounding text colour, with the rose dot. */}
+      <circle r="14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeDasharray="3.2 2.6" />
+      <path d="M0 -9 L2.4 -2.4 L9 0 L2.4 2.4 L0 9 L-2.4 2.4 L-9 0 L-2.4 -2.4 Z" fill="currentColor" />
+      <circle cx="9.9" cy="-9.9" r="2.2" fill="#F9A8D4" />
     </svg>
   );
 }

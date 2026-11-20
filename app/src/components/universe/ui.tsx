@@ -16,7 +16,7 @@ const TONE: Record<Tone, string> = {
 
 const BTN = {
   primary:
-    "bg-brand text-white hover:bg-brand-deep shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_10px_24px_-14px_rgba(67,41,178,0.9)]",
+    "bg-brand text-white hover:bg-brand-deep shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_10px_24px_-14px_rgba(63,83,91,0.9)]",
   secondary: "border border-line-strong bg-sheet text-ink hover:border-brand hover:text-brand-deep",
   quiet: "text-brand-deep hover:bg-brand-soft",
 } as const;
@@ -196,13 +196,13 @@ export function LevelRing({
     c = 2 * Math.PI * r;
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" role="img" aria-label={label}>
-      <circle cx="32" cy="32" r={r} fill="none" stroke="#EBE5FB" strokeWidth="6" />
+      <circle cx="32" cy="32" r={r} fill="none" stroke="#E2E8EA" strokeWidth="6" />
       <circle
         cx="32"
         cy="32"
         r={r}
         fill="none"
-        stroke="#5B3FD6"
+        stroke="#57707A"
         strokeWidth="6"
         strokeLinecap="round"
         strokeDasharray={c}
@@ -217,7 +217,7 @@ export function LevelRing({
         fontFamily="Bricolage Grotesque, system-ui"
         fontWeight="800"
         fontSize="20"
-        fill="#1D1B2C"
+        fill="#191D23"
       >
         {level}
       </text>

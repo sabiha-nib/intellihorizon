@@ -33,7 +33,7 @@ function Roti({ f, cuts, label }: { f: Frac; cuts: number; label: string }) {
       ))}
       {cuts > 1 && Array.from({ length: cuts }, (_, k) => {
         const [x, y] = pt(k, cuts);
-        return <line key={`c${k}`} x1={0} y1={0} x2={x} y2={y} stroke="#1D1B2C" strokeWidth={cuts > f.d ? 0.8 : 1.6} strokeDasharray={cuts > f.d ? "3 2" : undefined} />;
+        return <line key={`c${k}`} x1={0} y1={0} x2={x} y2={y} stroke="#191D23" strokeWidth={cuts > f.d ? 0.8 : 1.6} strokeDasharray={cuts > f.d ? "3 2" : undefined} />;
       })}
     </svg>
   );
